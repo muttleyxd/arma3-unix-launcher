@@ -27,3 +27,11 @@
 *.exe
 *.out
 *.app
+
+#Executable
+arma3_linux_launcher
+
+#Eclipse project files
+.settings/*
+.cproject
+.project
