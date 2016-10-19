@@ -32,8 +32,16 @@ int main(int argc, char *argv[])
 			<< "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
 
 	Filesystem fs;
-	cout << fs.GetDirectory(DirectoryToFind::ArmaInstall) << endl << fs.GetDirectory(DirectoryToFind::WorkshopMods) << endl;
-	/*int status = mkdir((fs.HomeDirectory + fs.LauncherSettingsDirectory).c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
+
+	string armaInstall = fs.GetDirectory(DirectoryToFind::ArmaInstall);
+	string workshopMods = fs.GetDirectory(DirectoryToFind::WorkshopMods);
+
+	cout << armaInstall << endl << workshopMods << endl;
+
+	vector<Mod> modList = fs.FindMods(workshopMods);
+	for (Mod m: modList)
+		cout << "Mod: " << m.Path << endl;
+		/*int status = mkdir((fs.HomeDirectory + fs.LauncherSettingsDirectory).c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
 	cout << "Creating directory " << fs.HomeDirectory + fs.LauncherSettingsDirectory << " result: " << status << endl;
 	cout << "Checking if config file " << fs.HomeDirectory + fs.LauncherSettingsDirectory + fs.LauncherSettingsFilename << " exists... ";
 	if (!fs.FileExists(fs.HomeDirectory + fs.LauncherSettingsDirectory + fs.LauncherSettingsFilename))

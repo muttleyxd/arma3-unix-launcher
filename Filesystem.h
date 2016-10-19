@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include "Mod.h"
 
 enum DirectoryToFind
 {
@@ -37,9 +38,12 @@ class Filesystem
 		std::string GetDirectory(DirectoryToFind dtf);
 
 		bool FileExists(std::string path);
+		bool DirectoryExists(std::string path);
 
 		void WriteAllText(std::string path, std::string value);
 		std::string ReadAllText(std::string path);
+
+		std::vector<Mod> FindMods(std::string path);
 };
 
 #endif /* FILESYSTEM_H_ */

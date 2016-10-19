@@ -15,6 +15,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
+#include <cstring>
+
 #include "VDF.h"
 
 using namespace std;
@@ -98,6 +100,25 @@ bool Filesystem::FileExists(string path)
 	return (stat(path.c_str(), &buffer) == 0);
 }
 
+bool Filesystem::DirectoryExists(string path)
+{
+	struct stat buffer;
+	int errorCode = stat(path.c_str(), &buffer);
+	if (errorCode == -1)
+	{
+		if (errno == ENOENT)
+			return false;
+		cout << "Stat Error in DirectoryExists(" << path <<");\n";
+		return false;
+	}
+	else
+	{
+		if (S_ISDIR(buffer.st_mode))
+			return true;
+		return false;
+	}
+}
+
 
 void Filesystem::WriteAllText(string path, string value)
 {
@@ -115,5 +136,48 @@ string Filesystem::ReadAllText(string path)
 	inFile.open(path, ios::in);
 	getline(inFile, response, '\0');
 	inFile.close();
+	return response;
+}
+
+vector<Mod> Filesystem::FindMods(string path)
+{
+	vector<Mod> response;
+
+	int directoryCount = 0;
+	struct dirent* directoryEntry;
+	cout << "Opening directory " << path << "...";
+	DIR* workshopDir = opendir(path.c_str());
+
+	if (workshopDir == NULL)
+	{
+		cout << " failed!\n";
+		return response;
+	}
+	cout << " success\n";
+
+	while ((directoryEntry = readdir(workshopDir)) != NULL)
+	{
+		struct stat st;
+
+		if ((strcmp(directoryEntry->d_name, ".") == 0) || (strcmp(directoryEntry->d_name, "..") == 0))
+			continue;
+
+		if (fstatat(dirfd(workshopDir), directoryEntry->d_name, &st, 0) < 0)
+		{
+			cout << "Directory error " << directoryEntry->d_name << "\n";
+			continue;
+		}
+
+		if (S_ISDIR(st.st_mode))
+		{
+			if (DirectoryExists(path + "/" + directoryEntry->d_name + "/Addons") || DirectoryExists(path + "/" + directoryEntry->d_name + "/addons"))
+			{
+				response.push_back(path + "/" + directoryEntry->d_name);
+				directoryCount++;
+			}
+		}
+	}
+	cout << "Found " << directoryCount << " directories in mod folder\n";
+	closedir(workshopDir);
 	return response;
 }
