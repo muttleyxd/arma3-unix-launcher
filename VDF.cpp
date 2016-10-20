@@ -8,60 +8,22 @@
 #include "VDF.h"
 
 #include <sstream>
-#include <cctype>
-#include <algorithm>
 #include <iostream>
-#include <cstring>
+
+#include "Utils.h"
 
 using namespace std;
 
-inline string trim(const string &s)
-{
-   auto wsfront=find_if_not(s.begin(),s.end(),[](int c){return isspace(c);});
-   auto wsback=find_if_not(s.rbegin(),s.rend(),[](int c){return isspace(c);}).base();
-   return (wsback<=wsfront ? string() : string(wsfront,wsback));
-}
-
-vector<string> split(string s, string delimiters)
-{
-	vector<string> response;
-	char* charPointer = strtok((char*)s.c_str(), delimiters.c_str());
-	while (charPointer != NULL)
-	{
-		string toAdd = charPointer;
-		toAdd=trim(toAdd);
-		if (toAdd.length() > 0)
-			response.push_back(toAdd);
-		charPointer = strtok(NULL, delimiters.c_str());
-	}
-	return response;
-}
-
-string removeLastElement(string s, bool removeSlash)
-{
-	if (s.length() == 0)
-		return "";
-	reverse(s.begin(), s.end());
-
-	size_t slashPos = s.find("/");
-
-	if (removeSlash)
-		slashPos++;
-
-	s = s.substr(slashPos);
-	reverse(s.begin(), s.end());
-
-	return s;
-}
-
 VDF::VDF(string text)
 {
+	Utils utils;
 	istringstream iss(text);
 	string currentPath = "";
 	int counter = 0;
+	cout << "VDF constructor\n";
 	for (string line; getline(iss, line); counter++)
 	{
-		vector<string> splits = split(line, "\"");
+		vector<string> splits = utils.Split(utils.Trim(line), "\"");
 		if (splits.size() == 0)
 			continue;
 		string newPath;
@@ -71,10 +33,10 @@ VDF::VDF(string text)
 				currentPath += '/';
 				break;
 			case '}':
-				currentPath = removeLastElement(currentPath, true);
+				currentPath = utils.RemoveLastElement(currentPath, true);
 				break;
 			default:
-				currentPath = removeLastElement(currentPath, false) + splits[0];
+				currentPath = utils.RemoveLastElement(currentPath, false) + splits[0];
 				if (splits.size() > 1)
 					Keys.push_back(VDFKey(currentPath, splits[1]));
 				else
@@ -82,13 +44,8 @@ VDF::VDF(string text)
 				break;
 		}
 	}
-	/*for (VDFKey v: Keys)
-	{
-			cout << "Key: " << v.Path;
-			if (v.Value != "")
-				cout << " Value: " << v.Value;
-			cout << endl;
-	}*/
+	/*for (VDFKey f: Keys)
+		cout << "Key: " << f.Path << (f.Value != "" ? " Value: " : "") << (f.Value != "" ? f.Value : "") << endl;*/
 }
 
 string VDF::GetValue(string KeyName)

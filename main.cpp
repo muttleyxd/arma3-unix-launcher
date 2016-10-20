@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <regex>
 
 #include <sys/types.h>
 #include <dirent.h>
@@ -21,6 +22,7 @@
 #include "VDF.h"
 #include "Filesystem.h"
 #include "Settings.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -31,17 +33,28 @@ int main(int argc, char *argv[])
 	cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl
 			<< "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
 
+	/*Utils us;
+	cout << us.Trim("\t\t          \t\t    \t\t          Salam alejkum\n");*/
+
+
 	Filesystem fs;
 
 	string armaInstall = fs.GetDirectory(DirectoryToFind::ArmaInstall);
 	string workshopMods = fs.GetDirectory(DirectoryToFind::WorkshopMods);
 
-	cout << armaInstall << endl << workshopMods << endl;
+	cout << "ArmA 3 install directory: " << armaInstall << "\nWorkshop directory: " << workshopMods << endl;
 
+	vector<string> ModDirs = fs.GetSubDirectories(armaInstall + "/!workshop");
+	for (string s: ModDirs)
+		cout << s << endl;
+	//Mod m("/mnt/nagrania/SteamLibraryLinux/steamapps/workshop/content/107410/743968516");
+	//cout << m.ToString();
 	vector<Mod> modList = fs.FindMods(workshopMods);
-	for (Mod m: modList)
-		cout << "Mod: " << m.Path << endl;
-		/*int status = mkdir((fs.HomeDirectory + fs.LauncherSettingsDirectory).c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
+	/*for (Mod m: modList)
+		cout << "Mod: " << m.PublishedId << endl;*/
+
+	fs.CheckFileStructure(armaInstall, workshopMods, modList);
+	/*int status = mkdir((fs.HomeDirectory + fs.LauncherSettingsDirectory).c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
 	cout << "Creating directory " << fs.HomeDirectory + fs.LauncherSettingsDirectory << " result: " << status << endl;
 	cout << "Checking if config file " << fs.HomeDirectory + fs.LauncherSettingsDirectory + fs.LauncherSettingsFilename << " exists... ";
 	if (!fs.FileExists(fs.HomeDirectory + fs.LauncherSettingsDirectory + fs.LauncherSettingsFilename))

@@ -44,6 +44,12 @@ class Filesystem
 		std::string ReadAllText(std::string path);
 
 		std::vector<Mod> FindMods(std::string path);
+
+		void CheckFileStructure(std::string armaDir, std::string workshopDir, std::vector<Mod> modList);
+
+		std::vector<std::string> GetSubDirectories(std::string path);
+
+		bool CreateDirectory(std::string path);
 };
 
 #endif /* FILESYSTEM_H_ */

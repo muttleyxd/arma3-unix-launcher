@@ -7,12 +7,13 @@ ArmA 3 Launcher for Linux.
 * VDF parsing
 * Reading existing Steam libraries
 * Getting location of existing ArmA 3 intsallation
+* Mod detection of workshop mods (parsing mod.cpp/meta.cpp)
+* Symlinking mods to ArmA directory
 
 ### TODO
 
 * GUI (GTK+?)
-* Mod detection (parsing of mod.cpp/meta.cpp)
-* Symlinking workshop mods to ArmA directory
+* Mod detection for mods outside workshop
 * Steam integration (don't know if possible)
 * Launching ArmA with desired options
 * .paa reading - for displaying mod images in launcher
