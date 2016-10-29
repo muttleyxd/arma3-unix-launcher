@@ -35,3 +35,4 @@ arma3_linux_launcher
 .settings/*
 .cproject
 .project
+/MainForm.glade~

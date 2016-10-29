@@ -13,9 +13,13 @@
 
 #include "Utils.h"
 #include "Filesystem.h"
+#include "Logger.h"
 
 using namespace std;
 
+// workshopId = 0 -> mod is not from workshop
+// workshopId > 1 -> mod from workshop, workshop
+// workshopId = -1 -> mod from Unix mod pack
 Mod::Mod(string path, string workshopId)
 {
 	Path = path;
@@ -27,13 +31,20 @@ Mod::Mod(string path, string workshopId)
 
 	WorkshopId = strtoll(workshopId.c_str(), NULL, 10);
 
-	Filesystem fs;
 	string metaPath = path + "/meta.cpp", modPath = path + "/mod.cpp";
-	if (!fs.FileExists(metaPath))
+	if (!Filesystem::FileExists(metaPath))
 		metaPath = "";
-	if (!fs.FileExists(modPath))
+	if (!Filesystem::FileExists(modPath))
 		modPath = "";
 	ParseCPP(metaPath, modPath);
+
+	//Mod is added manually by user and din't contain any data in meta.cpp or mod.cpp
+	//quick & dirty -> Name = DirectoryName
+	if (Name == "")
+	{
+		int withoutLastElement = Utils::RemoveLastElement(path, false).size();
+		Name = path.substr(withoutLastElement);
+	}
 }
 
 Mod::~Mod()
@@ -56,49 +67,46 @@ string Mod::ParseString(string input)
 //As anyone would expect - documentation on this is trash
 void Mod::ParseCPP(string meta, string mod)
 {
-	Filesystem fs;
-	Utils us;
-
 	if (mod != "")
 	{
-		string file = ParseString(fs.ReadAllText(mod));
-		vector<string> instructions = us.Split(file, ";");
+		string file = ParseString(Filesystem::ReadAllText(mod));
+		vector<string> instructions = Utils::Split(file, ";");
 		for (string s: instructions)
 		{
-			if (us.StartsWith(s, "name"))
+			if (Utils::StartsWith(s, "name"))
 				this->Name = s.substr(6, s.size() - 7);
-			else if (us.StartsWith(s, "picture"))
+			else if (Utils::StartsWith(s, "picture"))
 				this->Picture = s.substr(9, s.size() - 10);
-			else if (us.StartsWith(s, "logoSmall"))
+			else if (Utils::StartsWith(s, "logoSmall"))
 				this->LogoSmall = s.substr(11, s.size() - 12);
-			else if (us.StartsWith(s, "logo"))
+			else if (Utils::StartsWith(s, "logo"))
 				this->Logo = s.substr(6, s.size() - 7);
-			else if (us.StartsWith(s, "logoOver"))
+			else if (Utils::StartsWith(s, "logoOver"))
 				this->LogoOver = s.substr(10, s.size() - 11);
-			else if (us.StartsWith(s, "action"))
+			else if (Utils::StartsWith(s, "action"))
 				this->Action = s.substr(8, s.size() - 9);
-			else if (us.StartsWith(s, "actionName"))
+			else if (Utils::StartsWith(s, "actionName"))
 				this->ActionName = s.substr(12, s.size() - 13);
-			else if (us.StartsWith(s, "tooltipOwned"))
+			else if (Utils::StartsWith(s, "tooltipOwned"))
 				this->TooltipOwned = s.substr(14, s.size() - 15);
-			else if (us.StartsWith(s, "overview"))
+			else if (Utils::StartsWith(s, "overview"))
 				this->Overview = s.substr(10, s.size() - 11);
-			else if (us.StartsWith(s, "description"))
+			else if (Utils::StartsWith(s, "description"))
 				this->Description = s.substr(13, s.size() - 14);
-			else if (us.StartsWith(s, "overviewPicture"))
+			else if (Utils::StartsWith(s, "overviewPicture"))
 				this->OverviewPicture = s.substr(17, s.size() - 18);
-			else if (us.StartsWith(s, "overviewText"))
+			else if (Utils::StartsWith(s, "overviewText"))
 				this->OverviewText = s.substr(14, s.size() - 15);
-			else if (us.StartsWith(s, "author"))
+			else if (Utils::StartsWith(s, "author"))
 				this->Author = s.substr(8, s.size() - 9);
-			else if (us.StartsWith(s, "dlcColor"))
+			else if (Utils::StartsWith(s, "dlcColor"))
 			{
 				//dlcColor[]={1.2,5.8,3.23,6.44}
 				string dlcColor = s.substr(12, dlcColor.size() - 13);
 				//1.2,5.8,3.23,6.44
-				vector<string> splits = us.Split(dlcColor,",");
+				vector<string> splits = Utils::Split(dlcColor,",");
 				if (splits.size() != 4)
-					cout << "Could not read dlcColor from mod.cpp\n";
+					LOG(1, "Could not read dlcColor from mod.cpp");
 				else
 				{
 					DlcColor.r = atof(splits[0].c_str());
@@ -112,7 +120,7 @@ void Mod::ParseCPP(string meta, string mod)
 			 * some write hideName=0 or hideName=1
 			 * but also I've seen hideName="false"
 			 * */
-			else if (us.StartsWith(s, "hideName"))
+			else if (Utils::StartsWith(s, "hideName"))
 			{
 				string value = s.substr(10, s.size() - 11);
 				for (char c: value)
@@ -129,7 +137,7 @@ void Mod::ParseCPP(string meta, string mod)
 					}
 				}
 			}
-			else if (us.StartsWith(s, "hidePicture"))
+			else if (Utils::StartsWith(s, "hidePicture"))
 			{
 				string value = s.substr(13, s.size() - 14);
 				for (char c: value)
@@ -150,15 +158,15 @@ void Mod::ParseCPP(string meta, string mod)
 	}
 	if (meta != "")
 	{
-		string file = ParseString(fs.ReadAllText(meta));
+		string file = ParseString(Filesystem::ReadAllText(meta));
 		//cout << "Meta.cpp: "<< file << endl;
-		vector<string> instructions = us.Split(file, ";");
+		vector<string> instructions = Utils::Split(file, ";");
 		for (string s: instructions)
 		{
-			if (us.StartsWith(s, "name"))
+			if (Utils::StartsWith(s, "name"))
 				//name="hello" -> hello
 				this->Name = s.substr(6, s.size() - 7);
-			else if (us.StartsWith(s, "publishedid"))
+			else if (Utils::StartsWith(s, "publishedid"))
 				this->PublishedId = strtoll(s.substr(12, s.size() - 12).c_str(), NULL, 10);
 		}
 

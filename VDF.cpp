@@ -16,14 +16,12 @@ using namespace std;
 
 VDF::VDF(string text)
 {
-	Utils utils;
 	istringstream iss(text);
 	string currentPath = "";
 	int counter = 0;
-	cout << "VDF constructor\n";
 	for (string line; getline(iss, line); counter++)
 	{
-		vector<string> splits = utils.Split(utils.Trim(line), "\"");
+		vector<string> splits = Utils::Split(Utils::Trim(line), "\"");
 		if (splits.size() == 0)
 			continue;
 		string newPath;
@@ -33,10 +31,10 @@ VDF::VDF(string text)
 				currentPath += '/';
 				break;
 			case '}':
-				currentPath = utils.RemoveLastElement(currentPath, true);
+				currentPath = Utils::RemoveLastElement(currentPath, true);
 				break;
 			default:
-				currentPath = utils.RemoveLastElement(currentPath, false) + splits[0];
+				currentPath = Utils::RemoveLastElement(currentPath, false) + splits[0];
 				if (splits.size() > 1)
 					Keys.push_back(VDFKey(currentPath, splits[1]));
 				else
@@ -44,8 +42,6 @@ VDF::VDF(string text)
 				break;
 		}
 	}
-	/*for (VDFKey f: Keys)
-		cout << "Key: " << f.Path << (f.Value != "" ? " Value: " : "") << (f.Value != "" ? f.Value : "") << endl;*/
 }
 
 string VDF::GetValue(string KeyName)

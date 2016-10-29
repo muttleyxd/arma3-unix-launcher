@@ -11,17 +11,22 @@
 #include <vector>
 #include <string>
 
-class Settings
+#include "Mod.h"
+
+namespace Settings
 {
-	public:
-		Settings();
-		~Settings();
+	extern std::string ArmaPath;
+	extern std::string WorkshopPath;
+	extern int WindowSizeX;
+	extern int WindowSizeY;
+	extern int WindowPosX;
+	extern int WindowPosY;
 
-		std::string ArmaPath;
-		std::string WorkshopPath;
+	bool Load(std::string path);
+	bool Save(std::string path);
 
-		bool Load(std::string path);
-		bool Save(std::string path);
+	std::vector<Mod> LoadUserMods();
+	bool SaveUserMods(std::vector<Mod> mods);
 };
 
 #endif /* SETTINGS_H_ */

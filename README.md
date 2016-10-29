@@ -17,3 +17,4 @@ ArmA 3 Launcher for Linux.
 * Steam integration (don't know if possible)
 * Launching ArmA with desired options
 * .paa reading - for displaying mod images in launcher
+* Mod dependency caching from Steam Workshop

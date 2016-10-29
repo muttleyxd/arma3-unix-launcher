@@ -12,44 +12,72 @@
 #include <sstream>
 #include <iostream>
 
+#include "Filesystem.h"
+#include "Utils.h"
+#include "Logger.h"
+
 using namespace std;
 
-Settings::Settings()
+namespace Settings
 {
-	ArmaPath = "";
-	WorkshopPath = "";
+	string ArmaPath = "";
+	string WorkshopPath = "";
+	int WindowPosX = 0;
+	int WindowPosY = 0;
+	int WindowSizeX = 800;
+	int WindowSizeY = 600;
 
-}
-
-Settings::~Settings()
-{
-}
-
-bool Settings::Load(string path)
-{
-	ifstream configFile;
-	configFile.open(path);
-	string loadedFile;
-	if (configFile.is_open())
+	bool Load(string path)
 	{
-		cout << "File " << path << " successfully opened...\n";
-		getline(configFile, loadedFile, '\0');
-		istringstream iss(loadedFile);
-		string currentPath = "";
-		int counter = 0;
-		for (string line; getline(iss, line); counter++)
+		string loadedFile = Filesystem::ReadAllText(path);
+		if (loadedFile != Filesystem::FILE_NOT_OPEN)
 		{
-			if (strncmp(line.c_str(), "ArmaPath=", 9) == 0)
-				ArmaPath = line.substr(9);
-			else if (strncmp(line.c_str(), "WorkshopPath=", 13) == 0)
-				WorkshopPath = line.substr(13);
-			else
-				cout << "Invalid line in config file " << path << endl;
+			string currentPath = "";
+			for (string line: Utils::Split(loadedFile, "\n"))
+			{
+				if (strncmp(line.c_str(), "ArmaPath=", 9) == 0)
+					ArmaPath = line.substr(9);
+				else if (strncmp(line.c_str(), "WorkshopPath=", 13) == 0)
+					WorkshopPath = line.substr(13);
+				else if (strncmp(line.c_str(), "WindowSizeX=", 12) == 0)
+					WindowSizeX = strtol(line.substr(12).c_str(), NULL, 10);
+				else if (strncmp(line.c_str(), "WindowSizeY=", 12) == 0)
+					WindowSizeY = strtol(line.substr(12).c_str(), NULL, 10);
+				else if (strncmp(line.c_str(), "WindowPosX=", 11) == 0)
+					WindowPosX = strtol(line.substr(11).c_str(), NULL, 10);
+				else if (strncmp(line.c_str(), "WindowPosY=", 11) == 0)
+					WindowPosY = strtol(line.substr(11).c_str(), NULL, 10);
+				else
+					LOG(1, "Invalid line in config file " + path);
+			}
 		}
+		else
+			LOG(1, "Can't load settings!");
+		return true;
 	}
-	else
+
+	bool Save(string path)
 	{
-		cout << "Can't open " << path << "\nCan't load settings!\n\n";
+		string outFile = "ArmaPath=" + ArmaPath + "\nWorkshopPath=" + WorkshopPath
+				+ "\nWindowSizeX=" + to_string(WindowSizeX) + "\nWindowSizeY="
+				+ to_string(WindowSizeY) + "\nWindowPosX=" + to_string(WindowPosX)
+				+ "\nWindowPosY=" + to_string(WindowPosY);
+		if (!Filesystem::WriteAllText(path, outFile))
+		{
+			LOG(1, "Can't write to settings file!");
+			return false;
+		}
+		return true;
 	}
-	return true;
+
+	vector<Mod> LoadUserMods()
+	{
+		vector<Mod> response;
+		return response;
+	}
+
+	bool SaveUserMods(vector<Mod> mods)
+	{
+		return true;
+	}
 }
