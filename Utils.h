@@ -20,6 +20,7 @@ namespace Utils
 	std::string TrimLeft(const std::string& s);
 	std::string TrimRight(const std::string& s);
 	std::string RemoveLastElement(std::string s, bool removeSlash);
+	std::string ToString(bool b);
 };
 
 #endif /* UTILS_H_ */

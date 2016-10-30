@@ -83,4 +83,11 @@ namespace Utils
 
 		return s;
 	}
+
+	string ToString(bool b)
+	{
+		if (b)
+			return "1";
+		return "0";
+	}
 }

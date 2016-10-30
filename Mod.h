@@ -30,6 +30,8 @@ class Mod
 
 		bool IsRepresentedBySymlink;
 
+		bool Enabled;
+
 	private:
 		void ParseCPP(std::string meta,std::string mod);
 		std::string ParseString(std::string input);

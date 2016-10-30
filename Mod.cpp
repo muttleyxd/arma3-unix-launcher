@@ -29,6 +29,8 @@ Mod::Mod(string path, string workshopId)
 	PublishedId = -1;
 	IsRepresentedBySymlink = false;
 
+	Enabled = false;
+
 	WorkshopId = strtoll(workshopId.c_str(), NULL, 10);
 
 	string metaPath = path + "/meta.cpp", modPath = path + "/mod.cpp";
