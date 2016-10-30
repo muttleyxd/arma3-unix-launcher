@@ -9,10 +9,10 @@ ArmA 3 Launcher for Linux.
 * Getting location of existing ArmA 3 intsallation
 * Mod detection of workshop mods (parsing mod.cpp/meta.cpp)
 * Symlinking mods to ArmA directory
+* GUI (GTKMM)
 
 ### TODO
 
-* GUI (GTK+?)
 * Mod detection for mods outside workshop
 * Steam integration (don't know if possible)
 * Launching ArmA with desired options
