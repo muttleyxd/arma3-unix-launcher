@@ -25,8 +25,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	builder->get_widget("tvCustomMods", tvCustomMods);
 	builder->get_widget("tvWorkshopMods", tvWorkshopMods);
 
-	builder->get_widget("btnRefresh", btnRefresh);
-
 	builder->get_widget("btnAdd", btnAdd);
 	builder->get_widget("btnRemove", btnRemove);
 
@@ -63,10 +61,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	builder->get_widget("cbWorld", cbWorld);
 	builder->get_widget("tbWorld", tbWorld);
 
-	builder->get_widget("cbProfile", cbProfile);
-	builder->get_widget("tbProfile", tbProfile);
-	builder->get_widget("btnProfileBrowse", btnProfileBrowse);
-
 	builder->get_widget("cbNoPause", cbNoPause);
 
 	//Client
@@ -80,16 +74,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	builder->get_widget("tbPassword", tbPassword);
 
 	builder->get_widget("cbHost", cbHost);
-
-	//Settings tab
-	builder->get_widget("tbArmaPath", tbArmaPath);
-	builder->get_widget("tbWorkshopPath", tbWorkshopPath);
-
-	builder->get_widget("btnArmaPathBrowse", btnArmaPathBrowse);
-	builder->get_widget("btnWorkshopPathBrowse", btnWorkshopPathBrowse);
-
-	builder->get_widget("cbArmaPathAutodetect", cbArmaPathAutodetect);
-	builder->get_widget("cbWorkshopPathAutodetect", cbWorkshopPathAutodetect);
 
 	//Visible everywhere
 	builder->get_widget("btnPlay", btnPlay);
@@ -124,9 +108,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	cbWorld->set_active(Settings::World);
 	tbWorld->set_text(Settings::WorldValue);
 
-	cbProfile->set_active(Settings::Profile);
-	tbProfile->set_text(Settings::ProfileValue);
-
 	cbNoPause->set_active(Settings::NoPause);
 
 	cbConnect->set_active(Settings::Connect);
@@ -139,12 +120,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	tbPassword->set_text(Settings::PasswordValue);
 
 	cbHost->set_active(Settings::Host);
-
-	cbArmaPathAutodetect->set_active(Settings::ArmaPathAutodetect);
-	cbWorkshopPathAutodetect->set_active(Settings::WorkshopPathAutodetect);
-
-	tbArmaPath->set_text(Settings::ArmaPath);
-	tbWorkshopPath->set_text(Settings::WorkshopPath);
 
 	btnAdd->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnAdd_Clicked));
     btnRemove->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnRemove_Clicked));
@@ -176,10 +151,6 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	cbWorld->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbWorld_Toggled));
 	tbWorld->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbWorld_Changed));
 
-	cbProfile->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbProfile_Toggled));
-	tbProfile->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbProfile_Changed));
-	btnProfileBrowse->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnProfileBrowse_Clicked));
-
 	cbNoPause->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbNoPause_Toggled));
 
 	cbConnect->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbConnect_Toggled));
@@ -193,15 +164,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 
 	cbHost->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbHost_Toggled));
 
-	tbArmaPath->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbArmaPath_Changed));
-	tbWorkshopPath->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbWorkshopPath_Changed));
-
-	btnArmaPathBrowse->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnArmaPathBrowse_Clicked));
-	btnWorkshopPathBrowse->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnWorkshopPathBrowse_Clicked));
-
-	cbArmaPathAutodetect->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbArmaPathAutodetect_Toggled));
-	cbWorkshopPathAutodetect->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbWorkshopPathAutodetect_Toggled));
-
+	btnPlay->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPlay_Clicked));
 
 	/////Executing every event - need to make sure UI represents actual Settings
 	ignore = true;
@@ -211,11 +174,9 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 
 	cbExThreads_Toggled(); cbExThreadsFileOperations_Toggled(); cbExThreadsTextureLoading_Toggled();
 	cbExThreadsGeometryLoading_Toggled(); cbEnableHT_Toggled(); cbFilePatching_Toggled();
-	cbNoLogs_Toggled(); cbWorld_Toggled(); tbWorld_Changed(); cbProfile_Toggled();
-	tbProfile_Changed(); cbNoPause_Toggled(); cbConnect_Toggled();
-	tbConnect_Changed(); cbPort_Toggled(); tbPort_Changed(); cbPassword_Toggled();
-	tbPassword_Changed(); cbHost_Toggled(); tbArmaPath_Changed(); tbWorkshopPath_Changed();
-	cbArmaPathAutodetect_Toggled();	cbWorkshopPathAutodetect_Toggled();
+	cbNoLogs_Toggled(); cbWorld_Toggled(); tbWorld_Changed(); cbNoPause_Toggled();
+	cbConnect_Toggled(); tbConnect_Changed(); cbPort_Toggled(); tbPort_Changed();
+	cbPassword_Toggled(); tbPassword_Changed(); cbHost_Toggled();
 	ignore = false;
 	/////
 
@@ -275,6 +236,8 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	customToggleBox->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::CustomToggleBox_Toggled));
 
 	this->signal_delete_event().connect(sigc::mem_fun(*this, &MainWindow::onExit));
+
+	RefreshStatusLabel();
 }
 
 void MainWindow::btnAdd_Clicked()
@@ -333,6 +296,7 @@ void MainWindow::btnAdd_Clicked()
         row[customColumns.name] = m.Name;
         row[customColumns.path] = Utils::Replace(m.Path, Settings::ArmaPath, Filesystem::ArmaDirMark);
     }
+    RefreshStatusLabel();
 }
 
 void MainWindow::btnRemove_Clicked()
@@ -353,7 +317,9 @@ void MainWindow::btnRemove_Clicked()
         LOG(1, "Can't delete mods from ArmA's directory");
         return;
     }
+
     customModsStore.operator ->()->erase(treeSel.operator ->()->get_selected());
+    RefreshStatusLabel();
 }
 
 bool MainWindow::onExit(GdkEventAny* event)
@@ -404,6 +370,7 @@ void MainWindow::WorkshopToggleBox_Toggled(Glib::ustring path) //path is index n
 	//std::cout << path << std::endl;
 	Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(path));
 	row[workshopColumns.enabled] = !row[workshopColumns.enabled];
+	RefreshStatusLabel();
 }
 
 void MainWindow::CustomToggleBox_Toggled(Glib::ustring path) //path is index number
@@ -411,6 +378,7 @@ void MainWindow::CustomToggleBox_Toggled(Glib::ustring path) //path is index num
     //std::cout << path << std::endl;
     Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(path));
     row[customColumns.enabled] = !row[customColumns.enabled];
+    RefreshStatusLabel();
 }
 
 void MainWindow::cbSkipIntro_Toggled()
@@ -461,6 +429,13 @@ void MainWindow::tbParameterFile_Changed()
 void MainWindow::btnParameterFileBrowse_Clicked()
 {
 	LOG(0, "btnParameterFileBrowse_Clicked");
+    Gtk::FileChooserDialog fcDialog(*this, "Select parameter file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+    fcDialog.add_button("_Open", 1);
+    fcDialog.add_button("_Cancel", 0);
+    int result = fcDialog.run();
+
+    if (result)
+        tbParameterFile->set_text(fcDialog.get_filename());
 }
 
 void MainWindow::cbCheckSignatures_Toggled()
@@ -540,25 +515,6 @@ void MainWindow::tbWorld_Changed()
 	if (!ignore) Settings::WorldValue = tbWorld->get_text();
 }
 
-void MainWindow::cbProfile_Toggled()
-{
-	LOG(0, "cbProfile_Toggled: " + Utils::ToString(cbProfile->get_active()));
-	if (!ignore) Settings::Profile = cbProfile->get_active();
-	tbProfile->set_sensitive(Settings::Profile);
-	btnProfileBrowse->set_sensitive(Settings::Profile);
-}
-
-void MainWindow::tbProfile_Changed()
-{
-	LOG(0, "tbProfile_Changed: " + tbProfile->get_text());
-	if (!ignore) Settings::ProfileValue = tbProfile->get_text();
-}
-
-void MainWindow::btnProfileBrowse_Clicked()
-{
-	LOG(0, "btnProfileBrowse_Clicked");
-}
-
 void MainWindow::cbNoPause_Toggled()
 {
 	LOG(0, "cbNoPause_Toggled: " + Utils::ToString(cbNoPause->get_active()));
@@ -610,51 +566,35 @@ void MainWindow::cbHost_Toggled()
 	if (!ignore) Settings::Host = cbHost->get_active();
 }
 
-void MainWindow::tbArmaPath_Changed()
+void MainWindow::btnPlay_Clicked()
 {
-	LOG(0, "tbArmaPath_Changed: " + tbArmaPath->get_text());
-	if (!ignore) Settings::ArmaPath = tbArmaPath->get_text();
+    LOG(0, "btnPlay_Clicked");
 }
 
-void MainWindow::tbWorkshopPath_Changed()
+void MainWindow::RefreshStatusLabel()
 {
-	LOG(0, "tbWorkshopPath_Changed: " + tbWorkshopPath->get_text());
-	if (!ignore) Settings::WorkshopPath = tbWorkshopPath->get_text();
-}
+    int workshopMods = 0, customMods = 0;
+    for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
+    {
+        Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+        if (row[workshopColumns.enabled])
+            workshopMods++;
+    }
+    for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
+    {
+        Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+        if (row[customColumns.enabled])
+            customMods++;
+    }
 
-void MainWindow::btnArmaPathBrowse_Clicked()
-{
-	LOG(0, "btnArmaPathBrowse_Clicked");
-}
-
-void MainWindow::btnWorkshopPathBrowse_Clicked()
-{
-	LOG(0, "btnWorkshopPathBrowse_Clicked");
-}
-
-void MainWindow::cbArmaPathAutodetect_Toggled()
-{
-	LOG(0, "cbArmaPathAutodetect_Toggled: " + Utils::ToString(cbArmaPathAutodetect->get_active()));
-	if (!ignore) Settings::ArmaPathAutodetect = cbArmaPathAutodetect->get_active();
-	tbArmaPath->set_sensitive(!Settings::ArmaPathAutodetect);
-	btnArmaPathBrowse->set_sensitive(!Settings::ArmaPathAutodetect);
-}
-
-void MainWindow::cbWorkshopPathAutodetect_Toggled()
-{
-	LOG(0, "cbWorkshopPathAutodetect_Toggled: " + Utils::ToString(cbWorkshopPathAutodetect->get_active()));
-	if (!ignore) Settings::WorkshopPathAutodetect = cbWorkshopPathAutodetect->get_active();
-	tbWorkshopPath->set_sensitive(!Settings::WorkshopPathAutodetect);
-	btnWorkshopPathBrowse->set_sensitive(!Settings::WorkshopPathAutodetect);
+    lblSelectedMods->set_text("Selected " + std::to_string(workshopMods + customMods)
+                            + " mods (" + std::to_string(workshopMods)
+                            + " from workshop, " + std::to_string(customMods)
+                            + " custom)");
 }
 
 void MainWindow::Init()
 {
-	if (Settings::ArmaPathAutodetect)
-		Settings::ArmaPath = Filesystem::GetDirectory(DirectoryToFind::ArmaInstall);
-	if (Settings::WorkshopPathAutodetect)
-		Settings::WorkshopPath = Filesystem::GetDirectory(DirectoryToFind::WorkshopMods);
-
 	LOG(1, "ArmA 3 Path: " + Settings::ArmaPath + "\nWorkshop mods path: " + Settings::WorkshopPath);
 
 	WorkshopMods = Filesystem::FindMods(Settings::WorkshopPath);
@@ -679,5 +619,11 @@ void MainWindow::Init()
 	    continue;
 	}
 
-	Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, WorkshopMods);
+	std::vector<Mod> FullModList;
+	for (Mod m: WorkshopMods)
+	    FullModList.push_back(m);
+	for (Mod m: CustomMods)
+	    FullModList.push_back(m);
+
+	Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, FullModList);
 }

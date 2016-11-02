@@ -20,10 +20,8 @@ using namespace std;
 
 namespace Settings
 {
-	string ArmaPath = "";
-	string WorkshopPath = "";
-	bool ArmaPathAutodetect = true;
-	bool WorkshopPathAutodetect = true;
+	string ArmaPath = Filesystem::DIR_NOT_FOUND;
+	string WorkshopPath = Filesystem::DIR_NOT_FOUND;
 
 	int WindowPosX = 0;
 	int WindowPosY = 0;
@@ -55,9 +53,6 @@ namespace Settings
 
 	bool World = false;
 	string WorldValue = "";
-
-	bool Profile = false;
-	string ProfileValue = "";
 
 	bool NoPause = false;
 
@@ -98,10 +93,6 @@ namespace Settings
 					ArmaPath = line.substr(9);
 				else if (Utils::StartsWith(line, "WorkshopPath="))
 					WorkshopPath = line.substr(13);
-				else if (Utils::StartsWith(line, "ArmaPathAutodetect="))
-					ArmaPathAutodetect = strtol(line.substr(19).c_str(), NULL, 10);
-				else if (Utils::StartsWith(line, "WorkshopPathAutodetect="))
-					WorkshopPathAutodetect = strtol(line.substr(23).c_str(), NULL, 10);
 				else if (Utils::StartsWith(line, "WindowSizeX="))
 					WindowSizeX = strtol(line.substr(12).c_str(), NULL, 10);
 				else if (Utils::StartsWith(line, "WindowSizeY="))
@@ -148,10 +139,6 @@ namespace Settings
 					World = strtol(line.substr(6).c_str(), NULL, 10);
 				else if (Utils::StartsWith(line, "WorldValue="))
 					WorldValue = line.substr(11);
-				else if (Utils::StartsWith(line, "Profile="))
-					Profile = strtol(line.substr(8).c_str(), NULL, 10);
-				else if (Utils::StartsWith(line, "ProfileValue="))
-					ProfileValue = line.substr(13);
 				else if (Utils::StartsWith(line, "NoPause="))
 					NoPause = strtol(line.substr(8).c_str(), NULL, 10);
 				else if (Utils::StartsWith(line, "Connect="))
@@ -208,8 +195,6 @@ namespace Settings
 	{
 		string outFile = "ArmaPath=" + ArmaPath
 						+ "\nWorkshopPath=" + WorkshopPath
-						+ "\nArmaPathAutodetect=" + Utils::ToString(ArmaPathAutodetect)
-						+ "\nWorkshopPathAutodetect=" + Utils::ToString(WorkshopPathAutodetect)
 						+ "\nWindowSizeX=" + to_string(WindowSizeX)
 						+ "\nWindowSizeY=" + to_string(WindowSizeY)
 						+ "\nWindowPosX=" + to_string(WindowPosX)
@@ -233,8 +218,6 @@ namespace Settings
 						+ "\nNoLogs=" + Utils::ToString(NoLogs)
 						+ "\nWorld=" + Utils::ToString(World)
 						+ "\nWorldValue=" + WorldValue
-						+ "\nProfile=" + Utils::ToString(Profile)
-						+ "\nProfileValue=" + ProfileValue
 						+ "\nNoPause=" + Utils::ToString(NoPause)
 						+ "\nConnect=" + Utils::ToString(Connect)
 						+ "\nConnectValue=" + ConnectValue

@@ -27,8 +27,9 @@ using namespace std;
 
 namespace Filesystem
 {
-	std::string FILE_NOT_OPEN = "Filesystem couldn't open file";
-	std::string DIR_NOT_FOUND = "Directory not found";
+	std::string FILE_NOT_OPEN = "FILE_NOT_OPEN";
+	std::string DIR_NOT_FOUND = "DIR_NOT_FOUND";
+	std::string NOT_A_SYMLINK = "NOT_A_SYMLINK";
 
 	std::string STEAM_CONFIG_FILE = "/.local/share/Steam/config/config.vdf";
 	std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
@@ -37,9 +38,15 @@ namespace Filesystem
 	std::string HomeDirectory = getenv("HOME");
 	std::string LauncherSettingsDirectory = "/.config/a3linuxlauncher";
 	std::string LauncherSettingsFilename = "/settings.conf";
-	std::string LauncherCustomModDirectory = "/custommods";
+
+	std::string ArmaDirWorkshop = "/!workshop";
+	std::string ArmaDirCustom = "/!custom";
+
+	std::string ArmaDirDoNotChange = "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
 
 	std::string ArmaDirMark = "~arma";
+
+	std::string ArmaConfigFile = "/.local/share/bohemiainteractive/arma3/GameDocuments/Arma 3/Arma3.cfg";
 
 	std::vector<std::string> GetSteamLibraries()
 	{
@@ -176,72 +183,52 @@ namespace Filesystem
 
 	void CheckFileStructure(string armaDir, string workshopDir, vector<Mod> modList)
 	{
-		string armaDirWorkshopPath = armaDir + "/!workshop";
+	    LOG(0, "Checking file structure");
+		string armaDirWorkshopPath = armaDir + Filesystem::ArmaDirWorkshop;
+		string armaDirCustomPath = armaDir + Filesystem::ArmaDirCustom;
+
+		LOG(0, "!workshop -> " + armaDirWorkshopPath + "\n!custom -> " + armaDirCustomPath);
+
 		if (!DirectoryExists(armaDirWorkshopPath))
 		{
 			if (!CreateDirectory(armaDirWorkshopPath))
 				return;
 		}
 
-		if (!DirectoryExists(armaDirWorkshopPath + "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS"))
+		if (!DirectoryExists(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
 		{
-			if (!CreateDirectory(armaDirWorkshopPath + "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS"))
+			if (!CreateDirectory(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
 				return;
 		}
 
+        if (!DirectoryExists(armaDirCustomPath))
+        {
+            if (!CreateDirectory(armaDirCustomPath))
+                return;
+        }
+
+        if (!DirectoryExists(armaDirCustomPath + Filesystem::ArmaDirDoNotChange))
+        {
+            if (!CreateDirectory(armaDirCustomPath + Filesystem::ArmaDirDoNotChange))
+                return;
+        }
+
 		vector<string> ModDirs = GetSubDirectories(armaDirWorkshopPath);
 
-		for (string s: ModDirs)
-		{
-			struct stat statinfo;
-			if (lstat((armaDirWorkshopPath + "/" + s).c_str(), &statinfo) < 0)
-			{
-				LOG(0, "Can't open directory/symlink " + armaDirWorkshopPath + "/" + s);
-				continue;
-			}
-			if (S_ISLNK (statinfo.st_mode))
-			{
-				char* buffer = new char[PATH_MAX + 1];
-				size_t pathLength = readlink((armaDirWorkshopPath + "/" + s).c_str(), buffer, PATH_MAX);
-				buffer[pathLength] = '\0';
-				string target = buffer;
-				delete[] buffer;
-				LOG(0, "!workshop/" + s + " points to: " + target);
-				int targetLength = target.length();
-				target = Utils::Replace(target, workshopDir + "/", "");
+		CheckSymlinks(armaDirWorkshopPath, armaDir, workshopDir, &ModDirs, &modList);
 
-				//outside workshop dir
-				if (targetLength == target.length())
-				{
-					for (int i = 0; i < modList.size(); i++)
-					{
-						if (modList[i].Path == target)
-						{
-							modList[i].IsRepresentedBySymlink = true;
-							break;
-						}
-					}
-				}
-				else
-				{
-					string newWorkshopId = target;
-					for (int i = 0; i < modList.size(); i++)
-					{
-						if (modList[i].WorkshopId == newWorkshopId)
-						{
-							modList[i].IsRepresentedBySymlink = true;
-							break;
-						}
-					}
-				}
-			}
-		}
+		ModDirs = GetSubDirectories(armaDirCustomPath);
+		CheckSymlinks(armaDirCustomPath, armaDir, workshopDir, &ModDirs, &modList);
 
 		for (Mod m: modList)
 		{
+		    if (m.Path.find(armaDir) != string::npos)
+		        continue;
 			if (!m.IsRepresentedBySymlink)
 			{
 				string linkName = armaDirWorkshopPath + "/@" + m.Name;
+				if (m.WorkshopId == "-1")
+				    linkName = armaDirCustomPath + "/@" + m.Name;
 				if (!DirectoryExists(linkName) || !FileExists(linkName))
 				{
 					int result = symlink(m.Path.c_str(), linkName.c_str());
@@ -303,5 +290,68 @@ namespace Filesystem
 		}
 		LOG(0, "Successfully created directory " + path);
 		return true;
+	}
+
+	string GetSymlinkTarget(string path)
+	{
+	    struct stat statinfo;
+        if (lstat(path.c_str(), &statinfo) < 0)
+        {
+            LOG(0, "Can't open directory/symlink " + path);
+            return NOT_A_SYMLINK;
+        }
+        if (S_ISLNK(statinfo.st_mode))
+        {
+            char* buffer = new char[PATH_MAX + 1];
+            size_t pathLength = readlink(path.c_str(), buffer, PATH_MAX);
+            buffer[pathLength] = '\0';
+            string target = buffer;
+            delete[] buffer;
+            LOG(0, "!workshop/" + path + " points to: " + target);
+
+            return target;
+        }
+        return NOT_A_SYMLINK;
+	}
+
+	void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string>* ModDirs, vector<Mod>* modList)
+	{
+	    for (int i = 0; i < ModDirs->size(); i++)
+        {
+	        string s = ModDirs->operator [](i);
+            string target = GetSymlinkTarget(path + "/" + s);
+            if (target != NOT_A_SYMLINK)
+            {
+                int targetLength = target.length();
+                target = Utils::Replace(target, workshopDir + "/", "");
+
+                //outside workshop dir
+                if (targetLength == target.length())
+                {
+                    for (int i = 0; i < modList->size(); i++)
+                    {
+                        if (modList->operator[](i).Path == target)
+                        {
+                            modList->operator[](i).IsRepresentedBySymlink = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    string newWorkshopId = target;
+                    for (int i = 0; i < modList->size(); i++)
+                    {
+                        if (modList->operator[](i).WorkshopId == newWorkshopId)
+                        {
+                            modList->operator[](i).IsRepresentedBySymlink = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+                LOG(1, "Not a symlink found in ModDirs!");
+        }
 	}
 }

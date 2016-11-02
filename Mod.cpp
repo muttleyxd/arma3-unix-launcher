@@ -17,9 +17,8 @@
 
 using namespace std;
 
-// workshopId = 0 -> mod is not from workshop
+// workshopId = -1 -> mod is not from workshop
 // workshopId > 1 -> mod from workshop, workshop
-// workshopId = -1 -> mod from Unix mod pack
 Mod::Mod(string path, string workshopId)
 {
 	Path = path;

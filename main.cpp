@@ -50,18 +50,6 @@ int main(int argc, char *argv[])
 			exit(1);
 	}
 
-	//~/.config/a3linuxlauncher/custommods
-	if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
-	            + Filesystem::LauncherSettingsDirectory
-	            + Filesystem::LauncherCustomModDirectory))
-    {
-        bool result = Filesystem::CreateDirectory(Filesystem::HomeDirectory
-                + Filesystem::LauncherSettingsDirectory
-                + Filesystem::LauncherCustomModDirectory);
-        if (!result)
-            exit(1);
-    }
-
 	if (!Filesystem::FileExists(Filesystem::HomeDirectory
 			+ Filesystem::LauncherSettingsDirectory
 			+ Filesystem::LauncherSettingsFilename))
@@ -81,6 +69,48 @@ int main(int argc, char *argv[])
 
 	cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl
 		 << "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
+
+	if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
+	    Settings::ArmaPath = Filesystem::GetDirectory(DirectoryToFind::ArmaInstall);
+
+	if (Settings::WorkshopPath == Filesystem::DIR_NOT_FOUND)
+	    Settings::WorkshopPath = Filesystem::GetDirectory(DirectoryToFind::WorkshopMods);
+
+	//if autodetection fails
+    while (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
+    {
+        string Message = string("Launcher couldn't detect ArmA 3 installation directory") +
+                "\nClick 'Yes' to select appropriate directory" +
+                "\nClick 'No' to close the program";
+
+        Gtk::MessageDialog msg(Message, false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_YES_NO);
+        int result = msg.run();
+
+        if (result == Gtk::RESPONSE_NO)
+            exit(2);
+
+        Gtk::FileChooserDialog fcDialog("Select ArmA 3 install directory", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+        fcDialog.add_button("_Open", 1);
+        result = fcDialog.run();
+        if (result == 1)
+        {
+            string currentFolder = fcDialog.get_current_folder();
+            if (Filesystem::FileExists(currentFolder + "/arma3.i386"))
+                Settings::ArmaPath = currentFolder;
+            currentFolder = fcDialog.get_filename();
+            if (Filesystem::FileExists(currentFolder + "/arma3.i386"))
+                Settings::ArmaPath = currentFolder;
+
+            if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
+            {
+                string Message2 = string("Selected directory seems incorrect") +
+                                "\n" + currentFolder + "/arma3.i386 doesn't exist";
+
+                Gtk::MessageDialog msg2(Message2);
+                msg2.run();
+            }
+        }
+    }
 
 	MainWindow* mainWindow = NULL;
 

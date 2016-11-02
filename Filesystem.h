@@ -23,6 +23,7 @@ namespace Filesystem
 {
 	extern std::string FILE_NOT_OPEN;
 	extern std::string DIR_NOT_FOUND;
+	extern std::string NOT_A_SYMLINK;
 
 	extern std::string STEAM_CONFIG_FILE;
 	extern std::string SteamAppsArmaPath;
@@ -31,9 +32,15 @@ namespace Filesystem
 	extern std::string HomeDirectory;
 	extern std::string LauncherSettingsDirectory;
 	extern std::string LauncherSettingsFilename;
-	extern std::string LauncherCustomModDirectory;
+
+	extern std::string ArmaDirWorkshop;
+	extern std::string ArmaDirCustom;
+
+	extern std::string ArmaDirDoNotChange;
 
 	extern std::string ArmaDirMark;
+
+	extern std::string ArmaConfigFile;
 
 	//profiles - *.profile files in settings directory
 
@@ -53,6 +60,9 @@ namespace Filesystem
 	std::vector<std::string> GetSubDirectories(std::string path);
 
 	bool CreateDirectory(std::string path);
+
+	std::string GetSymlinkTarget(std::string path);
+	void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string>* ModDirs, std::vector<Mod>* modList);
 };
 
 #endif /* FILESYSTEM_H_ */

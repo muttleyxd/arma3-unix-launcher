@@ -17,8 +17,6 @@ namespace Settings
 {
 	extern std::string ArmaPath;
 	extern std::string WorkshopPath;
-	extern bool ArmaPathAutodetect;
-	extern bool WorkshopPathAutodetect;
 
 	extern int WindowSizeX;
 	extern int WindowSizeY;
@@ -50,9 +48,6 @@ namespace Settings
 
 	extern bool World;
 	extern std::string WorldValue;
-
-	extern bool Profile;
-	extern std::string ProfileValue;
 
 	extern bool NoPause;
 

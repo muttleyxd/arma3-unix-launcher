@@ -24,8 +24,6 @@ class MainWindow : public Gtk::Window
 			Gtk::TreeView* tvWorkshopMods;
 			Gtk::TreeView* tvCustomMods;
 
-			Gtk::Button* btnRefresh;
-
 			Gtk::Button* btnAdd;
 			Gtk::Button* btnRemove;
 
@@ -63,10 +61,6 @@ class MainWindow : public Gtk::Window
 			Gtk::CheckButton* cbWorld;
 			Gtk::Entry* tbWorld;
 
-			Gtk::CheckButton* cbProfile;
-			Gtk::Entry* tbProfile;
-			Gtk::Button* btnProfileBrowse;
-
 			Gtk::CheckButton* cbNoPause;
 
 			//Client
@@ -80,16 +74,6 @@ class MainWindow : public Gtk::Window
 			Gtk::Entry* tbPassword;
 
 			Gtk::CheckButton* cbHost;
-
-		//Settings tab
-			Gtk::Entry* tbArmaPath;
-			Gtk::Entry* tbWorkshopPath;
-
-			Gtk::Button* btnArmaPathBrowse;
-			Gtk::Button* btnWorkshopPathBrowse;
-
-			Gtk::CheckButton* cbArmaPathAutodetect;
-			Gtk::CheckButton* cbWorkshopPathAutodetect;
 
 		//Visible everywhere
 			Gtk::Button* btnPlay;
@@ -119,6 +103,9 @@ class MainWindow : public Gtk::Window
 
 		WorkshopModelColumns workshopColumns;
 		CustomModelColumns customColumns;
+
+        std::vector<Mod> WorkshopMods;
+        std::vector<Mod> CustomMods;
 
 	public:
 		MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade);
@@ -160,10 +147,6 @@ class MainWindow : public Gtk::Window
 		void cbWorld_Toggled();
 		void tbWorld_Changed();
 
-		void cbProfile_Toggled();
-		void tbProfile_Changed();
-		void btnProfileBrowse_Clicked();
-
 		void cbNoPause_Toggled();
 
 		void cbConnect_Toggled();
@@ -177,18 +160,11 @@ class MainWindow : public Gtk::Window
 
 		void cbHost_Toggled();
 
-		void tbArmaPath_Changed();
-		void tbWorkshopPath_Changed();
+		void btnPlay_Clicked();
 
-		void btnArmaPathBrowse_Clicked();
-		void btnWorkshopPathBrowse_Clicked();
-
-		void cbArmaPathAutodetect_Toggled();
-		void cbWorkshopPathAutodetect_Toggled();
+		void RefreshStatusLabel();
 
 		void Init();
-		std::vector<Mod> WorkshopMods;
-		std::vector<Mod> CustomMods;
 };
 
 #endif /* MAINWINDOW_H_ */
