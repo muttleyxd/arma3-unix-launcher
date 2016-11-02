@@ -37,6 +37,9 @@ namespace Filesystem
 	std::string HomeDirectory = getenv("HOME");
 	std::string LauncherSettingsDirectory = "/.config/a3linuxlauncher";
 	std::string LauncherSettingsFilename = "/settings.conf";
+	std::string LauncherCustomModDirectory = "/custommods";
+
+	std::string ArmaDirMark = "~arma";
 
 	std::vector<std::string> GetSteamLibraries()
 	{
@@ -161,6 +164,9 @@ namespace Filesystem
 
 		for (string s: GetSubDirectories(path))
 		{
+		    if (s == "curator" || s == "dta" || s == "Expansion" || s == "heli"
+		            || s == "kart" || s == "mark") //skip DLCs
+		        continue;
 			if (DirectoryExists(path + "/" + s + "/Addons")
 					|| DirectoryExists(path + "/" + s + "/addons"))
 				response.push_back(Mod(path + "/" + s, s));
@@ -184,14 +190,6 @@ namespace Filesystem
 		}
 
 		vector<string> ModDirs = GetSubDirectories(armaDirWorkshopPath);
-		/*for (int i = 0; i < ModDirs.size(); i++)
-		{
-			if (ModDirs[i] == "!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS")
-			{
-				ModDirs.erase(ModDirs.begin() + i);
-				break;
-			}
-		}*/
 
 		for (string s: ModDirs)
 		{
@@ -208,7 +206,7 @@ namespace Filesystem
 				buffer[pathLength] = '\0';
 				string target = buffer;
 				delete[] buffer;
-				LOG(0, "!workshop/" + s + "points to: " + target);
+				LOG(0, "!workshop/" + s + " points to: " + target);
 				int targetLength = target.length();
 				target = Utils::Replace(target, workshopDir + "/", "");
 
@@ -226,7 +224,7 @@ namespace Filesystem
 				}
 				else
 				{
-					int64_t newWorkshopId = strtoll(target.c_str(), NULL, 10);
+					string newWorkshopId = target;
 					for (int i = 0; i < modList.size(); i++)
 					{
 						if (modList[i].WorkshopId == newWorkshopId)
@@ -267,10 +265,10 @@ namespace Filesystem
 
 		if (pathDir == NULL)
 		{
-			LOG(0, "Opening directory " + path + " failed");
+			LOG(1, "Opening directory " + path + " failed");
 			return response;
 		}
-		LOG(10, "Opening directory " + path + " succeeded");
+		LOG(0, "Opening directory " + path + " succeeded");
 
 		while ((directoryEntry = readdir(pathDir)) != NULL)
 		{

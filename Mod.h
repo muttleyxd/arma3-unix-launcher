@@ -23,8 +23,8 @@ class Mod
 				OverviewText, Author;
 		Vec4 DlcColor;
 		bool HideName, HidePicture;
-		int64_t PublishedId;
-		int64_t WorkshopId;
+		std::string PublishedId;
+		std::string WorkshopId;
 
 		std::string ToString();
 

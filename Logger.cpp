@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int LogLevel = 2;
+int LogLevel = 1;
 
 void LOG(int logLevel, string text)
 {

@@ -14,7 +14,16 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkListStore" id="customModsStore"/>
+  <object class="GtkListStore" id="customModsStore">
+    <columns>
+      <!-- column-name enabled -->
+      <column type="gboolean"/>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name path -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="workshopModsStore">
     <columns>
       <!-- column-name enabled -->
@@ -22,7 +31,7 @@
       <!-- column-name name -->
       <column type="gchararray"/>
       <!-- column-name workshopid -->
-      <column type="gint64"/>
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="MainForm">
@@ -74,6 +83,7 @@
                         <property name="vadjustment">adjustment1</property>
                         <property name="vscroll_policy">natural</property>
                         <property name="model">workshopModsStore</property>
+                        <property name="reorderable">True</property>
                         <property name="enable_grid_lines">horizontal</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection"/>
@@ -167,9 +177,43 @@
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
                         <property name="model">customModsStore</property>
+                        <property name="reorderable">True</property>
                         <property name="enable_grid_lines">horizontal</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection"/>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Enabled</property>
+                            <child>
+                              <object class="GtkCellRendererToggle" id="customToggleBox"/>
+                              <attributes>
+                                <attribute name="active">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Name</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Path</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">2</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>

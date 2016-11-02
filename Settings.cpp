@@ -72,11 +72,25 @@ namespace Settings
 
 	bool Host = false;
 
+	std::vector<std::string> WorkshopModsEnabled;
+	std::vector<std::string> WorkshopModsOrder;
+
+	std::vector<std::string> CustomModsEnabled;
+	std::vector<std::string> CustomModsOrder;
+
+	std::vector<std::string> CustomMods;
+
 	bool Load(string path)
 	{
 		string loadedFile = Filesystem::ReadAllText(path);
 		if (loadedFile != Filesystem::FILE_NOT_OPEN)
 		{
+			WorkshopModsEnabled.clear();
+			WorkshopModsOrder.clear();
+
+			CustomModsEnabled.clear();
+			CustomModsOrder.clear();
+
 			string currentPath = "";
 			for (string line: Utils::Split(loadedFile, "\n"))
 			{
@@ -154,6 +168,30 @@ namespace Settings
 					PasswordValue = line.substr(14);
 				else if (Utils::StartsWith(line, "Host="))
 					Host = strtol(line.substr(5).c_str(), NULL, 10);
+				else if (Utils::StartsWith(line, "WorkshopModsEnabled="))
+				{
+					string sub = line.substr(20);
+					for (string s: Utils::Split(sub, ","))
+						WorkshopModsEnabled.push_back(s);
+				}
+				else if (Utils::StartsWith(line, "WorkshopModsOrder="))
+				{
+					string sub = line.substr(18);
+					for (string s: Utils::Split(sub, ","))
+						WorkshopModsOrder.push_back(s);
+				}
+				else if (Utils::StartsWith(line, "CustomModsEnabled="))
+				{
+					string sub = line.substr(18);
+					for (string s: Utils::Split(sub, ","))
+						CustomModsEnabled.push_back(s);
+				}
+				else if (Utils::StartsWith(line, "CustomModsOrder="))
+				{
+					string sub = line.substr(16);
+					for (string s: Utils::Split(sub, ","))
+						CustomModsOrder.push_back(s);
+				}
 				else
 					LOG(1, "Invalid line in config file " + path);
 			}
@@ -204,7 +242,27 @@ namespace Settings
 						+ "\nPortValue=" + PortValue
 						+ "\nPassword=" + Utils::ToString(Password)
 						+ "\nPasswordValue=" + PasswordValue
-						+ "\nHost=" + Utils::ToString(Host);
+						+ "\nHost=" + Utils::ToString(Host)
+						+ "\nWorkshopModsEnabled=";
+
+
+		for (string i: WorkshopModsEnabled)
+		    outFile += i + ",";
+
+		outFile += "\nWorkshopModsOrder=";
+
+        for (string i: WorkshopModsOrder)
+            outFile += i + ",";
+
+        outFile += "\nCustomModsEnabled=";
+
+        for (string i: CustomModsEnabled)
+            outFile += Utils::Replace(i, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
+
+        outFile += "\nCustomModsOrder=";
+
+        for (string i: CustomModsOrder)
+            outFile += Utils::Replace(i, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
 
 		if (!Filesystem::WriteAllText(path, outFile))
 		{
@@ -214,14 +272,26 @@ namespace Settings
 		return true;
 	}
 
-	vector<Mod> LoadUserMods()
+	bool ModEnabled(string workshopId)
 	{
-		vector<Mod> response;
-		return response;
-	}
-
-	bool SaveUserMods(vector<Mod> mods)
-	{
-		return true;
+	    if (workshopId.length() == 0)
+	        return false;
+	    else if (isdigit(workshopId[0]))
+	    {
+	        for (string s: WorkshopModsEnabled)
+	        {
+	            if (s == workshopId)
+	                return true;
+	        }
+	    }
+	    else
+	    {
+            for (string s: CustomModsEnabled)
+            {
+                if (s == workshopId)
+                    return true;
+            }
+	    }
+	    return false;
 	}
 }

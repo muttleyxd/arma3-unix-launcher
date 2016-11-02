@@ -26,12 +26,12 @@ Mod::Mod(string path, string workshopId)
 	Name = Picture = LogoSmall = Logo = LogoOver = Action = TooltipOwned = Overview = "";
 	DlcColor = {-1, -1, -1, -1};
 	HideName = HidePicture = false;
-	PublishedId = -1;
+	PublishedId = "-1";
 	IsRepresentedBySymlink = false;
 
 	Enabled = false;
 
-	WorkshopId = strtoll(workshopId.c_str(), NULL, 10);
+	WorkshopId = workshopId;
 
 	string metaPath = path + "/meta.cpp", modPath = path + "/mod.cpp";
 	if (!Filesystem::FileExists(metaPath))
@@ -124,7 +124,7 @@ void Mod::ParseCPP(string meta, string mod)
 			 * */
 			else if (Utils::StartsWith(s, "hideName"))
 			{
-				string value = s.substr(10, s.size() - 11);
+				string value = s.substr(9);
 				for (char c: value)
 				{
 					if (c == '0' || c == 'f')
@@ -141,7 +141,7 @@ void Mod::ParseCPP(string meta, string mod)
 			}
 			else if (Utils::StartsWith(s, "hidePicture"))
 			{
-				string value = s.substr(13, s.size() - 14);
+				string value = s.substr(12);
 				for (char c: value)
 				{
 					if (c == '0' || c == 'f')
@@ -169,7 +169,7 @@ void Mod::ParseCPP(string meta, string mod)
 				//name="hello" -> hello
 				this->Name = s.substr(6, s.size() - 7);
 			else if (Utils::StartsWith(s, "publishedid"))
-				this->PublishedId = strtoll(s.substr(12, s.size() - 12).c_str(), NULL, 10);
+				this->PublishedId = s.substr(12);
 		}
 
 	}
@@ -200,7 +200,7 @@ string Mod::ToString()
 	response += "HideName: " + to_string(HideName) + "\n";
 	response += "HidePicture: " + to_string(HidePicture) + "\n";
 
-	response += "PublishedId: " + to_string(PublishedId) + "\n";
+	response += "PublishedId: " + PublishedId + "\n";
 
 	return response;
 }

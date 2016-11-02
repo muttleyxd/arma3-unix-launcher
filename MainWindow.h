@@ -30,6 +30,7 @@ class MainWindow : public Gtk::Window
 			Gtk::Button* btnRemove;
 
 			Glib::RefPtr<Gtk::CellRendererToggle> workshopToggleBox;
+			Glib::RefPtr<Gtk::CellRendererToggle> customToggleBox;
 
 		//Parameters tab
 
@@ -96,17 +97,28 @@ class MainWindow : public Gtk::Window
 			Gtk::Label* lblSelectedMods;
 			Gtk::Label* lblStatus;
 
-		class ModelColumns : public Gtk::TreeModel::ColumnRecord
+		class WorkshopModelColumns : public Gtk::TreeModel::ColumnRecord
 		{
 			public:
-				ModelColumns() { add(enabled); add(name); add(workshopid); }
+				WorkshopModelColumns() { add(enabled); add(name); add(workshopid); }
 
 				Gtk::TreeModelColumn<bool> enabled;
 				Gtk::TreeModelColumn<Glib::ustring> name;
-				Gtk::TreeModelColumn<int64_t> workshopid;
+				Gtk::TreeModelColumn<Glib::ustring> workshopid;
 		};
 
-		ModelColumns workshopColumns;
+		class CustomModelColumns : public Gtk::TreeModel::ColumnRecord
+        {
+            public:
+                CustomModelColumns() { add(enabled); add(name); add(path); }
+
+                Gtk::TreeModelColumn<bool> enabled;
+                Gtk::TreeModelColumn<Glib::ustring> name;
+                Gtk::TreeModelColumn<Glib::ustring> path;
+        };
+
+		WorkshopModelColumns workshopColumns;
+		CustomModelColumns customColumns;
 
 	public:
 		MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade);
@@ -114,9 +126,12 @@ class MainWindow : public Gtk::Window
 	protected:
 		bool ignore;
 
-		void btnAdd_Click();
+		void btnAdd_Clicked();
+		void btnRemove_Clicked();
+
 		bool onExit(GdkEventAny* event);
-		void hey(Glib::ustring path);
+		void WorkshopToggleBox_Toggled(Glib::ustring path);
+		void CustomToggleBox_Toggled(Glib::ustring path);
 
 		void cbSkipIntro_Toggled();
 		void cbNosplash_Toggled();
@@ -172,7 +187,8 @@ class MainWindow : public Gtk::Window
 		void cbWorkshopPathAutodetect_Toggled();
 
 		void Init();
-		std::vector<Mod> Mods;
+		std::vector<Mod> WorkshopMods;
+		std::vector<Mod> CustomMods;
 };
 
 #endif /* MAINWINDOW_H_ */

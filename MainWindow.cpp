@@ -31,6 +31,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	builder->get_widget("btnRemove", btnRemove);
 
 	workshopToggleBox = Glib::RefPtr<Gtk::CellRendererToggle>::cast_dynamic(builder->get_object("workshopToggleBox"));
+	customToggleBox = Glib::RefPtr<Gtk::CellRendererToggle>::cast_dynamic(builder->get_object("customToggleBox"));
 
 	//Parameters tab
 	//Basic
@@ -145,6 +146,9 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	tbArmaPath->set_text(Settings::ArmaPath);
 	tbWorkshopPath->set_text(Settings::WorkshopPath);
 
+	btnAdd->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnAdd_Clicked));
+    btnRemove->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnRemove_Clicked));
+
 	cbSkipIntro->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbSkipIntro_Toggled));
 	cbNosplash->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbNosplash_Toggled));
 	cbWindow->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbWindow_Toggled));
@@ -201,63 +205,212 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 
 	/////Executing every event - need to make sure UI represents actual Settings
 	ignore = true;
-	cbSkipIntro_Toggled(); cbNosplash_Toggled(); cbWindow_Toggled(); cbName_Toggled(); tbName_Changed();
-	cbParameterFile_Toggled(); tbParameterFile_Changed(); btnParameterFileBrowse_Clicked();
+	cbSkipIntro_Toggled(); cbNosplash_Toggled(); cbWindow_Toggled(); cbName_Toggled();
+	tbName_Changed(); cbParameterFile_Toggled(); tbParameterFile_Changed();
 	cbCheckSignatures_Toggled(); cbCpuCount_Toggled(); numCpuCount_Changed();
 
 	cbExThreads_Toggled(); cbExThreadsFileOperations_Toggled(); cbExThreadsTextureLoading_Toggled();
 	cbExThreadsGeometryLoading_Toggled(); cbEnableHT_Toggled(); cbFilePatching_Toggled();
 	cbNoLogs_Toggled(); cbWorld_Toggled(); tbWorld_Changed(); cbProfile_Toggled();
-	tbProfile_Changed(); btnProfileBrowse_Clicked(); cbNoPause_Toggled(); cbConnect_Toggled();
+	tbProfile_Changed(); cbNoPause_Toggled(); cbConnect_Toggled();
 	tbConnect_Changed(); cbPort_Toggled(); tbPort_Changed(); cbPassword_Toggled();
 	tbPassword_Changed(); cbHost_Toggled(); tbArmaPath_Changed(); tbWorkshopPath_Changed();
-	btnArmaPathBrowse_Clicked(); btnWorkshopPathBrowse_Clicked(); cbArmaPathAutodetect_Toggled();
-	cbWorkshopPathAutodetect_Toggled();
+	cbArmaPathAutodetect_Toggled();	cbWorkshopPathAutodetect_Toggled();
 	ignore = false;
 	/////
 
 	set_title("ArmA 3 Linux Launcher");
 	set_default_size(Settings::WindowSizeX, Settings::WindowSizeY);
 	move(Settings::WindowPosX, Settings::WindowPosY);
-	tvWorkshopMods->columns_autosize();
-	btnAdd->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnAdd_Click));
 
-	for (Mod m: Mods)
+	for (std::string s: Settings::WorkshopModsOrder)
+	{
+	    for (int i = 0; i < WorkshopMods.size(); i++)
+	    {
+	        if (WorkshopMods[i].WorkshopId == s)
+	        {
+	            Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->append());
+                row[workshopColumns.enabled] = Settings::ModEnabled(WorkshopMods[i].WorkshopId);
+                row[workshopColumns.name] = WorkshopMods[i].Name;
+                row[workshopColumns.workshopid] = WorkshopMods[i].WorkshopId;
+                WorkshopMods.erase(WorkshopMods.begin() + i);
+                break;
+	        }
+	    }
+	}
+
+	for (Mod m: WorkshopMods)
 	{
 		Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->append());
-		row[workshopColumns.enabled] = false;
+		row[workshopColumns.enabled] = Settings::ModEnabled(m.WorkshopId);
 		row[workshopColumns.name] = m.Name;
 		row[workshopColumns.workshopid] = m.WorkshopId;
 	}
-	workshopToggleBox->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::hey));
+
+	for (std::string s: Settings::CustomModsOrder)
+    {
+        for (int i = 0; i < CustomMods.size(); i++)
+        {
+            if (CustomMods[i].WorkshopId == s)
+            {
+                Gtk::TreeModel::Row row = *(customModsStore.operator ->()->append());
+                row[customColumns.enabled] = Settings::ModEnabled(CustomMods[i].Path);
+                row[customColumns.name] = CustomMods[i].Name;
+                row[customColumns.path] = Utils::Replace(CustomMods[i].Path, Settings::ArmaPath, Filesystem::ArmaDirMark);
+                CustomMods.erase(CustomMods.begin() + i);
+                break;
+            }
+        }
+    }
+
+    for (Mod m: CustomMods)
+    {
+        Gtk::TreeModel::Row row = *(customModsStore.operator ->()->append());
+        row[customColumns.enabled] = Settings::ModEnabled(m.Path);
+        row[customColumns.name] = m.Name;
+        row[customColumns.path] = Utils::Replace(m.Path, Settings::ArmaPath, Filesystem::ArmaDirMark);
+    }
+
+	workshopToggleBox->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::WorkshopToggleBox_Toggled));
+	customToggleBox->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::CustomToggleBox_Toggled));
 
 	this->signal_delete_event().connect(sigc::mem_fun(*this, &MainWindow::onExit));
 }
 
-void MainWindow::btnAdd_Click()
+void MainWindow::btnAdd_Clicked()
 {
-	Gtk::MessageDialog dialog(*this, "This is 123", false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_YES_NO, true);
-	dialog.set_secondary_text("Hey there");
+    Gtk::FileChooserDialog fcDialog(*this, "Select new mod folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    /*fcDialog.set_title("Select new mod folder");
+    fcDialog.set_action(Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);*/
+    fcDialog.add_button("_Open", 1);
+    fcDialog.add_button("_Cancel", 0);
+    int result = fcDialog.run();
 
-	int result = dialog.run();
+    LOG(0, "Add dialog result: " + std::to_string(result));
+    if (result)
+    {
+        LOG(0, "Selected filename: " + fcDialog.get_filename());
+        LOG(0, "Current folder: " + fcDialog.get_current_folder());
+        std::string selectedPath = fcDialog.get_filename();
+        if (!Filesystem::DirectoryExists(selectedPath + "/addons") && !Filesystem::DirectoryExists(selectedPath + "/Addons"))
+            selectedPath = fcDialog.get_current_folder();
 
+        if (selectedPath == Settings::ArmaPath)
+        {
+            Gtk::MessageDialog msgDialog("You can't add ArmA's main directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            msgDialog.run();
+            LOG(1, "Selected directory equals ArmA path");
+            return;
+        }
+
+        if (!Filesystem::DirectoryExists(selectedPath + "/addons") && !Filesystem::DirectoryExists(selectedPath + "/Addons"))
+        {
+            Gtk::MessageDialog msgDialog("Couldn't find Addons folder in selected directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            msgDialog.run();
+            LOG(1, "Selected directory doesn't contain Addons folder");
+            return;
+        }
+
+        for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
+        {
+            Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+            Glib::ustring path = row[customColumns.path];
+            std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
+
+            if (pathStr == selectedPath)
+            {
+                Gtk::MessageDialog msgDialog("Mod with this path exists", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+                msgDialog.run();
+                LOG(1, "Selected directory exists in customModsStore");
+                return;
+            }
+        }
+
+        Gtk::TreeModel::Row row = *(customModsStore.operator ->()->append());
+        Mod m(selectedPath, "-1");
+        row[customColumns.enabled] = false;
+        row[customColumns.name] = m.Name;
+        row[customColumns.path] = Utils::Replace(m.Path, Settings::ArmaPath, Filesystem::ArmaDirMark);
+    }
+}
+
+void MainWindow::btnRemove_Clicked()
+{
+    Glib::RefPtr<Gtk::TreeSelection> treeSel = tvCustomMods->get_selection();
+    if (!treeSel.operator ->()->get_selected())
+    {
+        Gtk::MessageDialog msgDialog("Select a mod to delete first", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgDialog.run();
+        return;
+    }
+    Gtk::TreeModel::Row row = *(treeSel.operator ->()->get_selected());
+    Glib::ustring path = row[customColumns.path];
+    if (path.raw().find(Filesystem::ArmaDirMark) != std::string::npos)
+    {
+        Gtk::MessageDialog msgDialog("You can't remove mods from ArmA's directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        msgDialog.run();
+        LOG(1, "Can't delete mods from ArmA's directory");
+        return;
+    }
+    customModsStore.operator ->()->erase(treeSel.operator ->()->get_selected());
 }
 
 bool MainWindow::onExit(GdkEventAny* event)
 {
 	this->get_position(Settings::WindowPosX, Settings::WindowPosY);
 	this->get_size(Settings::WindowSizeX, Settings::WindowSizeY);
+
+	Settings::WorkshopModsEnabled.clear();
+	Settings::WorkshopModsOrder.clear();
+
+	Settings::CustomModsEnabled.clear();
+	Settings::CustomModsOrder.clear();
+
+	for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
+	{
+	    Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+	    LOG(0, "[W" + Utils::ToString(row[workshopColumns.enabled]) + "] Name: " + row[workshopColumns.name] + " WorkshopId: " + row[workshopColumns.workshopid]);
+
+	    Glib::ustring workshopId = row[workshopColumns.workshopid];
+	    Settings::WorkshopModsOrder.push_back(workshopId);
+
+	    if (row[workshopColumns.enabled])
+	        Settings::WorkshopModsEnabled.push_back(workshopId.raw());
+	}
+
+	for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
+	{
+	    Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+	    Glib::ustring path = row[customColumns.path];
+	            std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
+
+	    LOG(0, "[C" + Utils::ToString(row[customColumns.enabled]) + "] Name: " + row[customColumns.name] + " Path: " + pathStr);
+	    Settings::CustomModsOrder.push_back(pathStr);
+
+	    if (row[customColumns.enabled])
+	        Settings::CustomModsEnabled.push_back(pathStr);
+	}
+
 	Settings::Save(Filesystem::HomeDirectory
 					+ Filesystem::LauncherSettingsDirectory
 					+ Filesystem::LauncherSettingsFilename);
 	return false;
 }
 
-void MainWindow::hey(Glib::ustring path) //path is index number
+void MainWindow::WorkshopToggleBox_Toggled(Glib::ustring path) //path is index number
 {
-	std::cout << path << std::endl;
+	//std::cout << path << std::endl;
 	Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(path));
 	row[workshopColumns.enabled] = !row[workshopColumns.enabled];
+}
+
+void MainWindow::CustomToggleBox_Toggled(Glib::ustring path) //path is index number
+{
+    //std::cout << path << std::endl;
+    Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(path));
+    row[customColumns.enabled] = !row[customColumns.enabled];
 }
 
 void MainWindow::cbSkipIntro_Toggled()
@@ -504,6 +657,27 @@ void MainWindow::Init()
 
 	LOG(1, "ArmA 3 Path: " + Settings::ArmaPath + "\nWorkshop mods path: " + Settings::WorkshopPath);
 
-	Mods = Filesystem::FindMods(Settings::WorkshopPath);
-	Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, Mods);
+	WorkshopMods = Filesystem::FindMods(Settings::WorkshopPath);
+
+	for (std::string path: Settings::CustomModsOrder)
+	{
+	    LOG(0, "Custom mod: " + path);
+	    //path = Utils::Replace(path, Filesystem::ArmaDirMark, Settings::ArmaPath);
+	    CustomMods.push_back(Mod(path, "-1"));
+	}
+
+	std::vector<Mod> ArmaDirMods = Filesystem::FindMods(Settings::ArmaPath);
+	for (Mod m: ArmaDirMods)
+	{
+	    for (Mod n: CustomMods)
+	    {
+	        if (n.Path == m.Path)
+	            goto alreadyExists;
+	    }
+	    CustomMods.push_back(m);
+	    alreadyExists:
+	    continue;
+	}
+
+	Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, WorkshopMods);
 }

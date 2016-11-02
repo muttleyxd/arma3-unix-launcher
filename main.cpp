@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 
 	LOG(1, "ArmA 3 Launcher started");
 
+	//~/.config/a3linuxlauncher
 	if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
 			+ Filesystem::LauncherSettingsDirectory))
 	{
@@ -48,6 +49,18 @@ int main(int argc, char *argv[])
 		if (!result)
 			exit(1);
 	}
+
+	//~/.config/a3linuxlauncher/custommods
+	if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
+	            + Filesystem::LauncherSettingsDirectory
+	            + Filesystem::LauncherCustomModDirectory))
+    {
+        bool result = Filesystem::CreateDirectory(Filesystem::HomeDirectory
+                + Filesystem::LauncherSettingsDirectory
+                + Filesystem::LauncherCustomModDirectory);
+        if (!result)
+            exit(1);
+    }
 
 	if (!Filesystem::FileExists(Filesystem::HomeDirectory
 			+ Filesystem::LauncherSettingsDirectory
@@ -61,8 +74,9 @@ int main(int argc, char *argv[])
 			+ Filesystem::LauncherSettingsDirectory
 			+ Filesystem::LauncherSettingsFilename);
 
-	int zero = 0;
-	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(zero, argv, "muttley.a3linuxlauncher");
+	//Dirty fix to Gtk::Application trying to parse arguments on its own
+	argc = 0;
+	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3linuxlauncher");
 	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("MainForm.glade");
 
 	cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl

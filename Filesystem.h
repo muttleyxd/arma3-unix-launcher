@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "Mod.h"
 
 enum DirectoryToFind
@@ -30,6 +31,9 @@ namespace Filesystem
 	extern std::string HomeDirectory;
 	extern std::string LauncherSettingsDirectory;
 	extern std::string LauncherSettingsFilename;
+	extern std::string LauncherCustomModDirectory;
+
+	extern std::string ArmaDirMark;
 
 	//profiles - *.profile files in settings directory
 

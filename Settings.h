@@ -67,11 +67,16 @@ namespace Settings
 
 	extern bool Host;
 
+	extern std::vector<std::string> WorkshopModsEnabled;
+	extern std::vector<std::string> WorkshopModsOrder;
+
+	extern std::vector<std::string> CustomModsEnabled;
+	extern std::vector<std::string> CustomModsOrder;
+
 	bool Load(std::string path);
 	bool Save(std::string path);
 
-	std::vector<Mod> LoadUserMods();
-	bool SaveUserMods(std::vector<Mod> mods);
+	bool ModEnabled(std::string workshopId);
 };
 
 #endif /* SETTINGS_H_ */
