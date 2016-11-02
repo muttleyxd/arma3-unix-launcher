@@ -3,7 +3,7 @@
 ArmA 3 Launcher for Linux.
 Since Bohemia didn't port their launcher to Linux and existing launcher didn't satisfy my needs I decided to create my own.
 
-# This is work in progress, for now only GUI is functional
+# This is work in progress, for now it's only for GUI preview
 
 ### Features
 
@@ -30,6 +30,6 @@ Gtkmm is required
     cd arma3_linux_launcher
     make
 
-After that you can launcher with
+After that you can launch with
 
     ./arma3_linux_launcher
