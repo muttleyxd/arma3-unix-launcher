@@ -43,10 +43,14 @@ namespace Utils
 
 	string Replace(string str, string from, string to)
 	{
-		size_t start_pos = str.find(from);
-		if(start_pos == std::string::npos)
-			return str;;
-		str.replace(start_pos, from.length(), to);
+		size_t start_pos = 123;
+		while (start_pos != std::string::npos)
+		{
+		    start_pos = str.find(from);
+            if(start_pos == std::string::npos)
+                return str;
+            str.replace(start_pos, from.length(), to);
+		}
 		return str;
 	}
 

@@ -113,6 +113,8 @@ class MainWindow : public Gtk::Window
 	protected:
 		bool ignore;
 
+		std::vector<Mod> FullModList;
+
 		void btnAdd_Clicked();
 		void btnRemove_Clicked();
 
@@ -165,6 +167,7 @@ class MainWindow : public Gtk::Window
 		void RefreshStatusLabel();
 
 		void Init();
+		void PutModsToSettings();
 };
 
 #endif /* MAINWINDOW_H_ */

@@ -3,7 +3,7 @@
 ArmA 3 Launcher for Linux.
 Since Bohemia didn't port their launcher to Linux and existing launcher didn't satisfy my needs I decided to create my own.
 
-# This is work in progress, for now it's only for GUI preview
+Launcher detects and symlinks all mods from Workshop and ArmA's main directory. It also allows to add your own mods from outside ArmA directory.
 
 ### Features
 
@@ -11,15 +11,17 @@ Since Bohemia didn't port their launcher to Linux and existing launcher didn't s
 * Workshop mods support (symlink to ~arma/!workshop)
 * Detect @mods (ArmA main dir)
 * Add mods from outside ArmA's dir (symlink)
+* Launch ArmA with desired options
 
 ### TODO
 
 * Steam integration (info about downloading)
 * Server browser
-* Launching ArmA with desired options
 * .paa reading - for displaying mod images in launcher
 * Mod dependency caching from Steam Workshop
 * MacOS port
+* Code refactoring (logic should be outside GUI code)
+* AUR package for Arch-based, PPA for Ubuntu
 
 
 ### Building

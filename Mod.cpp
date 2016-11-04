@@ -22,7 +22,7 @@ using namespace std;
 Mod::Mod(string path, string workshopId)
 {
 	Path = path;
-	Name = Picture = LogoSmall = Logo = LogoOver = Action = TooltipOwned = Overview = "";
+	Name = DirName = Picture = LogoSmall = Logo = LogoOver = Action = TooltipOwned = Overview = "";
 	DlcColor = {-1, -1, -1, -1};
 	HideName = HidePicture = false;
 	PublishedId = "-1";
@@ -41,10 +41,13 @@ Mod::Mod(string path, string workshopId)
 
 	//Mod is added manually by user and din't contain any data in meta.cpp or mod.cpp
 	//quick & dirty -> Name = DirectoryName
-	if (Name == "")
+	if (Name == "" || DirName == "")
 	{
 		int withoutLastElement = Utils::RemoveLastElement(path, false).size();
-		Name = path.substr(withoutLastElement);
+		if (Name == "")
+		    Name = path.substr(withoutLastElement);
+		if (DirName == "")
+		    DirName = path.substr(withoutLastElement);
 	}
 }
 
@@ -68,6 +71,24 @@ string Mod::ParseString(string input)
 //As anyone would expect - documentation on this is trash
 void Mod::ParseCPP(string meta, string mod)
 {
+    if (meta != "")
+    {
+        string file = ParseString(Filesystem::ReadAllText(meta));
+        //cout << "Meta.cpp: "<< file << endl;
+        vector<string> instructions = Utils::Split(file, ";");
+        for (string s: instructions)
+        {
+            if (Utils::StartsWith(s, "name"))
+            {
+                //name="hello" -> hello
+                this->Name = s.substr(6, s.size() - 7);
+                this->DirName = s.substr(6, s.size() - 7);
+            }
+            else if (Utils::StartsWith(s, "publishedid"))
+                this->PublishedId = s.substr(12);
+        }
+
+    }
 	if (mod != "")
 	{
 		string file = ParseString(Filesystem::ReadAllText(mod));
@@ -156,21 +177,6 @@ void Mod::ParseCPP(string meta, string mod)
 				}
 			}
 		}
-	}
-	if (meta != "")
-	{
-		string file = ParseString(Filesystem::ReadAllText(meta));
-		//cout << "Meta.cpp: "<< file << endl;
-		vector<string> instructions = Utils::Split(file, ";");
-		for (string s: instructions)
-		{
-			if (Utils::StartsWith(s, "name"))
-				//name="hello" -> hello
-				this->Name = s.substr(6, s.size() - 7);
-			else if (Utils::StartsWith(s, "publishedid"))
-				this->PublishedId = s.substr(12);
-		}
-
 	}
 }
 

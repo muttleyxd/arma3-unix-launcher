@@ -226,9 +226,9 @@ namespace Filesystem
 		        continue;
 			if (!m.IsRepresentedBySymlink)
 			{
-				string linkName = armaDirWorkshopPath + "/@" + m.Name;
+				string linkName = armaDirWorkshopPath + "/@" + m.DirName;
 				if (m.WorkshopId == "-1")
-				    linkName = armaDirCustomPath + "/@" + m.Name;
+				    linkName = armaDirCustomPath + "/@" + m.DirName;
 				if (!DirectoryExists(linkName) || !FileExists(linkName))
 				{
 					int result = symlink(m.Path.c_str(), linkName.c_str());
@@ -353,5 +353,82 @@ namespace Filesystem
             else
                 LOG(1, "Not a symlink found in ModDirs!");
         }
+	}
+
+	string GenerateArmaCfg(string armaPath, string source, vector<Mod*> modList)
+	{
+	    LOG(1, "Generating Arma3.cfg");
+	    string response;
+	    string inputFile = ReadAllText(source);
+	    if (inputFile == FILE_NOT_OPEN)
+	        return FILE_NOT_OPEN;
+
+	    string modLauncherList = "class ModLauncherList\n{\n";
+	    int i;
+
+	    for (i = 0; i < modList.size(); i++)
+	    {
+	        string fullPath = armaPath;
+	        string symlinkAt = "@";
+	        if (modList[i]->WorkshopId == "-1")
+	        {
+	            if (fullPath.find(armaPath) == std::string::npos)
+	                fullPath += Filesystem::ArmaDirCustom;
+	            else
+	                symlinkAt = "";
+	        }
+	        else
+	            fullPath += Filesystem::ArmaDirWorkshop;
+	        fullPath += "/" + symlinkAt + modList[i]->DirName;
+
+	        string dirName = symlinkAt + modList[i]->DirName;
+
+	        string windowsPath = "C:" + Utils::Replace(fullPath, "/", "\\");
+	        modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
+	                + "\n\t\tdir=\"" + dirName + "\";"
+	                + "\n\t\tname=\"" + modList[i]->Name + "\";"
+	                + "\n\t\torigin=\"GAME DIR\";"
+	                + "\n\t\tfullPath=\"" + windowsPath + "\";"
+	                + "\n\t};\n";
+	    }
+
+	    /*modLauncherList += "\tclass Mod" + to_string(i + 1)
+	            + "\n\t{\n\t\tdir=\"Arma\";\n\t\tname=\"Arma\";"
+	            + "\n\t\torigin=\"NOT FOUND\";\n\t};\n};";*/
+
+	    modLauncherList += "};";
+
+	    int leftBracketsOpen = 0;
+	    bool ignoreAll = false;
+
+	    vector<string> lines = Utils::Split(inputFile, "\n");
+	    for (string s: lines)
+	    {
+	        string logMsg = "Line: " + s + "\n";
+	        if (Utils::Trim(s) == "{")
+	        {
+	            leftBracketsOpen++;
+	            logMsg += "Left brackets opened: " + to_string(leftBracketsOpen);
+	        }
+	        else if (Utils::Trim(s) == "};")
+	        {
+	            leftBracketsOpen--;
+	            if (leftBracketsOpen == 0)
+	                ignoreAll = false;
+	            logMsg += "Left brackets opened: " + to_string(leftBracketsOpen)
+	                    + "\nignoreAll = " + Utils::ToString(ignoreAll);
+	        }
+	        else
+	        {
+	            if (Utils::Trim(s) == "class ModLauncherList")
+	                ignoreAll = true;
+	            if (!ignoreAll)
+	                response += s + "\n";
+	            logMsg += "\nignoreAll = " + Utils::ToString(ignoreAll);
+	        }
+	        LOG(0, logMsg);
+	    }
+	    response += modLauncherList + "\n";
+	    return response;
 	}
 }

@@ -18,7 +18,7 @@ class Mod
 		Mod(std::string path, std::string workshopId);
 		~Mod();
 
-		std::string Path, Name, Picture, LogoSmall, Logo, LogoOver, Action,
+		std::string Path, Name, DirName, Picture, LogoSmall, Logo, LogoOver, Action,
 				ActionName, TooltipOwned, Overview, Description, OverviewPicture,
 				OverviewText, Author;
 		Vec4 DlcColor;

@@ -63,6 +63,7 @@ namespace Filesystem
 
 	std::string GetSymlinkTarget(std::string path);
 	void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string>* ModDirs, std::vector<Mod>* modList);
-};
 
+    std::string GenerateArmaCfg(std::string armaPath, std::string source, std::vector<Mod*> modList);
+}
 #endif /* FILESYSTEM_H_ */
