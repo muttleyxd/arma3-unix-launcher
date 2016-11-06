@@ -9,7 +9,7 @@
 
 VDFKey::VDFKey(std::string path, std::string value)
 {
-	Path = path;
-	Value = value;
+    Path = path;
+    Value = value;
 }
 

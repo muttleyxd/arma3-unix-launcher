@@ -15,10 +15,10 @@
 
 class VDF
 {
-	public:
-		VDF(std::string filename);
-		std::vector<VDFKey> Keys;
-		std::string GetValue(std::string KeyName);
+    public:
+        VDF(std::string filename);
+        std::vector<VDFKey> Keys;
+        std::string GetValue(std::string KeyName);
 };
 
 #endif /* VDF_H_ */

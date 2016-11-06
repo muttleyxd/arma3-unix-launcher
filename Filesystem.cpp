@@ -27,179 +27,184 @@ using namespace std;
 
 namespace Filesystem
 {
-	std::string FILE_NOT_OPEN = "FILE_NOT_OPEN";
-	std::string DIR_NOT_FOUND = "DIR_NOT_FOUND";
-	std::string NOT_A_SYMLINK = "NOT_A_SYMLINK";
+    std::string FILE_NOT_OPEN = "FILE_NOT_OPEN";
+    std::string DIR_NOT_FOUND = "DIR_NOT_FOUND";
+    std::string NOT_A_SYMLINK = "NOT_A_SYMLINK";
 
-	std::string STEAM_CONFIG_FILE = "/.local/share/Steam/config/config.vdf";
-	std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
-	std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
-	std::string SteamPath = "/.steam/steam";
-	std::string HomeDirectory = getenv("HOME");
-	std::string LauncherSettingsDirectory = "/.config/a3linuxlauncher";
-	std::string LauncherSettingsFilename = "/settings.conf";
+    std::string STEAM_CONFIG_FILE = "/.local/share/Steam/config/config.vdf";
+    std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
+    std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
+    std::string SteamPath = "/.steam/steam";
+    std::string HomeDirectory = getenv("HOME");
+    std::string LauncherSettingsDirectory = "/.config/a3linuxlauncher";
+    std::string LauncherSettingsFilename = "/settings.conf";
 
-	std::string ArmaDirWorkshop = "/!workshop";
-	std::string ArmaDirCustom = "/!custom";
+    std::string ArmaDirWorkshop = "/!workshop";
+    std::string ArmaDirCustom = "/!custom";
 
-	std::string ArmaDirDoNotChange = "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
+    std::string ArmaDirDoNotChange = "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
 
-	std::string ArmaDirMark = "~arma";
+    std::string ArmaDirMark = "~arma";
 
-	std::string ArmaConfigFile = "/.local/share/bohemiainteractive/arma3/GameDocuments/Arma 3/Arma3.cfg";
+    std::string ArmaConfigFile = "/.local/share/bohemiainteractive/arma3/GameDocuments/Arma 3/Arma3.cfg";
 
-	std::vector<std::string> GetSteamLibraries()
-	{
-		vector<string> response;
-		string steamConfigFile;
-		ifstream configFile;
-		configFile.open(HomeDirectory + STEAM_CONFIG_FILE, ios::in);
-		if (configFile.is_open())
-		{
-			LOG(0, "File " + HomeDirectory + STEAM_CONFIG_FILE + " successfully opened...\nReading libraries list...\n");
-			getline(configFile, steamConfigFile, '\0');
-			VDF vdfReader(steamConfigFile);
-			string currentLibraryPath = "";
-			int libraryNumber = 1;
+    std::vector<std::string> GetSteamLibraries()
+    {
+        vector<string> response;
+        string steamConfigFile;
+        ifstream configFile;
+        configFile.open(HomeDirectory + STEAM_CONFIG_FILE, ios::in);
+        if (configFile.is_open())
+        {
+            LOG(0, "File " + HomeDirectory + STEAM_CONFIG_FILE + " successfully opened...\nReading libraries list...\n");
+            getline(configFile, steamConfigFile, '\0');
+            VDF vdfReader(steamConfigFile);
+            string currentLibraryPath = "";
+            int libraryNumber = 1;
 
-			while (true)
-			{
-				currentLibraryPath = vdfReader.GetValue("InstallConfigStore/Software/Valve/Steam/BaseInstallFolder_" + to_string(libraryNumber++));
-				if (currentLibraryPath == KEY_NOT_FOUND)
-					break;
-				response.push_back(currentLibraryPath);
-			}
-		}
-		else
-			LOG(1, "Can't open " + HomeDirectory + STEAM_CONFIG_FILE + "\nCritical error\n");
-		return response;
-	}
+            while (true)
+            {
+                currentLibraryPath = vdfReader.GetValue("InstallConfigStore/Software/Valve/Steam/BaseInstallFolder_" + to_string(libraryNumber++));
+                if (currentLibraryPath == KEY_NOT_FOUND)
+                    break;
+                response.push_back(currentLibraryPath);
+            }
+        }
+        else
+            LOG(1, "Can't open " + HomeDirectory + STEAM_CONFIG_FILE + "\nCritical error\n");
+        return response;
+    }
 
-	std::string GetDirectory(DirectoryToFind dtf)
-	{
-		string DirName = "";
-		switch (dtf)
-		{
-			case DirectoryToFind::ArmaInstall:
-				DirName = SteamAppsArmaPath;
-				break;
-			case DirectoryToFind::WorkshopMods:
-				DirName = SteamAppsModWorkshopPath;
-				break;
-			default:
-				DirName = SteamAppsModWorkshopPath;
-				break;
-		}
-		DIR* dir = opendir((SteamPath + DirName).c_str());
-		if (dir)
-		{
-			closedir(dir);
-			return SteamPath + DirName;
-		}
-		for (string s: GetSteamLibraries())
-		{
-			DIR* dir = opendir((s + DirName).c_str());
-			if (dir)
-			{
-				closedir(dir);
-				return s + DirName;
-			}
-		}
-		return DIR_NOT_FOUND;
-	}
+    std::string GetDirectory(DirectoryToFind dtf)
+    {
+        string DirName = "";
+        switch (dtf)
+        {
+            case DirectoryToFind::ArmaInstall:
+                DirName = SteamAppsArmaPath;
+                break;
+            case DirectoryToFind::WorkshopMods:
+                DirName = SteamAppsModWorkshopPath;
+                break;
+            default:
+                DirName = SteamAppsModWorkshopPath;
+                break;
+        }
+        DIR* dir = opendir((SteamPath + DirName).c_str());
+        if (dir)
+        {
+            closedir(dir);
+            return SteamPath + DirName;
+        }
+        for (string s: GetSteamLibraries())
+        {
+            DIR* dir = opendir((s + DirName).c_str());
+            if (dir)
+            {
+                closedir(dir);
+                return s + DirName;
+            }
+        }
+        return DIR_NOT_FOUND;
+    }
 
-	bool FileExists(string path)
-	{
-		struct stat buffer;
-		return (stat(path.c_str(), &buffer) == 0);
-	}
+    bool FileExists(string path)
+    {
+        struct stat buffer;
+        return (stat(path.c_str(), &buffer) == 0);
+    }
 
-	bool DirectoryExists(string path)
-	{
-		struct stat buffer;
-		int errorCode = stat(path.c_str(), &buffer);
-		if (errorCode == -1)
-		{
-			if (errno == ENOENT)
-				return false;
-			LOG(1, "Stat Error in DirectoryExists(" + path + ");");
-			return false;
-		}
-		else
-		{
-			if (S_ISDIR(buffer.st_mode))
-				return true;
-			return false;
-		}
-	}
+    bool DirectoryExists(string path)
+    {
+        struct stat buffer;
+        int errorCode = stat(path.c_str(), &buffer);
+        if (errorCode == -1)
+        {
+            if (errno == ENOENT)
+                return false;
+            LOG(1, "Stat Error in DirectoryExists(" + path + ");");
+            return false;
+        }
+        else
+        {
+            if (S_ISDIR(buffer.st_mode))
+                return true;
+            return false;
+        }
+    }
 
-	bool WriteAllText(string path, string value)
-	{
-		LOG(0, "Writing to file " + path);
-		ofstream outFile(path);
-		if (outFile.is_open())
-		{
-			LOG(0, "File write success");
-			outFile << value;
-			outFile.close();
-			return true;
-		}
-		LOG(1, "Can't open file " + path + " for write");
-		return false;
-	}
+    bool WriteAllText(string path, string value)
+    {
+        LOG(0, "Writing to file " + path);
+        ofstream outFile(path);
+        if (outFile.is_open())
+        {
+            LOG(0, "File write success");
+            outFile << value;
+            outFile.close();
+            return true;
+        }
+        LOG(1, "Can't open file " + path + " for write");
+        return false;
+    }
 
-	string ReadAllText(string path)
-	{
-		LOG(0, "Reading file " + path + "... ");
-		string response;
-		ifstream inFile;
-		inFile.open(path, ios::in);
-		if (inFile.is_open())
-		{
-			getline(inFile, response, '\0');
-			inFile.close();
-			LOG(0, "File read successfully");
-			return response;
-		}
-		LOG(1, "Can't open file " + path + " for read");
-		return FILE_NOT_OPEN;
-	}
+    string ReadAllText(string path)
+    {
+        LOG(0, "Reading file " + path + "... ");
+        string response;
+        ifstream inFile;
+        inFile.open(path, ios::in);
+        if (inFile.is_open())
+        {
+            getline(inFile, response, '\0');
+            inFile.close();
+            LOG(0, "File read successfully");
+            return response;
+        }
+        LOG(1, "Can't open file " + path + " for read");
+        return FILE_NOT_OPEN;
+    }
 
-	vector<Mod> FindMods(string path)
-	{
-		vector<Mod> response;
+    vector<Mod> FindMods(string path)
+    {
+        vector<Mod> response;
 
-		for (string s: GetSubDirectories(path))
-		{
-		    if (s == "curator" || s == "dta" || s == "Expansion" || s == "heli"
-		            || s == "kart" || s == "mark") //skip DLCs
-		        continue;
-			if (DirectoryExists(path + "/" + s + "/Addons")
-					|| DirectoryExists(path + "/" + s + "/addons"))
-				response.push_back(Mod(path + "/" + s, s));
-		}
-		return response;
-	}
+        for (string s: GetSubDirectories(path))
+        {
+            if (s == "curator" || s == "dta" || s == "Expansion" || s == "heli"
+                    || s == "kart" || s == "mark") //skip DLCs
+                continue;
+            if (DirectoryExists(path + "/" + s + "/Addons")
+                    || DirectoryExists(path + "/" + s + "/addons"))
+            {
+                if (isdigit(s.at(0)))
+                    response.push_back(Mod(path + "/" + s, s));
+                else
+                    response.push_back(Mod(path + "/" + s, "-1"));
+            }
+        }
+        return response;
+    }
 
-	void CheckFileStructure(string armaDir, string workshopDir, vector<Mod> modList)
-	{
-	    LOG(0, "Checking file structure");
-		string armaDirWorkshopPath = armaDir + Filesystem::ArmaDirWorkshop;
-		string armaDirCustomPath = armaDir + Filesystem::ArmaDirCustom;
+    void CheckFileStructure(string armaDir, string workshopDir, vector<Mod> modList)
+    {
+        LOG(0, "Checking file structure");
+        string armaDirWorkshopPath = armaDir + Filesystem::ArmaDirWorkshop;
+        string armaDirCustomPath = armaDir + Filesystem::ArmaDirCustom;
 
-		LOG(0, "!workshop -> " + armaDirWorkshopPath + "\n!custom -> " + armaDirCustomPath);
+        LOG(0, "!workshop -> " + armaDirWorkshopPath + "\n!custom -> " + armaDirCustomPath);
 
-		if (!DirectoryExists(armaDirWorkshopPath))
-		{
-			if (!CreateDirectory(armaDirWorkshopPath))
-				return;
-		}
+        if (!DirectoryExists(armaDirWorkshopPath))
+        {
+            if (!CreateDirectory(armaDirWorkshopPath))
+                return;
+        }
 
-		if (!DirectoryExists(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
-		{
-			if (!CreateDirectory(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
-				return;
-		}
+        if (!DirectoryExists(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
+        {
+            if (!CreateDirectory(armaDirWorkshopPath + Filesystem::ArmaDirDoNotChange))
+                return;
+        }
 
         if (!DirectoryExists(armaDirCustomPath))
         {
@@ -213,88 +218,88 @@ namespace Filesystem
                 return;
         }
 
-		vector<string> ModDirs = GetSubDirectories(armaDirWorkshopPath);
+        vector<string> ModDirs = GetSubDirectories(armaDirWorkshopPath);
 
-		CheckSymlinks(armaDirWorkshopPath, armaDir, workshopDir, &ModDirs, &modList);
+        CheckSymlinks(armaDirWorkshopPath, armaDir, workshopDir, &ModDirs, &modList);
 
-		ModDirs = GetSubDirectories(armaDirCustomPath);
-		CheckSymlinks(armaDirCustomPath, armaDir, workshopDir, &ModDirs, &modList);
+        ModDirs = GetSubDirectories(armaDirCustomPath);
+        CheckSymlinks(armaDirCustomPath, armaDir, workshopDir, &ModDirs, &modList);
 
-		for (Mod m: modList)
-		{
-		    if (m.Path.find(armaDir) != string::npos)
-		        continue;
-			if (!m.IsRepresentedBySymlink)
-			{
-				string linkName = armaDirWorkshopPath + "/@" + m.DirName;
-				if (m.WorkshopId == "-1")
-				    linkName = armaDirCustomPath + "/@" + m.DirName;
-				if (!DirectoryExists(linkName) || !FileExists(linkName))
-				{
-					int result = symlink(m.Path.c_str(), linkName.c_str());
-					if (result != 0)
-						LOG(1, "Symlink creation failed: " + m.Path + "->" + linkName);
-					else
-						LOG(0, "Symlink creation success: " + m.Path + "->" + linkName);
-				}
-				else
-					LOG(1, "Dir/file " + linkName + " already exists");
-			}
-		}
-	}
+        for (Mod m: modList)
+        {
+            if (m.Path.find(armaDir) != string::npos)
+                continue;
+            if (!m.IsRepresentedBySymlink)
+            {
+                string linkName = armaDirWorkshopPath + "/@" + m.DirName;
+                if (m.WorkshopId == "-1")
+                    linkName = armaDirCustomPath + "/@" + m.DirName;
+                if (!DirectoryExists(linkName) || !FileExists(linkName))
+                {
+                    int result = symlink(m.Path.c_str(), linkName.c_str());
+                    if (result != 0)
+                        LOG(1, "Symlink creation failed: " + m.Path + "->" + linkName);
+                    else
+                        LOG(0, "Symlink creation success: " + m.Path + "->" + linkName);
+                }
+                else
+                    LOG(1, "Dir/file " + linkName + " already exists");
+            }
+        }
+    }
 
-	vector<string> GetSubDirectories(string path)
-	{
-		vector<string> response;
-		struct dirent* directoryEntry;
+    vector<string> GetSubDirectories(string path)
+    {
+        vector<string> response;
+        struct dirent* directoryEntry;
 
-		DIR* pathDir = opendir(path.c_str());
+        DIR* pathDir = opendir(path.c_str());
 
-		if (pathDir == NULL)
-		{
-			LOG(1, "Opening directory " + path + " failed");
-			return response;
-		}
-		LOG(0, "Opening directory " + path + " succeeded");
+        if (pathDir == NULL)
+        {
+            LOG(1, "Opening directory " + path + " failed");
+            return response;
+        }
+        LOG(0, "Opening directory " + path + " succeeded");
 
-		while ((directoryEntry = readdir(pathDir)) != NULL)
-		{
-			struct stat st;
+        while ((directoryEntry = readdir(pathDir)) != NULL)
+        {
+            struct stat st;
 
-			if ((strcmp(directoryEntry->d_name, ".") == 0) || (strcmp(directoryEntry->d_name, "..") == 0))
-				continue;
+            if ((strcmp(directoryEntry->d_name, ".") == 0) || (strcmp(directoryEntry->d_name, "..") == 0))
+                continue;
 
-			if (fstatat(dirfd(pathDir), directoryEntry->d_name, &st, 0) < 0)
-			{
-				string DirName = directoryEntry->d_name;
-				LOG(1, "Directory error " + DirName);
-				continue;
-			}
+            if (fstatat(dirfd(pathDir), directoryEntry->d_name, &st, 0) < 0)
+            {
+                string DirName = directoryEntry->d_name;
+                LOG(1, "Directory error " + DirName);
+                continue;
+            }
 
-			if (S_ISDIR(st.st_mode))
-				response.push_back(directoryEntry->d_name);
-		}
+            if (S_ISDIR(st.st_mode))
+                response.push_back(directoryEntry->d_name);
+        }
 
-		closedir(pathDir);
+        closedir(pathDir);
 
-		return response;
-	}
+        return response;
+    }
 
-	bool CreateDirectory(string path)
-	{
-		int status = mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
-		if (status != 0)
-		{
-			LOG(1, "Can't create directory " + path);
-			return false;
-		}
-		LOG(0, "Successfully created directory " + path);
-		return true;
-	}
+    bool CreateDirectory(string path)
+    {
+        int status = mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH); //d rwx r-x r-x
+        if (status != 0)
+        {
+            LOG(1, "Can't create directory " + path);
+            return false;
+        }
+        LOG(0, "Successfully created directory " + path);
+        return true;
+    }
 
-	string GetSymlinkTarget(string path)
-	{
-	    struct stat statinfo;
+    string GetSymlinkTarget(string path)
+    {
+        struct stat statinfo;
         if (lstat(path.c_str(), &statinfo) < 0)
         {
             LOG(0, "Can't open directory/symlink " + path);
@@ -312,13 +317,13 @@ namespace Filesystem
             return target;
         }
         return NOT_A_SYMLINK;
-	}
+    }
 
-	void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string>* ModDirs, vector<Mod>* modList)
-	{
-	    for (int i = 0; i < ModDirs->size(); i++)
+    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string>* ModDirs, vector<Mod>* modList)
+    {
+        for (int i = 0; i < ModDirs->size(); i++)
         {
-	        string s = ModDirs->operator [](i);
+            string s = ModDirs->operator [](i);
             string target = GetSymlinkTarget(path + "/" + s);
             if (target != NOT_A_SYMLINK)
             {
@@ -353,82 +358,82 @@ namespace Filesystem
             else
                 LOG(1, "Not a symlink found in ModDirs!");
         }
-	}
+    }
 
-	string GenerateArmaCfg(string armaPath, string source, vector<Mod*> modList)
-	{
-	    LOG(1, "Generating Arma3.cfg");
-	    string response;
-	    string inputFile = ReadAllText(source);
-	    if (inputFile == FILE_NOT_OPEN)
-	        return FILE_NOT_OPEN;
+    string GenerateArmaCfg(string armaPath, string source, vector<Mod*> modList)
+    {
+        LOG(1, "Generating Arma3.cfg");
+        string response;
+        string inputFile = ReadAllText(source);
+        if (inputFile == FILE_NOT_OPEN)
+            return FILE_NOT_OPEN;
 
-	    string modLauncherList = "class ModLauncherList\n{\n";
-	    int i;
+        string modLauncherList = "class ModLauncherList\n{\n";
+        int i;
 
-	    for (i = 0; i < modList.size(); i++)
-	    {
-	        string fullPath = armaPath;
-	        string symlinkAt = "@";
-	        if (modList[i]->WorkshopId == "-1")
-	        {
-	            if (fullPath.find(armaPath) == std::string::npos)
-	                fullPath += Filesystem::ArmaDirCustom;
-	            else
-	                symlinkAt = "";
-	        }
-	        else
-	            fullPath += Filesystem::ArmaDirWorkshop;
-	        fullPath += "/" + symlinkAt + modList[i]->DirName;
+        for (i = 0; i < modList.size(); i++)
+        {
+            string fullPath = armaPath;
+            string symlinkAt = "@";
+            if (modList[i]->WorkshopId == "-1")
+            {
+                if (fullPath.find(armaPath) == std::string::npos)
+                    fullPath += Filesystem::ArmaDirCustom;
+                else
+                    symlinkAt = "";
+            }
+            else
+                fullPath += Filesystem::ArmaDirWorkshop;
+            fullPath += "/" + symlinkAt + modList[i]->DirName;
 
-	        string dirName = symlinkAt + modList[i]->DirName;
+            string dirName = symlinkAt + modList[i]->DirName;
 
-	        string windowsPath = "C:" + Utils::Replace(fullPath, "/", "\\");
-	        modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
-	                + "\n\t\tdir=\"" + dirName + "\";"
-	                + "\n\t\tname=\"" + modList[i]->Name + "\";"
-	                + "\n\t\torigin=\"GAME DIR\";"
-	                + "\n\t\tfullPath=\"" + windowsPath + "\";"
-	                + "\n\t};\n";
-	    }
+            string windowsPath = "C:" + Utils::Replace(fullPath, "/", "\\");
+            modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
+                    + "\n\t\tdir=\"" + dirName + "\";"
+                    + "\n\t\tname=\"" + modList[i]->Name + "\";"
+                    + "\n\t\torigin=\"GAME DIR\";"
+                    + "\n\t\tfullPath=\"" + windowsPath + "\";"
+                    + "\n\t};\n";
+        }
 
-	    /*modLauncherList += "\tclass Mod" + to_string(i + 1)
-	            + "\n\t{\n\t\tdir=\"Arma\";\n\t\tname=\"Arma\";"
-	            + "\n\t\torigin=\"NOT FOUND\";\n\t};\n};";*/
+        /*modLauncherList += "\tclass Mod" + to_string(i + 1)
+                + "\n\t{\n\t\tdir=\"Arma\";\n\t\tname=\"Arma\";"
+                + "\n\t\torigin=\"NOT FOUND\";\n\t};\n};";*/
 
-	    modLauncherList += "};";
+        modLauncherList += "};";
 
-	    int leftBracketsOpen = 0;
-	    bool ignoreAll = false;
+        int leftBracketsOpen = 0;
+        bool ignoreAll = false;
 
-	    vector<string> lines = Utils::Split(inputFile, "\n");
-	    for (string s: lines)
-	    {
-	        string logMsg = "Line: " + s + "\n";
-	        if (Utils::Trim(s) == "{")
-	        {
-	            leftBracketsOpen++;
-	            logMsg += "Left brackets opened: " + to_string(leftBracketsOpen);
-	        }
-	        else if (Utils::Trim(s) == "};")
-	        {
-	            leftBracketsOpen--;
-	            if (leftBracketsOpen == 0)
-	                ignoreAll = false;
-	            logMsg += "Left brackets opened: " + to_string(leftBracketsOpen)
-	                    + "\nignoreAll = " + Utils::ToString(ignoreAll);
-	        }
-	        else
-	        {
-	            if (Utils::Trim(s) == "class ModLauncherList")
-	                ignoreAll = true;
-	            if (!ignoreAll)
-	                response += s + "\n";
-	            logMsg += "\nignoreAll = " + Utils::ToString(ignoreAll);
-	        }
-	        LOG(0, logMsg);
-	    }
-	    response += modLauncherList + "\n";
-	    return response;
-	}
+        vector<string> lines = Utils::Split(inputFile, "\n");
+        for (string s: lines)
+        {
+            string logMsg = "Line: " + s + "\n";
+            if (Utils::Trim(s) == "{")
+            {
+                leftBracketsOpen++;
+                logMsg += "Left brackets opened: " + to_string(leftBracketsOpen);
+            }
+            else if (Utils::Trim(s) == "};")
+            {
+                leftBracketsOpen--;
+                if (leftBracketsOpen == 0)
+                    ignoreAll = false;
+                logMsg += "Left brackets opened: " + to_string(leftBracketsOpen)
+                        + "\nignoreAll = " + Utils::ToString(ignoreAll);
+            }
+            else
+            {
+                if (Utils::Trim(s) == "class ModLauncherList")
+                    ignoreAll = true;
+                if (!ignoreAll)
+                    response += s + "\n";
+                logMsg += "\nignoreAll = " + Utils::ToString(ignoreAll);
+            }
+            LOG(0, logMsg);
+        }
+        response += modLauncherList + "\n";
+        return response;
+    }
 }

@@ -12,10 +12,10 @@
 
 class VDFKey
 {
-	public:
-		VDFKey(std::string path, std::string value);
+    public:
+        VDFKey(std::string path, std::string value);
 
-		std::string Path, Value;
+        std::string Path, Value;
 };
 
 #endif /* VDFKEY_H_ */

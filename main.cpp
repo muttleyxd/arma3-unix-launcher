@@ -31,52 +31,75 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	//Checking parameters for --verbose or -v
-	for (int i = 0; i < argc; i++)
-	{
-		if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0)
-			LogLevel = 0;
-	}
+   /*Mod m("/mnt/nagrania/SteamLibraryLinux/steamapps/common/Arma 3/@CBA_A3", "-1");
+    cout << m.Path << endl << m.DirName << endl << m.WorkshopId << endl << m.Name << endl;
 
-	LOG(1, "ArmA 3 Launcher started");
+    return 33;*/
+    //Checking parameters for --verbose or -v
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0)
+            LogLevel = 0;
+    }
 
-	//~/.config/a3linuxlauncher
-	if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
-			+ Filesystem::LauncherSettingsDirectory))
-	{
-		bool result = Filesystem::CreateDirectory(Filesystem::HomeDirectory
-				+ Filesystem::LauncherSettingsDirectory);
-		if (!result)
-			exit(1);
-	}
+    LOG(1, "ArmA 3 Launcher started");
 
-	if (!Filesystem::FileExists(Filesystem::HomeDirectory
-			+ Filesystem::LauncherSettingsDirectory
-			+ Filesystem::LauncherSettingsFilename))
-	{
-		Settings::Save(Filesystem::HomeDirectory
-				+ Filesystem::LauncherSettingsDirectory
-				+ Filesystem::LauncherSettingsFilename);
-	}
-	Settings::Load(Filesystem::HomeDirectory
-			+ Filesystem::LauncherSettingsDirectory
-			+ Filesystem::LauncherSettingsFilename);
+    //~/.config/a3linuxlauncher
+    if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
+            + Filesystem::LauncherSettingsDirectory))
+    {
+        bool result = Filesystem::CreateDirectory(Filesystem::HomeDirectory
+                + Filesystem::LauncherSettingsDirectory);
+        if (!result)
+            return 1;
+    }
 
-	//Dirty fix to Gtk::Application trying to parse arguments on its own
-	argc = 0;
-	Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3linuxlauncher");
-	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("MainForm.glade");
+    if (!Filesystem::FileExists(Filesystem::HomeDirectory
+            + Filesystem::LauncherSettingsDirectory
+            + Filesystem::LauncherSettingsFilename))
+    {
+        Settings::Save(Filesystem::HomeDirectory
+                + Filesystem::LauncherSettingsDirectory
+                + Filesystem::LauncherSettingsFilename);
+    }
 
-	cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl
-		 << "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
+    Settings::Load(Filesystem::HomeDirectory
+            + Filesystem::LauncherSettingsDirectory
+            + Filesystem::LauncherSettingsFilename);
 
-	if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
-	    Settings::ArmaPath = Filesystem::GetDirectory(DirectoryToFind::ArmaInstall);
 
-	if (Settings::WorkshopPath == Filesystem::DIR_NOT_FOUND)
-	    Settings::WorkshopPath = Filesystem::GetDirectory(DirectoryToFind::WorkshopMods);
+    if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
+        Settings::ArmaPath = Filesystem::GetDirectory(DirectoryToFind::ArmaInstall);
 
-	//if autodetection fails
+    if (Settings::WorkshopPath == Filesystem::DIR_NOT_FOUND)
+        Settings::WorkshopPath = Filesystem::GetDirectory(DirectoryToFind::WorkshopMods);
+
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i], "--purge") == 0)
+        {
+            if (Settings::ArmaPath != Filesystem::DIR_NOT_FOUND)
+            {
+                string removeWorkshop = "rm -rf " + Utils::BashAdaptPath(Settings::ArmaPath + Filesystem::ArmaDirWorkshop);
+                string removeCustom = "rm -rf " + Utils::BashAdaptPath(Settings::ArmaPath + Filesystem::ArmaDirCustom);
+                system(removeWorkshop.c_str());
+                system(removeCustom.c_str());
+            }
+            system(("rm -rf " + Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory).c_str());
+            LOG(1, "Purged config file, !workshop, !custom directories");
+            exit(0);
+        }
+    }
+
+    //Dirty fix to Gtk::Application trying to parse arguments on its own
+    argc = 0;
+    Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3linuxlauncher");
+    Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("MainForm.glade");
+
+    cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl
+         << "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
+
+    //if autodetection fails
     while (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
     {
         string Message = string("Launcher couldn't detect ArmA 3 installation directory") +
@@ -112,14 +135,14 @@ int main(int argc, char *argv[])
         }
     }
 
-	MainWindow* mainWindow = NULL;
+    MainWindow* mainWindow = NULL;
 
-	builder->get_widget_derived("MainForm", mainWindow);
+    builder->get_widget_derived("MainForm", mainWindow);
 
-	if (mainWindow)
-		app->run(*mainWindow);
+    if (mainWindow)
+        app->run(*mainWindow);
 
-	delete mainWindow;
+    delete mainWindow;
 
-	return 0;
+    return 0;
 }
