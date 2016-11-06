@@ -14,6 +14,8 @@
 #include "Utils.h"
 
 #include <cstdlib>
+#include <thread>
+#include <chrono>
 
 MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade) :
 			Gtk::Window(cobject), builder(refGlade)
@@ -240,6 +242,25 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 	this->signal_delete_event().connect(sigc::mem_fun(*this, &MainWindow::onExit));
 
 	RefreshStatusLabel();
+
+	std::thread t1(&MainWindow::ArmaStatusThread, this);
+	t1.detach();
+}
+
+void MainWindow::ArmaStatusThread()
+{
+    LOG(1, "Status monitoring thread started");
+    while (true)
+    {
+        armaPid = Utils::FindProcess("./arma3.i386");
+        if (armaPid != -1)
+            lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
+        else
+            lblStatus->set_text("Status: ArmA 3 not running");
+
+        //std::cout << "Hai";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
 }
 
 void MainWindow::btnAdd_Clicked()
@@ -297,6 +318,11 @@ void MainWindow::btnAdd_Clicked()
         row[customColumns.enabled] = false;
         row[customColumns.name] = m.Name;
         row[customColumns.path] = Utils::Replace(m.Path, Settings::ArmaPath, Filesystem::ArmaDirMark);
+
+        std::vector<Mod> modList;
+        modList.push_back(m);
+
+        Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, modList);
     }
     RefreshStatusLabel();
 }
@@ -567,6 +593,14 @@ void MainWindow::cbHost_Toggled()
 void MainWindow::btnPlay_Clicked()
 {
     LOG(0, "btnPlay_Clicked");
+
+    if (armaPid != -1)
+    {
+        Gtk::MessageDialog msg("ArmA 3 is already running! PID: " + std::to_string(armaPid), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+        msg.run();
+        return;
+    }
+
     std::string parameters;
 
     PutModsToSettings();

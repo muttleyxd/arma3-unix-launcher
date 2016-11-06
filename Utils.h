@@ -21,6 +21,7 @@ namespace Utils
 	std::string TrimRight(const std::string& s);
 	std::string RemoveLastElement(std::string s, bool removeSlash);
 	std::string ToString(bool b);
+	pid_t FindProcess(std::string name);
 };
 
 #endif /* UTILS_H_ */

@@ -112,8 +112,11 @@ class MainWindow : public Gtk::Window
 
 	protected:
 		bool ignore;
+		pid_t armaPid;
 
 		std::vector<Mod> FullModList;
+
+		void ArmaStatusThread();
 
 		void btnAdd_Clicked();
 		void btnRemove_Clicked();

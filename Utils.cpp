@@ -10,6 +10,14 @@
 #include <cstring>
 #include <algorithm>
 
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/types.h>
+
+#include "Logger.h"
+
 using namespace std;
 
 namespace Utils
@@ -93,5 +101,46 @@ namespace Utils
 		if (b)
 			return "1";
 		return "0";
+	}
+
+	pid_t FindProcess(string name)
+	{
+	    DIR* dir;
+        struct dirent* ent;
+        char* endptr;
+        char buf[512];
+
+        if (!(dir = opendir("/proc")))
+            return -1;
+
+        while((ent = readdir(dir)) != NULL)
+        {
+            long lpid = strtol(ent->d_name, &endptr, 10);
+            if (*endptr != '\0')
+                continue;
+
+            snprintf(buf, sizeof(buf), "/proc/%ld/cmdline", lpid);
+            FILE* fp = fopen(buf, "r");
+
+            if (fp)
+            {
+                if (fgets(buf, sizeof(buf), fp) != NULL)
+                {
+                    char* first = strtok(buf, " ");
+                    //LOG(1, first);
+                    if (!strcmp(first, name.c_str()))
+                    {
+                        fclose(fp);
+                        closedir(dir);
+                        return (pid_t)lpid;
+                    }
+                }
+                fclose(fp);
+            }
+
+        }
+
+        closedir(dir);
+        return -1;
 	}
 }
