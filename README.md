@@ -35,3 +35,27 @@ Gtkmm is required
 After that you can launch with
 
     ./arma3_linux_launcher
+
+
+### Launch parameters
+
+    ./arma3_linux_launcher --verbose
+
+This enables verbose logging - useful if something works in a wrong way
+
+
+    ./arma3_linux_launcher --purge
+
+This deletes all files created by the launcher (symlinks and config files)
+
+
+### Screenshots
+
+Mods tab:
+![mods tab](http://i.imgur.com/OmN0IDe.png)
+
+Parameters tab:
+![parameters tab](http://i.imgur.com/IseHvUc.png)
+
+
+
