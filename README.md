@@ -21,8 +21,13 @@ Launcher detects and symlinks all mods from Workshop and ArmA's main directory. 
 * Mod dependency caching from Steam Workshop
 * MacOS port
 * Code refactoring (logic should be outside GUI code)
-* AUR package for Arch-based, PPA for Ubuntu
+* PPA for Ubuntu
 
+### Installing
+
+For now there's AUR package available - it's called arma3-linux-launcher-git.
+
+    yaourt -S arma3-linux-launcher-git
 
 ### Building
 
