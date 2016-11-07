@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=ArmA 3 Linux Launcher
+Comment=Advanced launcher for ArmA 3 on Linux
+Exec=arma3-linux-launcher
+Categories=Game;
+StartupNotify=true

@@ -30,12 +30,18 @@ Gtkmm is required
 
     git clone https://github.com/muttleyxd/arma3_linux_launcher.git
     cd arma3_linux_launcher
+    mkdir build
+    cd build
+    cmake ..
     make
 
 After that you can launch with
 
     ./arma3_linux_launcher
 
+Or install globally with
+    sudo make install
+    arma3_linux_launcher
 
 ### Launch parameters
 

@@ -94,7 +94,12 @@ int main(int argc, char *argv[])
     //Dirty fix to Gtk::Application trying to parse arguments on its own
     argc = 0;
     Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3linuxlauncher");
-    Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("MainForm.glade");
+
+    string MainFormPath = "/usr/share/arma3-linux-launcher/MainForm.glade";
+    if (!Filesystem::FileExists(MainFormPath))
+        MainFormPath = "MainForm.glade";
+
+    Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(MainFormPath);
 
     cout << "GTK+ version: " << gtk_major_version << "." << gtk_minor_version << "." << gtk_micro_version << endl
          << "Glib version: " << glib_major_version << "." << glib_minor_version << "." << glib_micro_version << endl;
