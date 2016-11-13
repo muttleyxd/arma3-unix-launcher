@@ -1,7 +1,7 @@
-# ArmA 3 Linux Launcher
+# ArmA 3 Unix Launcher
 
-ArmA 3 Launcher for Linux.
-Since Bohemia didn't port their launcher to Linux and existing launcher didn't satisfy my needs I decided to create my own.
+ArmA 3 Launcher for Linux and Mac.
+Since Bohemia didn't port their launcher to Linux and Mac and existing launcher didn't satisfy my needs I decided to create my own.
 
 Launcher detects and symlinks all mods from Workshop and ArmA's main directory. It also allows to add your own mods from outside ArmA directory.
 
@@ -12,6 +12,7 @@ Launcher detects and symlinks all mods from Workshop and ArmA's main directory. 
 * Detect @mods (ArmA main dir)
 * Add mods from outside ArmA's dir (symlink)
 * Launch ArmA with desired options
+* Cross platform - Linux and Mac
 
 ### TODO
 
@@ -19,7 +20,7 @@ Launcher detects and symlinks all mods from Workshop and ArmA's main directory. 
 * Server browser
 * .paa reading - for displaying mod images in launcher
 * Mod dependency caching from Steam Workshop
-* MacOS port
+* MacOS binary build
 * Code refactoring (logic should be outside GUI code)
 * PPA for Ubuntu
 
@@ -27,9 +28,9 @@ Launcher detects and symlinks all mods from Workshop and ArmA's main directory. 
 
 #### Debian based (Debian, Ubuntu)
 
-There's a .deb package available in releases tab!
+There is a .deb package available in releases tab!
 
-[Releases tab](https://github.com/muttleyxd/arma3-linux-launcher/releases)
+[Releases tab](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
 #### Arch based (Arch, Antergos, Manjaro)
 
@@ -37,12 +38,26 @@ For now there's AUR package available - it's called arma3-linux-launcher-git.
 
     yaourt -S arma3-linux-launcher-git
 
+#### Mac OS X
+
+Binary package is currently unavailable. Please build from source.
+
 ### Building from source
 
-Gtkmm is required
+Gtkmm3 is required
 
-    git clone https://github.com/muttleyxd/arma3_linux_launcher.git
-    cd arma3_linux_launcher
+#### Debian package
+    apt-get install libgtkmm-3.0-1v5
+
+#### Arch Linux
+    pacman -S gtkmm3
+
+#### Mac OS X
+    brew install gtkmm3
+
+#### Build process
+    git clone https://github.com/muttleyxd/arma3_unix_launcher.git
+    cd arma3_unix_launcher
     mkdir build
     cd build
     cmake ..
@@ -50,21 +65,27 @@ Gtkmm is required
 
 After that you can launch with
 
-    ./arma3_linux_launcher
+    ./arma3_unix_launcher
 
 Or install globally with
 
     sudo make install
-    arma3_linux_launcher
+
+#### Launching on Linux
+
+    arma3_unix_launcher
+
+#### Launching on Mac OS X
+
+Go to Applications and run "arma3-unix-launcher"
 
 ### Launch parameters
 
-    ./arma3_linux_launcher --verbose
+    --verbose
 
 This enables verbose logging - useful if something works in a wrong way
 
-
-    ./arma3_linux_launcher --purge
+    --purge
 
 This deletes all files created by the launcher (symlinks and config files)
 

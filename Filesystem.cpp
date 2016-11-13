@@ -31,12 +31,23 @@ namespace Filesystem
     std::string DIR_NOT_FOUND = "DIR_NOT_FOUND";
     std::string NOT_A_SYMLINK = "NOT_A_SYMLINK";
 
-    std::string STEAM_CONFIG_FILE = "/.local/share/Steam/config/config.vdf";
+#ifdef __APPLE__
+    std::string LocalSharePrefix = "/Library/Application Support";
+    std::string BohemiaInteractivePrefix = "/com.vpltd.Arma3";
+    std::string SteamPath = LocalSharePrefix + "/Steam";
+    std::string LauncherSettingsDirectory = LocalSharePrefix + "/a3unixlauncher";
+#else
+    std::string LocalSharePrefix = "/.local/share";
+    std::string BohemiaInteractivePrefix = "/bohemiainteractive/arma3";
+    std::string SteamPath = "/.steam/steam";
+    std::string LauncherSettingsDirectory = "/.config/a3unixlauncher";
+#endif
+    std::string STEAM_CONFIG_FILE = LocalSharePrefix + "/Steam/config/config.vdf";
     std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
     std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
-    std::string SteamPath = "/.steam/steam";
+
     std::string HomeDirectory = getenv("HOME");
-    std::string LauncherSettingsDirectory = "/.config/a3linuxlauncher";
+
     std::string LauncherSettingsFilename = "/settings.conf";
 
     std::string ArmaDirWorkshop = "/!workshop";
@@ -46,7 +57,13 @@ namespace Filesystem
 
     std::string ArmaDirMark = "~arma";
 
-    std::string ArmaConfigFile = "/.local/share/bohemiainteractive/arma3/GameDocuments/Arma 3/Arma3.cfg";
+
+#ifdef __APPLE__
+
+#else
+
+#endif
+    std::string ArmaConfigFile = LocalSharePrefix + BohemiaInteractivePrefix +"/GameDocuments/Arma 3/Arma3.cfg";
 
     std::vector<std::string> GetSteamLibraries()
     {
@@ -437,3 +454,4 @@ namespace Filesystem
         return response;
     }
 }
+

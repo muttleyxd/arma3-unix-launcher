@@ -184,7 +184,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
     ignore = false;
     /////
 
-    set_title("ArmA 3 Linux Launcher");
+    set_title("ArmA 3 Unix Launcher");
     set_default_size(Settings::WindowSizeX, Settings::WindowSizeY);
     move(Settings::WindowPosX, Settings::WindowPosY);
 
@@ -678,7 +678,11 @@ void MainWindow::btnPlay_Clicked()
 
     LOG(0, "Arma 3 launch command:\n" + Settings::ArmaPath + "/arma " + parameters);
 
-    //Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
+#ifdef __APPLE__
+    Glib::spawn_command_line_async("open steam://run/107410//" + Utils::Replace(parameters, " ", "%20"));
+#else
+    Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
+#endif
 }
 
 void MainWindow::RefreshStatusLabel()
