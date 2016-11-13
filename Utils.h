@@ -11,6 +11,9 @@
 #include <vector>
 #include <string>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 namespace Utils
 {
     std::vector<std::string> Split(std::string textToSplit, std::string delimiters);
@@ -19,7 +22,7 @@ namespace Utils
     std::string Trim(const std::string& s);
     std::string TrimLeft(const std::string& s);
     std::string TrimRight(const std::string& s);
-    std::string RemoveLastElement(std::string s, bool removeSlash);
+    std::string RemoveLastElement(std::string s, bool removeSlash, int count = 1);
     std::string ToString(bool b);
     pid_t FindProcess(std::string name);
     std::string BashAdaptPath(std::string path);

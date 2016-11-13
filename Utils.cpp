@@ -12,9 +12,7 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <unistd.h>
 #include <dirent.h>
-#include <sys/types.h>
 
 #include "Logger.h"
 
@@ -22,7 +20,6 @@ using namespace std;
 
 namespace Utils
 {
-
     vector<string> Split(std::string textToSplit, std::string delimiters)
     {
         vector<string> response;
@@ -81,18 +78,21 @@ namespace Utils
         return (endpos == std::string::npos) ? "" : s.substr(0, endpos+1);
     }
 
-    string RemoveLastElement(string s, bool removeSlash)
+    string RemoveLastElement(string s, bool removeSlash, int count)
     {
         if (s.length() == 0)
             return "";
         reverse(s.begin(), s.end());
 
-        size_t slashPos = s.find("/");
+        for (int i = 0; i < count; i++)
+        {
+			size_t slashPos = s.find("/");
 
-        if (removeSlash)
-            slashPos++;
+			if (removeSlash || i != count - 1)
+				slashPos++;
 
-        s = s.substr(slashPos);
+			s = s.substr(slashPos);
+        }
         reverse(s.begin(), s.end());
 
         return s;

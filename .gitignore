@@ -29,7 +29,7 @@
 *.app
 
 #Executable
-arma3-linux-launcher
+arma3-unix-launcher
 
 #Eclipse project files
 .settings/*

@@ -27,14 +27,14 @@
 
 #include "MainWindow.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-   /*Mod m("/mnt/nagrania/SteamLibraryLinux/steamapps/common/Arma 3/@CBA_A3", "-1");
-    cout << m.Path << endl << m.DirName << endl << m.WorkshopId << endl << m.Name << endl;
-
-    return 33;*/
     //Checking parameters for --verbose or -v
     for (int i = 0; i < argc; i++)
     {
@@ -42,9 +42,9 @@ int main(int argc, char *argv[])
             LogLevel = 0;
     }
 
-    LOG(1, "ArmA 3 Launcher started");
+    LOG(1, "ArmA 3 Unix Launcher started");
 
-    //~/.config/a3linuxlauncher
+    //~/.config/a3unixlauncher
     if (!Filesystem::DirectoryExists(Filesystem::HomeDirectory
             + Filesystem::LauncherSettingsDirectory))
     {
@@ -85,7 +85,9 @@ int main(int argc, char *argv[])
                 system(removeWorkshop.c_str());
                 system(removeCustom.c_str());
             }
-            system(("rm -rf " + Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory).c_str());
+            string removeConfig = "rm -rf \"" + Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory + "\"";
+            system(removeConfig.c_str());
+
             LOG(1, "Purged config file, !workshop, !custom directories");
             exit(0);
         }
@@ -93,11 +95,22 @@ int main(int argc, char *argv[])
 
     //Dirty fix to Gtk::Application trying to parse arguments on its own
     argc = 0;
-    Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3linuxlauncher");
+    Glib::RefPtr<Gtk::Application> app = Gtk::Application::create(argc, argv, "muttley.a3unixlauncher");
 
-    string MainFormPath = "/usr/share/arma3-linux-launcher/MainForm.glade";
+#ifdef __APPLE__
+    //apple path is like: /Applications/arma3-unix-launcher.app/Contents/MacOS/./arma3-unix-launcher
+    char* path = new char[4096];
+    unsigned int pathLength = 4095;
+    _NSGetExecutablePath(path, &pathLength);
+    string currentPath = path;
+    delete[] path;
+
+    string MainFormPath = Utils::RemoveLastElement(currentPath, false) + "MainForm.glade";
+#else
+    string MainFormPath = "/usr/share/arma3-unix-launcher/MainForm.glade";
     if (!Filesystem::FileExists(MainFormPath))
         MainFormPath = "MainForm.glade";
+#endif
 
     Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(MainFormPath);
 
