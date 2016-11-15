@@ -124,7 +124,7 @@ void Mod::ParseCPP(string meta, string mod)
             else if (Utils::StartsWith(s, "dlcColor"))
             {
                 //dlcColor[]={1.2,5.8,3.23,6.44}
-                string dlcColor = s.substr(12, dlcColor.size() - 13);
+                string dlcColor = s.substr(12, s.size() - 13);
                 //1.2,5.8,3.23,6.44
                 vector<string> splits = Utils::Split(dlcColor,",");
                 if (splits.size() != 4)
