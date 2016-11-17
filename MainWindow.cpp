@@ -252,7 +252,11 @@ void MainWindow::ArmaStatusThread()
     LOG(1, "Status monitoring thread started");
     while (true)
     {
+#ifdef __APPLE__
+        armaPid = Utils::FindProcess("ArmA3");
+#else
         armaPid = Utils::FindProcess("./arma3.i386");
+#endif
         if (armaPid != -1)
             lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
         else

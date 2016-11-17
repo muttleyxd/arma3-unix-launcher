@@ -37,3 +37,6 @@ arma3-unix-launcher
 .project
 /MainForm.glade~
 /#MainForm.glade#
+
+#build dir
+build/*

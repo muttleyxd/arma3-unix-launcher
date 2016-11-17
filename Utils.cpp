@@ -107,6 +107,24 @@ namespace Utils
 
     pid_t FindProcess(string name)
     {
+#ifdef __APPLE__
+        char buffer[128];
+        std::string result = "";
+        std::string cmd = "ps -Ac | grep " + name;
+        std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), pclose);
+        if (!pipe) throw std::runtime_error("popen() failed!");
+        while (!feof(pipe.get()))
+        {
+            if (fgets(buffer, 128, pipe.get()) != NULL)
+                result += buffer;
+        }
+        if (result.length() < 1)
+        return -1;
+        vector<string> splits = Split(result, " ");
+        if (splits.size() > 0)
+        return strtol(splits[0].c_str(), NULL, 10);
+        return -1;
+#else
         DIR* dir;
         struct dirent* ent;
         char* endptr;
@@ -144,6 +162,7 @@ namespace Utils
 
         closedir(dir);
         return -1;
+#endif
     }
 
     string BashAdaptPath(string path)
