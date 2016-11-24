@@ -110,6 +110,11 @@ int main(int argc, char *argv[])
     string MainFormPath = "/usr/share/arma3-unix-launcher/MainForm.glade";
     if (!Filesystem::FileExists(MainFormPath))
         MainFormPath = "MainForm.glade";
+    if (!Filesystem::FileExists(MainFormPath))
+    {
+        string binaryPath = Filesystem::GetSymlinkTarget("/proc/" + to_string(getpid()) + "/exe");
+        MainFormPath = Utils::RemoveLastElement(binaryPath, false, 2) + "MainForm.glade";
+    }
 #endif
 
     Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(MainFormPath);

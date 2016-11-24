@@ -86,13 +86,13 @@ namespace Utils
 
         for (int i = 0; i < count; i++)
         {
-			size_t slashPos = s.find("/");
+            size_t slashPos = s.find("/");
+            slashPos++;
 
-			if (removeSlash || i != count - 1)
-				slashPos++;
-
-			s = s.substr(slashPos);
+            s = s.substr(slashPos);
         }
+        if (!removeSlash)
+            s = "/" + s;
         reverse(s.begin(), s.end());
 
         return s;

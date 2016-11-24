@@ -38,5 +38,10 @@ arma3-unix-launcher
 /MainForm.glade~
 /#MainForm.glade#
 
+#CLion project files
+.idea/*
+
 #build dir
 build/*
+cmake-build-debug/*
+cmake-build-release/*
