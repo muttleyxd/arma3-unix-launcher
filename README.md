@@ -40,7 +40,7 @@ For now there's AUR package available - it's called arma3-linux-launcher-git.
 
 #### Mac OS X
 
-Binary package is currently unavailable. Please build from source.
+Binary package is currently unavailable. Please build from source or use [install script](https://github.com/muttleyxd/arma3-unix-launcher/tree/mac_installer).
 
 ### Building from source
 
