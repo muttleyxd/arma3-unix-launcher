@@ -56,8 +56,8 @@ Gtkmm3 is required
     brew install gtkmm3
 
 #### Build process
-    git clone https://github.com/muttleyxd/arma3_unix_launcher.git
-    cd arma3_unix_launcher
+    git clone https://github.com/muttleyxd/arma3-unix-launcher.git
+    cd arma3-unix-launcher
     mkdir build
     cd build
     cmake ..
@@ -65,7 +65,7 @@ Gtkmm3 is required
 
 After that you can launch with
 
-    ./arma3_unix_launcher
+    ./arma3-unix-launcher
 
 Or install globally with
 
