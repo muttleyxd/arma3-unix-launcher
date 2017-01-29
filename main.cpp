@@ -141,16 +141,21 @@ int main(int argc, char *argv[])
         if (result == 1)
         {
             string currentFolder = fcDialog.get_current_folder();
-            if (Filesystem::FileExists(currentFolder + "/arma3.i386"))
+            if (Filesystem::FileExists(currentFolder + "/arma3.i386")
+                    || Filesystem::FileExists(currentFolder + "/ArmA3.app")
+                    || Filesystem::DirectoryExists(currentFolder + "/ArmA3.app"))
                 Settings::ArmaPath = currentFolder;
             currentFolder = fcDialog.get_filename();
-            if (Filesystem::FileExists(currentFolder + "/arma3.i386"))
+            if (Filesystem::FileExists(currentFolder + "/arma3.i386")
+                    || Filesystem::FileExists(currentFolder + "/ArmA3.app")
+                    || Filesystem::DirectoryExists(currentFolder + "/ArmA3.app"))
                 Settings::ArmaPath = currentFolder;
 
             if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
             {
                 string Message2 = string("Selected directory seems incorrect") +
-                                "\n" + currentFolder + "/arma3.i386 doesn't exist";
+                                "\n" + currentFolder + "/arma3.i386 doesn't exist"
+                                 "\n" + currentFolder + "/ArmA3.app doesn't exist";
 
                 Gtk::MessageDialog msg2(Message2);
                 msg2.run();
