@@ -160,6 +160,11 @@ int main(int argc, char *argv[])
                 Gtk::MessageDialog msg2(Message2);
                 msg2.run();
             }
+            else
+            {
+                Settings::WorkshopPath = Utils::RemoveLastElement(Settings::ArmaPath, false, 2) + "workshop/content/107410";
+                LOG(1, "Workaround workshop path: " + Settings::WorkshopPath);
+            }
         }
     }
 
