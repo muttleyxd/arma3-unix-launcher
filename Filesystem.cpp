@@ -42,12 +42,12 @@ namespace Filesystem
     std::string SteamPath = "/.steam/steam";
     std::string LauncherSettingsDirectory = "/.config/a3unixlauncher";
 #endif
+    std::string HomeDirectory = getenv("HOME");
+
     std::string SteamConfigFile = LocalSharePrefix + "/Steam/config/config.vdf";
     std::string SteamConfigFileNeon = HomeDirectory + "/.steam/steam/config/config.vdf";
     std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
     std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
-
-    std::string HomeDirectory = getenv("HOME");
 
     std::string LauncherSettingsFilename = "/settings.conf";
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat /etc/*-release | grep debian > /dev/null
-if [ $? -ne 1 ]; then
+if [ $? -ne 0 ]; then
    echo "You are not Debian-based distro!"
    exit 1
 fi
