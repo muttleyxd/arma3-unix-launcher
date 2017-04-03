@@ -17,8 +17,8 @@
 #include <thread>
 #include <chrono>
 
-MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>& refGlade) :
-            Gtk::Window(cobject), builder(refGlade)
+MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade) :
+    Gtk::Window(cobject), builder(refGlade)
 {
     Init();
 
@@ -172,15 +172,34 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
 
     /////Executing every event - need to make sure UI represents actual Settings
     ignore = true;
-    cbSkipIntro_Toggled(); cbNosplash_Toggled(); cbWindow_Toggled(); cbName_Toggled();
-    tbName_Changed(); cbParameterFile_Toggled(); tbParameterFile_Changed();
-    cbCheckSignatures_Toggled(); cbCpuCount_Toggled(); numCpuCount_Changed();
+    cbSkipIntro_Toggled();
+    cbNosplash_Toggled();
+    cbWindow_Toggled();
+    cbName_Toggled();
+    tbName_Changed();
+    cbParameterFile_Toggled();
+    tbParameterFile_Changed();
+    cbCheckSignatures_Toggled();
+    cbCpuCount_Toggled();
+    numCpuCount_Changed();
 
-    cbExThreads_Toggled(); cbExThreadsFileOperations_Toggled(); cbExThreadsTextureLoading_Toggled();
-    cbExThreadsGeometryLoading_Toggled(); cbEnableHT_Toggled(); cbFilePatching_Toggled();
-    cbNoLogs_Toggled(); cbWorld_Toggled(); tbWorld_Changed(); cbNoPause_Toggled();
-    cbConnect_Toggled(); tbConnect_Changed(); cbPort_Toggled(); tbPort_Changed();
-    cbPassword_Toggled(); tbPassword_Changed(); cbHost_Toggled();
+    cbExThreads_Toggled();
+    cbExThreadsFileOperations_Toggled();
+    cbExThreadsTextureLoading_Toggled();
+    cbExThreadsGeometryLoading_Toggled();
+    cbEnableHT_Toggled();
+    cbFilePatching_Toggled();
+    cbNoLogs_Toggled();
+    cbWorld_Toggled();
+    tbWorld_Changed();
+    cbNoPause_Toggled();
+    cbConnect_Toggled();
+    tbConnect_Changed();
+    cbPort_Toggled();
+    tbPort_Changed();
+    cbPassword_Toggled();
+    tbPassword_Changed();
+    cbHost_Toggled();
     ignore = false;
     /////
 
@@ -188,7 +207,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
     set_default_size(Settings::WindowSizeX, Settings::WindowSizeY);
     move(Settings::WindowPosX, Settings::WindowPosY);
 
-    for (std::string s: Settings::WorkshopModsOrder)
+    for (std::string s : Settings::WorkshopModsOrder)
     {
         for (int i = 0; i < WorkshopMods.size(); i++)
         {
@@ -204,7 +223,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
         }
     }
 
-    for (Mod m: WorkshopMods)
+    for (Mod m : WorkshopMods)
     {
         Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->append());
         row[workshopColumns.enabled] = Settings::ModEnabled(m.WorkshopId);
@@ -212,7 +231,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
         row[workshopColumns.workshopid] = m.WorkshopId;
     }
 
-    for (std::string s: Settings::CustomModsOrder)
+    for (std::string s : Settings::CustomModsOrder)
     {
         for (int i = 0; i < CustomMods.size(); i++)
         {
@@ -228,7 +247,7 @@ MainWindow::MainWindow(BaseObjectType* cobject, const Glib::RefPtr<Gtk::Builder>
         }
     }
 
-    for (Mod m: CustomMods)
+    for (Mod m : CustomMods)
     {
         Gtk::TreeModel::Row row = *(customModsStore.operator ->()->append());
         row[customColumns.enabled] = Settings::ModEnabled(m.Path);
@@ -252,11 +271,11 @@ void MainWindow::ArmaStatusThread()
     LOG(1, "Status monitoring thread started");
     while (true)
     {
-#ifdef __APPLE__
+        #ifdef __APPLE__
         armaPid = Utils::FindProcess("ArmA3");
-#else
+        #else
         armaPid = Utils::FindProcess("./arma3.i386");
-#endif
+        #endif
         if (armaPid != -1)
             lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
         else
@@ -354,7 +373,7 @@ void MainWindow::btnRemove_Clicked()
     RefreshStatusLabel();
 }
 
-bool MainWindow::onExit(GdkEventAny* event)
+bool MainWindow::onExit(GdkEventAny *event)
 {
     LOG(1, "onExit() -> restoring Arma3.cfg");
     std::string configFile = Utils::BashAdaptPath(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile);
@@ -368,8 +387,8 @@ bool MainWindow::onExit(GdkEventAny* event)
     PutModsToSettings();
 
     Settings::Save(Filesystem::HomeDirectory
-                    + Filesystem::LauncherSettingsDirectory
-                    + Filesystem::LauncherSettingsFilename);
+                   + Filesystem::LauncherSettingsDirectory
+                   + Filesystem::LauncherSettingsFilename);
     return false;
 }
 
@@ -615,10 +634,10 @@ void MainWindow::btnPlay_Clicked()
 
     PutModsToSettings();
 
-    std::vector<Mod*> modList;
+    std::vector<Mod *> modList;
 
     LOG(1, "FullModList size:" + std::to_string(FullModList.size()));
-    for (std::string s: Settings::CustomModsEnabled)
+    for (std::string s : Settings::CustomModsEnabled)
     {
         for (int i = 0; i < FullModList.size(); i++)
         {
@@ -631,7 +650,7 @@ void MainWindow::btnPlay_Clicked()
         }
     }
 
-    for (std::string s: Settings::WorkshopModsEnabled)
+    for (std::string s : Settings::WorkshopModsEnabled)
     {
         for (int i = 0; i < FullModList.size(); i++)
         {
@@ -661,8 +680,8 @@ void MainWindow::btnPlay_Clicked()
     parameters += Settings::CpuCount        ? "-cpuCount=" + std::to_string(Settings::CpuCountValue) + " "  : "";
 
     int exThreadsValue = Settings::ExThreadsFileOperations
-            + Settings::ExThreadsTextureLoading * 2
-            + Settings::ExThreadsGeometryLoading * 4;
+                         + Settings::ExThreadsTextureLoading * 2
+                         + Settings::ExThreadsGeometryLoading * 4;
 
     parameters += Settings::ExThreads       ? "-exThreads=" + std::to_string(exThreadsValue) + " " : "";
 
@@ -682,11 +701,11 @@ void MainWindow::btnPlay_Clicked()
 
     LOG(0, "Arma 3 launch command:\n" + Settings::ArmaPath + "/arma " + parameters);
 
-#ifdef __APPLE__
+    #ifdef __APPLE__
     Glib::spawn_command_line_async("open steam://run/107410//" + Utils::Replace(parameters, " ", "%20"));
-#else
+    #else
     Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
-#endif
+    #endif
 }
 
 void MainWindow::RefreshStatusLabel()
@@ -706,9 +725,9 @@ void MainWindow::RefreshStatusLabel()
     }
 
     lblSelectedMods->set_text("Selected " + std::to_string(workshopMods + customMods)
-                            + " mods (" + std::to_string(workshopMods)
-                            + " from workshop, " + std::to_string(customMods)
-                            + " custom)");
+                              + " mods (" + std::to_string(workshopMods)
+                              + " from workshop, " + std::to_string(customMods)
+                              + " custom)");
 }
 
 void MainWindow::Init()
@@ -739,7 +758,7 @@ void MainWindow::Init()
 
     WorkshopMods = Filesystem::FindMods(Settings::WorkshopPath);
 
-    for (std::string path: Settings::CustomModsOrder)
+    for (std::string path : Settings::CustomModsOrder)
     {
         LOG(0, "Custom mod: " + path);
         //path = Utils::Replace(path, Filesystem::ArmaDirMark, Settings::ArmaPath);
@@ -747,22 +766,22 @@ void MainWindow::Init()
     }
 
     std::vector<Mod> ArmaDirMods = Filesystem::FindMods(Settings::ArmaPath);
-    for (Mod m: ArmaDirMods)
+    for (Mod m : ArmaDirMods)
     {
-        for (Mod n: CustomMods)
+        for (Mod n : CustomMods)
         {
             if (n.Path == m.Path)
                 goto alreadyExists;
         }
         CustomMods.push_back(m);
-        alreadyExists:
+alreadyExists:
         continue;
     }
 
     FullModList.clear();
-    for (Mod m: WorkshopMods)
+    for (Mod m : WorkshopMods)
         FullModList.push_back(m);
-    for (Mod m: CustomMods)
+    for (Mod m : CustomMods)
         FullModList.push_back(m);
 
     Filesystem::CheckFileStructure(Settings::ArmaPath, Settings::WorkshopPath, FullModList);
@@ -793,7 +812,7 @@ void MainWindow::PutModsToSettings()
         Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
 
         Glib::ustring path = row[customColumns.path];
-                std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
+        std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
 
         LOG(0, "[C" + Utils::ToString(row[customColumns.enabled]) + "] Name: " + row[customColumns.name] + " Path: " + pathStr);
         Settings::CustomModsOrder.push_back(pathStr);

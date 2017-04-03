@@ -15,7 +15,7 @@ int LogLevel = 1;
 void LOG(int logLevel, string text)
 {
     time_t rawTime;
-    tm* timeInfo;
+    tm *timeInfo;
     char buffer[30];
 
     time(&rawTime);

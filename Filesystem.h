@@ -25,7 +25,7 @@ namespace Filesystem
     extern std::string DIR_NOT_FOUND;
     extern std::string NOT_A_SYMLINK;
 
-    extern std::string STEAM_CONFIG_FILE;
+    extern std::string SteamConfigFile;
     extern std::string SteamAppsArmaPath;
     extern std::string SteamAppsModWorkshopPath;
     extern std::string SteamPath;
@@ -62,8 +62,8 @@ namespace Filesystem
     bool CreateDirectory(std::string path);
 
     std::string GetSymlinkTarget(std::string path);
-    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string>* ModDirs, std::vector<Mod>* modList);
+    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string> *ModDirs, std::vector<Mod> *modList);
 
-    std::string GenerateArmaCfg(std::string armaPath, std::string source, std::vector<Mod*> modList);
+    std::string GenerateArmaCfg(std::string armaPath, std::string source, std::vector<Mod *> modList);
 }
 #endif /* FILESYSTEM_H_ */

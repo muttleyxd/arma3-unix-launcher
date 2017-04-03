@@ -23,9 +23,9 @@ namespace Utils
     vector<string> Split(std::string textToSplit, std::string delimiters)
     {
         vector<string> response;
-        char* text = new char[textToSplit.size() + 1];
+        char *text = new char[textToSplit.size() + 1];
         strcpy(text, textToSplit.c_str());
-        char* strPtr = strtok(text, delimiters.c_str());
+        char *strPtr = strtok(text, delimiters.c_str());
         while (strPtr != NULL)
         {
             string toAdd = strPtr;
@@ -52,7 +52,7 @@ namespace Utils
         while (start_pos != std::string::npos)
         {
             start_pos = str.find(from, start_pos);
-            if(start_pos == std::string::npos)
+            if (start_pos == std::string::npos)
                 return str;
             str.replace(start_pos, from.length(), to);
             //move start_pos forward so it doesn't replace the same string over and over
@@ -61,21 +61,21 @@ namespace Utils
         return str;
     }
 
-    string Trim(const string& s)
+    string Trim(const string &s)
     {
         return TrimRight(TrimLeft(s));
     }
 
-    string TrimLeft(const string& s)
+    string TrimLeft(const string &s)
     {
         size_t startpos = s.find_first_not_of(" \n\r\t");
         return (startpos == std::string::npos) ? "" : s.substr(startpos);
     }
 
-    string TrimRight(const string& s)
+    string TrimRight(const string &s)
     {
         size_t endpos = s.find_last_not_of(" \n\r\t");
-        return (endpos == std::string::npos) ? "" : s.substr(0, endpos+1);
+        return (endpos == std::string::npos) ? "" : s.substr(0, endpos + 1);
     }
 
     string RemoveLastElement(string s, bool removeSlash, int count)
@@ -107,7 +107,7 @@ namespace Utils
 
     pid_t FindProcess(string name)
     {
-#ifdef __APPLE__
+        #ifdef __APPLE__
         char buffer[128];
         std::string result = "";
         std::string cmd = "ps -Ac | grep " + name;
@@ -119,34 +119,34 @@ namespace Utils
                 result += buffer;
         }
         if (result.length() < 1)
-        return -1;
+            return -1;
         vector<string> splits = Split(result, " ");
         if (splits.size() > 0)
-        return strtol(splits[0].c_str(), NULL, 10);
+            return strtol(splits[0].c_str(), NULL, 10);
         return -1;
-#else
-        DIR* dir;
-        struct dirent* ent;
-        char* endptr;
+        #else
+        DIR *dir;
+        struct dirent *ent;
+        char *endptr;
         char buf[512];
 
         if (!(dir = opendir("/proc")))
             return -1;
 
-        while((ent = readdir(dir)) != NULL)
+        while ((ent = readdir(dir)) != NULL)
         {
             long lpid = strtol(ent->d_name, &endptr, 10);
             if (*endptr != '\0')
                 continue;
 
             snprintf(buf, sizeof(buf), "/proc/%ld/cmdline", lpid);
-            FILE* fp = fopen(buf, "r");
+            FILE *fp = fopen(buf, "r");
 
             if (fp)
             {
                 if (fgets(buf, sizeof(buf), fp) != NULL)
                 {
-                    char* first = strtok(buf, " ");
+                    char *first = strtok(buf, " ");
                     //LOG(1, first);
                     if (!strcmp(first, name.c_str()))
                     {
@@ -162,7 +162,7 @@ namespace Utils
 
         closedir(dir);
         return -1;
-#endif
+        #endif
     }
 
     string BashAdaptPath(string path)

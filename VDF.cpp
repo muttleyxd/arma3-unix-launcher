@@ -46,7 +46,7 @@ VDF::VDF(string text)
 
 string VDF::GetValue(string KeyName)
 {
-    for (VDFKey v: Keys)
+    for (VDFKey v : Keys)
         if (v.Path == KeyName)
             return v.Value;
     return KEY_NOT_FOUND;

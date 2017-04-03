@@ -10,7 +10,7 @@
 
 struct Vec4
 {
-        float r, g, b, a;
+    float r, g, b, a;
 };
 
 

@@ -87,7 +87,7 @@ namespace Settings
             CustomModsOrder.clear();
 
             string currentPath = "";
-            for (string line: Utils::Split(loadedFile, "\n"))
+            for (string line : Utils::Split(loadedFile, "\n"))
             {
                 if (Utils::StartsWith(line, "ArmaPath="))
                     ArmaPath = line.substr(9);
@@ -158,25 +158,25 @@ namespace Settings
                 else if (Utils::StartsWith(line, "WorkshopModsEnabled="))
                 {
                     string sub = line.substr(20);
-                    for (string s: Utils::Split(sub, ","))
+                    for (string s : Utils::Split(sub, ","))
                         WorkshopModsEnabled.push_back(s);
                 }
                 else if (Utils::StartsWith(line, "WorkshopModsOrder="))
                 {
                     string sub = line.substr(18);
-                    for (string s: Utils::Split(sub, ","))
+                    for (string s : Utils::Split(sub, ","))
                         WorkshopModsOrder.push_back(s);
                 }
                 else if (Utils::StartsWith(line, "CustomModsEnabled="))
                 {
                     string sub = line.substr(18);
-                    for (string s: Utils::Split(sub, ","))
+                    for (string s : Utils::Split(sub, ","))
                         CustomModsEnabled.push_back(s);
                 }
                 else if (Utils::StartsWith(line, "CustomModsOrder="))
                 {
                     string sub = line.substr(16);
-                    for (string s: Utils::Split(sub, ","))
+                    for (string s : Utils::Split(sub, ","))
                         CustomModsOrder.push_back(s);
                 }
                 else
@@ -194,57 +194,57 @@ namespace Settings
     bool Save(string path)
     {
         string outFile = "ArmaPath=" + ArmaPath
-                        + "\nWorkshopPath=" + WorkshopPath
-                        + "\nWindowSizeX=" + to_string(WindowSizeX)
-                        + "\nWindowSizeY=" + to_string(WindowSizeY)
-                        + "\nWindowPosX=" + to_string(WindowPosX)
-                        + "\nWindowPosY=" + to_string(WindowPosY)
-                        + "\nSkipIntro=" + Utils::ToString(SkipIntro)
-                        + "\nNosplash=" + Utils::ToString(Nosplash)
-                        + "\nWindow=" + Utils::ToString(Window)
-                        + "\nName=" + Utils::ToString(Name)
-                        + "\nNameValue=" + NameValue
-                        + "\nParameterFile=" + Utils::ToString(ParameterFile)
-                        + "\nParameterFileValue=" + ParameterFileValue
-                        + "\nCheckSignatures=" + Utils::ToString(CheckSignatures)
-                        + "\nCpuCount=" + Utils::ToString(CpuCount)
-                        + "\nCpuCountValue=" + to_string(CpuCountValue)
-                        + "\nExThreads=" + Utils::ToString(ExThreads)
-                        + "\nExThreadsFileOperations=" + Utils::ToString(ExThreadsFileOperations)
-                        + "\nExThreadsTextureLoading=" + Utils::ToString(ExThreadsTextureLoading)
-                        + "\nExThreadsGeometryLoading=" + Utils::ToString(ExThreadsGeometryLoading)
-                        + "\nEnableHT=" + Utils::ToString(EnableHT)
-                        + "\nFilePatching=" + Utils::ToString(FilePatching)
-                        + "\nNoLogs=" + Utils::ToString(NoLogs)
-                        + "\nWorld=" + Utils::ToString(World)
-                        + "\nWorldValue=" + WorldValue
-                        + "\nNoPause=" + Utils::ToString(NoPause)
-                        + "\nConnect=" + Utils::ToString(Connect)
-                        + "\nConnectValue=" + ConnectValue
-                        + "\nPort=" + Utils::ToString(Port)
-                        + "\nPortValue=" + PortValue
-                        + "\nPassword=" + Utils::ToString(Password)
-                        + "\nPasswordValue=" + PasswordValue
-                        + "\nHost=" + Utils::ToString(Host)
-                        + "\nWorkshopModsEnabled=";
+                         + "\nWorkshopPath=" + WorkshopPath
+                         + "\nWindowSizeX=" + to_string(WindowSizeX)
+                         + "\nWindowSizeY=" + to_string(WindowSizeY)
+                         + "\nWindowPosX=" + to_string(WindowPosX)
+                         + "\nWindowPosY=" + to_string(WindowPosY)
+                         + "\nSkipIntro=" + Utils::ToString(SkipIntro)
+                         + "\nNosplash=" + Utils::ToString(Nosplash)
+                         + "\nWindow=" + Utils::ToString(Window)
+                         + "\nName=" + Utils::ToString(Name)
+                         + "\nNameValue=" + NameValue
+                         + "\nParameterFile=" + Utils::ToString(ParameterFile)
+                         + "\nParameterFileValue=" + ParameterFileValue
+                         + "\nCheckSignatures=" + Utils::ToString(CheckSignatures)
+                         + "\nCpuCount=" + Utils::ToString(CpuCount)
+                         + "\nCpuCountValue=" + to_string(CpuCountValue)
+                         + "\nExThreads=" + Utils::ToString(ExThreads)
+                         + "\nExThreadsFileOperations=" + Utils::ToString(ExThreadsFileOperations)
+                         + "\nExThreadsTextureLoading=" + Utils::ToString(ExThreadsTextureLoading)
+                         + "\nExThreadsGeometryLoading=" + Utils::ToString(ExThreadsGeometryLoading)
+                         + "\nEnableHT=" + Utils::ToString(EnableHT)
+                         + "\nFilePatching=" + Utils::ToString(FilePatching)
+                         + "\nNoLogs=" + Utils::ToString(NoLogs)
+                         + "\nWorld=" + Utils::ToString(World)
+                         + "\nWorldValue=" + WorldValue
+                         + "\nNoPause=" + Utils::ToString(NoPause)
+                         + "\nConnect=" + Utils::ToString(Connect)
+                         + "\nConnectValue=" + ConnectValue
+                         + "\nPort=" + Utils::ToString(Port)
+                         + "\nPortValue=" + PortValue
+                         + "\nPassword=" + Utils::ToString(Password)
+                         + "\nPasswordValue=" + PasswordValue
+                         + "\nHost=" + Utils::ToString(Host)
+                         + "\nWorkshopModsEnabled=";
 
 
-        for (string i: WorkshopModsEnabled)
+        for (string i : WorkshopModsEnabled)
             outFile += i + ",";
 
         outFile += "\nWorkshopModsOrder=";
 
-        for (string i: WorkshopModsOrder)
+        for (string i : WorkshopModsOrder)
             outFile += i + ",";
 
         outFile += "\nCustomModsEnabled=";
 
-        for (string i: CustomModsEnabled)
+        for (string i : CustomModsEnabled)
             outFile += Utils::Replace(i, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
 
         outFile += "\nCustomModsOrder=";
 
-        for (string i: CustomModsOrder)
+        for (string i : CustomModsOrder)
             outFile += Utils::Replace(i, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
 
         if (!Filesystem::WriteAllText(path, outFile))
@@ -261,7 +261,7 @@ namespace Settings
             return false;
         else if (isdigit(workshopId[0]))
         {
-            for (string s: WorkshopModsEnabled)
+            for (string s : WorkshopModsEnabled)
             {
                 if (s == workshopId)
                     return true;
@@ -269,7 +269,7 @@ namespace Settings
         }
         else
         {
-            for (string s: CustomModsEnabled)
+            for (string s : CustomModsEnabled)
             {
                 if (s == workshopId)
                     return true;

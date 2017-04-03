@@ -42,7 +42,8 @@ namespace Filesystem
     std::string SteamPath = "/.steam/steam";
     std::string LauncherSettingsDirectory = "/.config/a3unixlauncher";
 #endif
-    std::string STEAM_CONFIG_FILE = LocalSharePrefix + "/Steam/config/config.vdf";
+    std::string SteamConfigFile = LocalSharePrefix + "/Steam/config/config.vdf";
+    std::string SteamConfigFileNeon = HomeDirectory + "/.steam/steam/config/config.vdf";
     std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
     std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
 
@@ -52,28 +53,25 @@ namespace Filesystem
 
     std::string ArmaDirWorkshop = "/!workshop";
     std::string ArmaDirCustom = "/!custom";
-
     std::string ArmaDirDoNotChange = "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
-
     std::string ArmaDirMark = "~arma";
 
-
-#ifdef __APPLE__
-
-#else
-
-#endif
-    std::string ArmaConfigFile = LocalSharePrefix + BohemiaInteractivePrefix +"/GameDocuments/Arma 3/Arma3.cfg";
+    std::string ArmaConfigFile = LocalSharePrefix + BohemiaInteractivePrefix + "/GameDocuments/Arma 3/Arma3.cfg";
 
     std::vector<std::string> GetSteamLibraries()
     {
         vector<string> response;
         string steamConfigFile;
         ifstream configFile;
-        configFile.open(HomeDirectory + STEAM_CONFIG_FILE, ios::in);
+
+        if (!FileExists(HomeDirectory + SteamConfigFile))
+            configFile.open(HomeDirectory + SteamConfigFileNeon);
+        else
+            configFile.open(HomeDirectory + SteamConfigFile, ios::in);
+
         if (configFile.is_open())
         {
-            LOG(0, "File " + HomeDirectory + STEAM_CONFIG_FILE + " successfully opened...\nReading libraries list...\n");
+            LOG(0, "File " + HomeDirectory + SteamConfigFile + " successfully opened...\nReading libraries list...\n");
             getline(configFile, steamConfigFile, '\0');
             VDF vdfReader(steamConfigFile);
             string currentLibraryPath = "";
@@ -88,7 +86,7 @@ namespace Filesystem
             }
         }
         else
-            LOG(1, "Can't open " + HomeDirectory + STEAM_CONFIG_FILE + "\nCritical error\n");
+            LOG(1, "Can't open " + HomeDirectory + SteamConfigFile + "\nCritical error\n");
         return response;
     }
 
@@ -107,15 +105,15 @@ namespace Filesystem
                 DirName = SteamAppsModWorkshopPath;
                 break;
         }
-        DIR* dir = opendir((SteamPath + DirName).c_str());
+        DIR *dir = opendir((SteamPath + DirName).c_str());
         if (dir)
         {
             closedir(dir);
             return SteamPath + DirName;
         }
-        for (string s: GetSteamLibraries())
+        for (string s : GetSteamLibraries())
         {
-            DIR* dir = opendir((s + DirName).c_str());
+            DIR *dir = opendir((s + DirName).c_str());
             if (dir)
             {
                 closedir(dir);
@@ -186,7 +184,7 @@ namespace Filesystem
     {
         vector<Mod> response;
 
-        for (string s: GetSubDirectories(path))
+        for (string s : GetSubDirectories(path))
         {
             if (s == "curator" || s == "dta" || s == "Expansion" || s == "heli"
                     || s == "kart" || s == "mark") //skip DLCs
@@ -242,7 +240,7 @@ namespace Filesystem
         ModDirs = GetSubDirectories(armaDirCustomPath);
         CheckSymlinks(armaDirCustomPath, armaDir, workshopDir, &ModDirs, &modList);
 
-        for (Mod m: modList)
+        for (Mod m : modList)
         {
             if (m.Path.find(armaDir) != string::npos)
                 continue;
@@ -268,9 +266,9 @@ namespace Filesystem
     vector<string> GetSubDirectories(string path)
     {
         vector<string> response;
-        struct dirent* directoryEntry;
+        struct dirent *directoryEntry;
 
-        DIR* pathDir = opendir(path.c_str());
+        DIR *pathDir = opendir(path.c_str());
 
         if (pathDir == NULL)
         {
@@ -324,7 +322,7 @@ namespace Filesystem
         }
         if (S_ISLNK(statinfo.st_mode))
         {
-            char* buffer = new char[PATH_MAX + 1];
+            char *buffer = new char[PATH_MAX + 1];
             size_t pathLength = readlink(path.c_str(), buffer, PATH_MAX);
             buffer[pathLength] = '\0';
             string target = buffer;
@@ -336,7 +334,7 @@ namespace Filesystem
         return NOT_A_SYMLINK;
     }
 
-    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string>* ModDirs, vector<Mod>* modList)
+    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string> *ModDirs, vector<Mod> *modList)
     {
         for (int i = 0; i < ModDirs->size(); i++)
         {
@@ -377,7 +375,7 @@ namespace Filesystem
         }
     }
 
-    string GenerateArmaCfg(string armaPath, string source, vector<Mod*> modList)
+    string GenerateArmaCfg(string armaPath, string source, vector<Mod *> modList)
     {
         LOG(1, "Generating Arma3.cfg");
         string response;
@@ -407,11 +405,11 @@ namespace Filesystem
 
             string windowsPath = "C:" + Utils::Replace(fullPath, "/", "\\");
             modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
-                    + "\n\t\tdir=\"" + dirName + "\";"
-                    + "\n\t\tname=\"" + modList[i]->Name + "\";"
-                    + "\n\t\torigin=\"GAME DIR\";"
-                    + "\n\t\tfullPath=\"" + windowsPath + "\";"
-                    + "\n\t};\n";
+                               + "\n\t\tdir=\"" + dirName + "\";"
+                               + "\n\t\tname=\"" + modList[i]->Name + "\";"
+                               + "\n\t\torigin=\"GAME DIR\";"
+                               + "\n\t\tfullPath=\"" + windowsPath + "\";"
+                               + "\n\t};\n";
         }
 
         /*modLauncherList += "\tclass Mod" + to_string(i + 1)
@@ -424,7 +422,7 @@ namespace Filesystem
         bool ignoreAll = false;
 
         vector<string> lines = Utils::Split(inputFile, "\n");
-        for (string s: lines)
+        for (string s : lines)
         {
             string logMsg = "Line: " + s + "\n";
             if (Utils::Trim(s) == "{")
@@ -438,7 +436,7 @@ namespace Filesystem
                 if (leftBracketsOpen == 0)
                     ignoreAll = false;
                 logMsg += "Left brackets opened: " + to_string(leftBracketsOpen)
-                        + "\nignoreAll = " + Utils::ToString(ignoreAll);
+                          + "\nignoreAll = " + Utils::ToString(ignoreAll);
             }
             else
             {
@@ -454,4 +452,3 @@ namespace Filesystem
         return response;
     }
 }
-
