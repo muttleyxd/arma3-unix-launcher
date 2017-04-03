@@ -19,8 +19,8 @@ class Mod
         ~Mod();
 
         std::string Path, Name, DirName, Picture, LogoSmall, Logo, LogoOver, Action,
-                ActionName, TooltipOwned, Overview, Description, OverviewPicture,
-                OverviewText, Author;
+            ActionName, TooltipOwned, Overview, Description, OverviewPicture,
+            OverviewText, Author;
         Vec4 DlcColor;
         bool HideName, HidePicture;
         std::string PublishedId;
@@ -33,7 +33,7 @@ class Mod
         bool Enabled;
 
     private:
-        void ParseCPP(std::string meta,std::string mod);
+        void ParseCPP(std::string meta, std::string mod);
         std::string ParseString(std::string input);
 };
 

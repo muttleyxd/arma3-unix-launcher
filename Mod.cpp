@@ -76,7 +76,7 @@ void Mod::ParseCPP(string meta, string mod)
         string file = ParseString(Filesystem::ReadAllText(meta));
         //cout << "Meta.cpp: "<< file << endl;
         vector<string> instructions = Utils::Split(file, ";");
-        for (string s: instructions)
+        for (string s : instructions)
         {
             if (Utils::StartsWith(s, "name"))
             {
@@ -93,7 +93,7 @@ void Mod::ParseCPP(string meta, string mod)
     {
         string file = ParseString(Filesystem::ReadAllText(mod));
         vector<string> instructions = Utils::Split(file, ";");
-        for (string s: instructions)
+        for (string s : instructions)
         {
             if (Utils::StartsWith(s, "name"))
                 this->Name = s.substr(6, s.size() - 7);
@@ -126,7 +126,7 @@ void Mod::ParseCPP(string meta, string mod)
                 //dlcColor[]={1.2,5.8,3.23,6.44}
                 string dlcColor = s.substr(12, s.size() - 13);
                 //1.2,5.8,3.23,6.44
-                vector<string> splits = Utils::Split(dlcColor,",");
+                vector<string> splits = Utils::Split(dlcColor, ",");
                 if (splits.size() != 4)
                     LOG(1, "Could not read dlcColor from mod.cpp");
                 else
@@ -145,7 +145,7 @@ void Mod::ParseCPP(string meta, string mod)
             else if (Utils::StartsWith(s, "hideName"))
             {
                 string value = s.substr(9);
-                for (char c: value)
+                for (char c : value)
                 {
                     if (c == '0' || c == 'f')
                     {
@@ -162,7 +162,7 @@ void Mod::ParseCPP(string meta, string mod)
             else if (Utils::StartsWith(s, "hidePicture"))
             {
                 string value = s.substr(12);
-                for (char c: value)
+                for (char c : value)
                 {
                     if (c == '0' || c == 'f')
                     {
@@ -200,7 +200,7 @@ string Mod::ToString()
     response += "Author: " + Author + "\n";
 
     response += "DlcColor r:" + to_string(DlcColor.r) + " g:" + to_string(DlcColor.g)
-                    + " b:" + to_string(DlcColor.b) + " a:" + to_string(DlcColor.a) + "\n";
+                + " b:" + to_string(DlcColor.b) + " a:" + to_string(DlcColor.a) + "\n";
 
     response += "HideName: " + to_string(HideName) + "\n";
     response += "HidePicture: " + to_string(HidePicture) + "\n";
