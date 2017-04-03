@@ -108,12 +108,13 @@ int main(int argc, char *argv[])
     string MainFormPath = Utils::RemoveLastElement(currentPath, false) + "MainForm.glade";
     #else
     string MainFormPath = "/usr/share/arma3-unix-launcher/MainForm.glade";
-    if (!Filesystem::FileExists(MainFormPath))
-        MainFormPath = "MainForm.glade";
-    if (!Filesystem::FileExists(MainFormPath))
+    for (int i = 0; i < 2; i++)
     {
-        string binaryPath = Filesystem::GetSymlinkTarget("/proc/" + to_string(getpid()) + "/exe");
-        MainFormPath = Utils::RemoveLastElement(binaryPath, false, 2) + "MainForm.glade";
+        if (!Filesystem::FileExists(MainFormPath))
+        {
+            string binaryPath = Filesystem::GetSymlinkTarget("/proc/" + to_string(getpid()) + "/exe");
+            MainFormPath = Utils::RemoveLastElement(binaryPath, false, i + 1) + "MainForm.glade";
+        }
     }
     #endif
 
