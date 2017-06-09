@@ -805,14 +805,32 @@ void MainWindow::Init()
     std::vector<Mod> ArmaDirMods = Filesystem::FindMods(Settings::ArmaPath);
     for (Mod m : ArmaDirMods)
     {
+        bool alreadyExists = false;
         for (Mod n : CustomMods)
         {
             if (n.Path == m.Path)
-                goto alreadyExists;
+                alreadyExists = true;
         }
-        CustomMods.push_back(m);
-alreadyExists:
-        continue;
+        if (!alreadyExists)
+            CustomMods.push_back(m);
+    }
+
+    // Removes CustomMods that are not located inside the ArmaDir anymore.
+    for (std::vector<Mod>::iterator it = CustomMods.begin(); it != CustomMods.end();)
+    {
+        bool found = false;
+        for (Mod m : ArmaDirMods)
+        {
+            if (it->Path == m.Path)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            it = CustomMods.erase(it);
+        else
+            it++;
     }
 
     FullModList.clear();
