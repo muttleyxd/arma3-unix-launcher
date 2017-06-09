@@ -59,12 +59,12 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     builder->get_widget("cbExThreadsGeometryLoading", cbExThreadsGeometryLoading);
 
     builder->get_widget("cbEnableHT", cbEnableHT);
-	builder->get_widget("cbDisableMulticore", cbDisableMulticore);
-	builder->get_widget("cbHugePages", cbHugePages);
-	
+    builder->get_widget("cbDisableMulticore", cbDisableMulticore);
+    builder->get_widget("cbHugePages", cbHugePages);
+
     builder->get_widget("cbFilePatching", cbFilePatching);
     builder->get_widget("cbNoLogs", cbNoLogs);
-	builder->get_widget("cbShowScriptErrors", cbShowScriptErrors);
+    builder->get_widget("cbShowScriptErrors", cbShowScriptErrors);
 
     builder->get_widget("cbWorld", cbWorld);
     builder->get_widget("tbWorld", tbWorld);
@@ -110,12 +110,12 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     cbExThreadsGeometryLoading->set_active(Settings::ExThreadsGeometryLoading);
 
     cbEnableHT->set_active(Settings::EnableHT);
-	cbDisableMulticore->set_active(Settings::DisableMulticore);
-	cbHugePages->set_active(Settings::HugePages);
-	
+    cbDisableMulticore->set_active(Settings::DisableMulticore);
+    cbHugePages->set_active(Settings::HugePages);
+
     cbFilePatching->set_active(Settings::FilePatching);
     cbNoLogs->set_active(Settings::NoLogs);
-	cbShowScriptErrors->set_active(Settings::ShowScriptErrors);
+    cbShowScriptErrors->set_active(Settings::ShowScriptErrors);
 
     cbWorld->set_active(Settings::World);
     tbWorld->set_text(Settings::WorldValue);
@@ -157,12 +157,12 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     cbExThreadsGeometryLoading->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbExThreadsGeometryLoading_Toggled));
 
     cbEnableHT->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbEnableHT_Toggled));
-	cbDisableMulticore->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbDisableMulticore_Toggled));
-	cbHugePages->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbHugePages_Toggled));
-	
+    cbDisableMulticore->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbDisableMulticore_Toggled));
+    cbHugePages->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbHugePages_Toggled));
+
     cbFilePatching->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbFilePatching_Toggled));
     cbNoLogs->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbNoLogs_Toggled));
-	cbShowScriptErrors->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbShowScriptErrors_Toggled));
+    cbShowScriptErrors->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbShowScriptErrors_Toggled));
 
     cbWorld->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbWorld_Toggled));
     tbWorld->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbWorld_Changed));
@@ -200,11 +200,11 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     cbExThreadsTextureLoading_Toggled();
     cbExThreadsGeometryLoading_Toggled();
     cbEnableHT_Toggled();
-	cbDisableMulticore_Toggled();
-	cbHugePages_Toggled();
+    cbDisableMulticore_Toggled();
+    cbHugePages_Toggled();
     cbFilePatching_Toggled();
     cbNoLogs_Toggled();
-	cbShowScriptErrors_Toggled();
+    cbShowScriptErrors_Toggled();
     cbWorld_Toggled();
     tbWorld_Changed();
     cbNoPause_Toggled();
@@ -560,14 +560,14 @@ void MainWindow::cbEnableHT_Toggled()
 
 void MainWindow::cbDisableMulticore_Toggled()
 {
-	LOG(0, "cbDisableMulticore_Toggled: " + Utils::ToString(cbDisableMulticore->get_active()));
-	if(!ignore) Settings::DisableMulticore = cbDisableMulticore->get_active();
+    LOG(0, "cbDisableMulticore_Toggled: " + Utils::ToString(cbDisableMulticore->get_active()));
+    if (!ignore) Settings::DisableMulticore = cbDisableMulticore->get_active();
 }
 
 void MainWindow::cbHugePages_Toggled()
 {
-	LOG(0, "cbHugePages_Toggled: " + Utils::ToString(cbHugePages->get_active()));
-	if(!ignore) Settings::HugePages = cbHugePages->get_active();
+    LOG(0, "cbHugePages_Toggled: " + Utils::ToString(cbHugePages->get_active()));
+    if (!ignore) Settings::HugePages = cbHugePages->get_active();
 }
 
 void MainWindow::cbFilePatching_Toggled()
@@ -584,8 +584,8 @@ void MainWindow::cbNoLogs_Toggled()
 
 void MainWindow::cbShowScriptErrors_Toggled()
 {
-	LOG(0, "cbShowScriptErrors_Toggled: " + Utils::ToString(cbShowScriptErrors->get_active()));
-	if (!ignore) Settings::ShowScriptErrors = cbShowScriptErrors->get_active();
+    LOG(0, "cbShowScriptErrors_Toggled: " + Utils::ToString(cbShowScriptErrors->get_active()));
+    if (!ignore) Settings::ShowScriptErrors = cbShowScriptErrors->get_active();
 }
 
 void MainWindow::cbWorld_Toggled()
@@ -701,40 +701,40 @@ void MainWindow::btnPlay_Clicked()
     Filesystem::WriteAllText(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile, newArmaCfg);
     LOG(0, "Arma3.cfg:\n--------------------\n" + newArmaCfg + "\n--------------------");
 
-    parameters += Settings::SkipIntro       	? "-skipIntro " : "";
-    parameters += Settings::Nosplash        	? "-nosplash " : "";
-    parameters += Settings::Window          	? "-window " : "";
-    parameters += Settings::Name            	? "-name=" + Settings::NameValue + " " : "";
+    parameters += Settings::SkipIntro           ? "-skipIntro " : "";
+    parameters += Settings::Nosplash            ? "-nosplash " : "";
+    parameters += Settings::Window              ? "-window " : "";
+    parameters += Settings::Name                ? "-name=" + Settings::NameValue + " " : "";
 
-    parameters += Settings::ParameterFile   	? "-par=" + Settings::ParameterFileValue + " " : "";
+    parameters += Settings::ParameterFile       ? "-par=" + Settings::ParameterFileValue + " " : "";
 
-    parameters += Settings::CheckSignatures 	? "-checkSignatures " : "";
+    parameters += Settings::CheckSignatures     ? "-checkSignatures " : "";
 
-    parameters += Settings::CpuCount        	? "-cpuCount=" + std::to_string(Settings::CpuCountValue) + " "  : "";
+    parameters += Settings::CpuCount            ? "-cpuCount=" + std::to_string(Settings::CpuCountValue) + " "  : "";
 
     int exThreadsValue = Settings::ExThreadsFileOperations
                          + Settings::ExThreadsTextureLoading * 2
                          + Settings::ExThreadsGeometryLoading * 4;
 
-    parameters += Settings::ExThreads       	? "-exThreads=" + std::to_string(exThreadsValue) + " " : "";
+    parameters += Settings::ExThreads           ? "-exThreads=" + std::to_string(exThreadsValue) + " " : "";
 
-    parameters += Settings::EnableHT        	? "-enableHT " : "";
-	parameters += Settings::DisableMulticore	? "-noCB " : "";
-	parameters += Settings::HugePages 			? "-hugepages " : "";
-	
-    parameters += Settings::FilePatching    	? "-filePatching " : "";
-    parameters += Settings::NoLogs          	? "-noLogs " : "";
-	parameters += Settings::ShowScriptErrors	? "-showScriptErrors " : "";
+    parameters += Settings::EnableHT            ? "-enableHT " : "";
+    parameters += Settings::DisableMulticore    ? "-noCB " : "";
+    parameters += Settings::HugePages           ? "-hugepages " : "";
 
-    parameters += Settings::World           	? "-world=" + Settings::WorldValue + " " : "";
+    parameters += Settings::FilePatching        ? "-filePatching " : "";
+    parameters += Settings::NoLogs              ? "-noLogs " : "";
+    parameters += Settings::ShowScriptErrors    ? "-showScriptErrors " : "";
 
-    parameters += Settings::NoPause         	? "-noPause " : "";
+    parameters += Settings::World               ? "-world=" + Settings::WorldValue + " " : "";
 
-    parameters += Settings::Connect         	? "-connect=" + Settings::ConnectValue + " " : "";
-    parameters += Settings::Port            	? "-port=" + Settings::PortValue + " " : "";
-    parameters += Settings::Password        	? "-password=" + Settings::PasswordValue + " " : "";
+    parameters += Settings::NoPause             ? "-noPause " : "";
 
-    parameters += Settings::Host            	? "-host" : "";
+    parameters += Settings::Connect             ? "-connect=" + Settings::ConnectValue + " " : "";
+    parameters += Settings::Port                ? "-port=" + Settings::PortValue + " " : "";
+    parameters += Settings::Password            ? "-password=" + Settings::PasswordValue + " " : "";
+
+    parameters += Settings::Host                ? "-host" : "";
 
     LOG(0, "Arma 3 launch command:\n" + Settings::ArmaPath + "/arma " + parameters);
 

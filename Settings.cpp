@@ -22,7 +22,7 @@ namespace Settings
 {
     string ArmaPath = Filesystem::DIR_NOT_FOUND;
     string WorkshopPath = Filesystem::DIR_NOT_FOUND;
-	
+
     int WindowPosX = 0;
     int WindowPosY = 0;
     int WindowSizeX = 800;
@@ -48,12 +48,12 @@ namespace Settings
     bool ExThreadsGeometryLoading = false;
 
     bool EnableHT = false;
-	bool DisableMulticore = false;
-	bool HugePages = false;
-	
+    bool DisableMulticore = false;
+    bool HugePages = false;
+
     bool FilePatching = false;
     bool NoLogs = false;
-	bool ShowScriptErrors = false;
+    bool ShowScriptErrors = false;
 
     bool World = false;
     string WorldValue = "";
@@ -135,16 +135,16 @@ namespace Settings
                     ExThreadsGeometryLoading = strtol(line.substr(25).c_str(), NULL, 10);
                 else if (Utils::StartsWith(line, "EnableHT="))
                     EnableHT = strtol(line.substr(9).c_str(), NULL, 10);
-				else if (Utils::StartsWith(line, "DisableMulticore="))
-					DisableMulticore = strtol(line.substr(17).c_str(), NULL, 10);
-				else if (Utils::StartsWith(line, "HugePages="))
-					HugePages = strtol(line.substr(10).c_str(), NULL, 10);
+                else if (Utils::StartsWith(line, "DisableMulticore="))
+                    DisableMulticore = strtol(line.substr(17).c_str(), NULL, 10);
+                else if (Utils::StartsWith(line, "HugePages="))
+                    HugePages = strtol(line.substr(10).c_str(), NULL, 10);
                 else if (Utils::StartsWith(line, "FilePatching="))
                     FilePatching = strtol(line.substr(13).c_str(), NULL, 10);
                 else if (Utils::StartsWith(line, "NoLogs="))
                     NoLogs = strtol(line.substr(7).c_str(), NULL, 10);
-				else if (Utils::StartsWith(line, "ShowScriptErrors="))
-					ShowScriptErrors = strtol(line.substr(17).c_str(), NULL, 10);
+                else if (Utils::StartsWith(line, "ShowScriptErrors="))
+                    ShowScriptErrors = strtol(line.substr(17).c_str(), NULL, 10);
                 else if (Utils::StartsWith(line, "World="))
                     World = strtol(line.substr(6).c_str(), NULL, 10);
                 else if (Utils::StartsWith(line, "WorldValue="))
@@ -224,11 +224,11 @@ namespace Settings
                          + "\nExThreadsTextureLoading=" + Utils::ToString(ExThreadsTextureLoading)
                          + "\nExThreadsGeometryLoading=" + Utils::ToString(ExThreadsGeometryLoading)
                          + "\nEnableHT=" + Utils::ToString(EnableHT)
-						 + "\nDisableMulticore=" + Utils::ToString(DisableMulticore)
-						 + "\nHugePages=" + Utils::ToString(HugePages)
+                         + "\nDisableMulticore=" + Utils::ToString(DisableMulticore)
+                         + "\nHugePages=" + Utils::ToString(HugePages)
                          + "\nFilePatching=" + Utils::ToString(FilePatching)
                          + "\nNoLogs=" + Utils::ToString(NoLogs)
-						 + "\nShowScriptErrors=" + Utils::ToString(ShowScriptErrors)
+                         + "\nShowScriptErrors=" + Utils::ToString(ShowScriptErrors)
                          + "\nWorld=" + Utils::ToString(World)
                          + "\nWorldValue=" + WorldValue
                          + "\nNoPause=" + Utils::ToString(NoPause)
