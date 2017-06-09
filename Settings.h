@@ -43,8 +43,12 @@ namespace Settings
     extern bool ExThreadsGeometryLoading;
 
     extern bool EnableHT;
+    extern bool DisableMulticore;
+    extern bool HugePages;
+
     extern bool FilePatching;
     extern bool NoLogs;
+    extern bool ShowScriptErrors;
 
     extern bool World;
     extern std::string WorldValue;

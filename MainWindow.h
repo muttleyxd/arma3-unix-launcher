@@ -55,8 +55,12 @@ class MainWindow : public Gtk::Window
         Gtk::CheckButton *cbExThreadsGeometryLoading;
 
         Gtk::CheckButton *cbEnableHT;
+        Gtk::CheckButton *cbDisableMulticore;
+        Gtk::CheckButton *cbHugePages;
+
         Gtk::CheckButton *cbFilePatching;
         Gtk::CheckButton *cbNoLogs;
+        Gtk::CheckButton *cbShowScriptErrors;
 
         Gtk::CheckButton *cbWorld;
         Gtk::Entry *tbWorld;
@@ -156,8 +160,12 @@ class MainWindow : public Gtk::Window
         void cbExThreadsGeometryLoading_Toggled();
 
         void cbEnableHT_Toggled();
+        void cbDisableMulticore_Toggled();
+        void cbHugePages_Toggled();
+
         void cbFilePatching_Toggled();
         void cbNoLogs_Toggled();
+        void cbShowScriptErrors_Toggled();
 
         void cbWorld_Toggled();
         void tbWorld_Changed();
