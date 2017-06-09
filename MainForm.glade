@@ -727,9 +727,9 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbFilePatching">
-                                    <property name="label" translatable="yes">Enable File-Patching</property>
-                                    <property name="name">cbFilePatching</property>
+                                  <object class="GtkCheckButton" id="cbDisableMulticore">
+                                    <property name="label" translatable="yes">Disable Multicore Rendering</property>
+                                    <property name="name">cbDisableMulticore</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
@@ -755,9 +755,9 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="cbNoLogs">
-                                    <property name="label" translatable="yes">No Logs</property>
-                                    <property name="name">cbNoLogs</property>
+                                  <object class="GtkCheckButton" id="cbHugePages">
+                                    <property name="label" translatable="yes">Enable Huge Pages</property>
+                                    <property name="name">cbHugePages</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
@@ -780,6 +780,90 @@
                                     <property name="fill">True</property>
                                     <property name="padding">4</property>
                                     <property name="position">13</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbFilePatching">
+                                    <property name="label" translatable="yes">Enable File-Patching</property>
+                                    <property name="name">cbFilePatching</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">14</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparator">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">4</property>
+                                    <property name="position">15</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbNoLogs">
+                                    <property name="label" translatable="yes">No Logs</property>
+                                    <property name="name">cbNoLogs</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">16</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparator">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">4</property>
+                                    <property name="position">17</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckButton" id="cbShowScriptErrors">
+                                    <property name="label" translatable="yes">Show Script Errors</property>
+                                    <property name="name">cbShowScriptErrors</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="draw_indicator">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">18</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparator">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">4</property>
+                                    <property name="position">19</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -821,7 +905,7 @@
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">14</property>
+                                    <property name="position">20</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -833,7 +917,7 @@
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="padding">4</property>
-                                    <property name="position">15</property>
+                                    <property name="position">21</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -848,7 +932,7 @@
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">16</property>
+                                    <property name="position">22</property>
                                   </packing>
                                 </child>
                               </object>
