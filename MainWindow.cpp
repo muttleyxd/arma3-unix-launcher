@@ -182,6 +182,9 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     btnPlay->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPlay_Clicked));
 
+	cbNosplash->set_tooltip_text("(1.70) Game will Crash if you enable this and alt tab during the initial loading screen!"
+								 "\nWait until you're in the main menu!");
+
     /////Executing every event - need to make sure UI represents actual Settings
     ignore = true;
     cbSkipIntro_Toggled();
