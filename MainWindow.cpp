@@ -289,7 +289,7 @@ void MainWindow::ArmaStatusThread()
         #ifdef __APPLE__
         armaPid = Utils::FindProcess("ArmA3");
         #else
-        armaPid = Utils::FindProcess("./arma3.i386");
+		armaPid = Utils::FindProcess("./arma3.x86_64");
         #endif
         if (armaPid != -1)
             lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
@@ -702,7 +702,7 @@ void MainWindow::btnPlay_Clicked()
     LOG(0, "Arma3.cfg:\n--------------------\n" + newArmaCfg + "\n--------------------");
 
     parameters += Settings::SkipIntro           ? "-skipIntro " : "";
-    parameters += Settings::Nosplash            ? "-nosplash " : "";
+	parameters += Settings::Nosplash            ? "-noSplash " : "";
     parameters += Settings::Window              ? "-window " : "";
     parameters += Settings::Name                ? "-name=" + Settings::NameValue + " " : "";
 
@@ -720,7 +720,7 @@ void MainWindow::btnPlay_Clicked()
 
     parameters += Settings::EnableHT            ? "-enableHT " : "";
     parameters += Settings::DisableMulticore    ? "-noCB " : "";
-    parameters += Settings::HugePages           ? "-hugepages " : "";
+	parameters += Settings::HugePages           ? "-hugePages " : "";
 
     parameters += Settings::FilePatching        ? "-filePatching " : "";
     parameters += Settings::NoLogs              ? "-noLogs " : "";
