@@ -182,8 +182,8 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     btnPlay->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPlay_Clicked));
 
-	cbNosplash->set_tooltip_text("(1.70) Game will Crash if you enable this and alt tab during the initial loading screen!"
-								 "\nWait until you're in the main menu!");
+    cbNosplash->set_tooltip_text("(1.70) Game will Crash if you enable this and alt tab during the initial loading screen!"
+                                 "\nWait until you're in the main menu!");
 
     /////Executing every event - need to make sure UI represents actual Settings
     ignore = true;
@@ -292,7 +292,7 @@ void MainWindow::ArmaStatusThread()
         #ifdef __APPLE__
         armaPid = Utils::FindProcess("ArmA3");
         #else
-		armaPid = Utils::FindProcess("./arma3.x86_64");
+        armaPid = Utils::FindProcess("./arma3.x86_64");
         #endif
         if (armaPid != -1)
             lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
@@ -705,7 +705,7 @@ void MainWindow::btnPlay_Clicked()
     LOG(0, "Arma3.cfg:\n--------------------\n" + newArmaCfg + "\n--------------------");
 
     parameters += Settings::SkipIntro           ? "-skipIntro " : "";
-	parameters += Settings::Nosplash            ? "-noSplash " : "";
+    parameters += Settings::Nosplash            ? "-noSplash " : "";
     parameters += Settings::Window              ? "-window " : "";
     parameters += Settings::Name                ? "-name=" + Settings::NameValue + " " : "";
 
@@ -723,7 +723,7 @@ void MainWindow::btnPlay_Clicked()
 
     parameters += Settings::EnableHT            ? "-enableHT " : "";
     parameters += Settings::DisableMulticore    ? "-noCB " : "";
-	parameters += Settings::HugePages           ? "-hugePages " : "";
+    parameters += Settings::HugePages           ? "-hugePages " : "";
 
     parameters += Settings::FilePatching        ? "-filePatching " : "";
     parameters += Settings::NoLogs              ? "-noLogs " : "";
