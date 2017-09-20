@@ -34,6 +34,7 @@ namespace Utils
                 response.push_back(strPtr);
             strPtr = strtok(NULL, delimiters.c_str());
         }
+		delete[] text;
         return response;
     }
 
