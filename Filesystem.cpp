@@ -186,8 +186,9 @@ namespace Filesystem
 
         for (string s : GetSubDirectories(path))
         {
-            if (s == "curator" || s == "dta" || s == "Expansion" || s == "heli"
-                    || s == "kart" || s == "mark") //skip DLCs
+			if (s == "Curator" || s == "Dta" || s == "Expansion" || s == "Heli"
+					|| s == "Jets" || s == "Kart" || s == "Mark" || s == "Argo"
+					|| s == "Orange") //skip DLCs
                 continue;
             if (DirectoryExists(path + "/" + s + "/Addons")
                     || DirectoryExists(path + "/" + s + "/addons"))
