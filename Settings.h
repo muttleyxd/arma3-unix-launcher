@@ -66,6 +66,8 @@ namespace Settings
 
     extern bool Host;
 
+    extern std::string ModPreset;
+
     extern std::vector<std::string> WorkshopModsEnabled;
     extern std::vector<std::string> WorkshopModsOrder;
 

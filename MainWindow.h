@@ -27,6 +27,9 @@ class MainWindow : public Gtk::Window
         Gtk::Button *btnAdd;
         Gtk::Button *btnRemove;
 
+        Gtk::Button *btnPresetLoad;
+        Gtk::Button *btnPresetSave;
+
         Glib::RefPtr<Gtk::CellRendererToggle> workshopToggleBox;
         Glib::RefPtr<Gtk::CellRendererToggle> customToggleBox;
 
@@ -134,6 +137,9 @@ class MainWindow : public Gtk::Window
 
         void btnAdd_Clicked();
         void btnRemove_Clicked();
+
+        void btnPresetLoad_Clicked();
+        void btnPresetSave_Clicked();
 
         bool onExit(GdkEventAny *event);
         void WorkshopToggleBox_Toggled(Glib::ustring path);

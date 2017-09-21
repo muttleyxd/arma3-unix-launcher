@@ -32,6 +32,9 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     builder->get_widget("btnAdd", btnAdd);
     builder->get_widget("btnRemove", btnRemove);
 
+    builder->get_widget("btnPresetLoad", btnPresetLoad);
+    builder->get_widget("btnPresetSave", btnPresetSave);
+
     workshopToggleBox = Glib::RefPtr<Gtk::CellRendererToggle>::cast_dynamic(builder->get_object("workshopToggleBox"));
     customToggleBox = Glib::RefPtr<Gtk::CellRendererToggle>::cast_dynamic(builder->get_object("customToggleBox"));
 
@@ -135,6 +138,9 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     btnAdd->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnAdd_Clicked));
     btnRemove->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnRemove_Clicked));
+
+    btnPresetLoad->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPresetLoad_Clicked));
+    btnPresetSave->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPresetSave_Clicked));
 
     cbSkipIntro->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbSkipIntro_Toggled));
     cbNosplash->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbNosplash_Toggled));
@@ -391,6 +397,92 @@ void MainWindow::btnRemove_Clicked()
     RefreshStatusLabel();
 }
 
+void MainWindow::btnPresetLoad_Clicked()
+{
+    Gtk::FileChooserDialog fcDialog(*this, "Select a Preset", Gtk::FILE_CHOOSER_ACTION_OPEN);
+    fcDialog.add_button("_Open", 1);
+    fcDialog.add_button("_Cancel", 0);
+    fcDialog.set_current_folder(Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory);
+    int result = fcDialog.run();
+
+    if (result)
+    {
+        std::string fname = fcDialog.get_filename();
+        Settings::ModPreset = fname.substr(fname.find_last_of('/') + 1);
+        std::string contents = Filesystem::ReadAllText(fcDialog.get_filename());
+        Settings::WorkshopModsEnabled.clear();
+        Settings::CustomModsEnabled.clear();
+
+        //load mods into settings
+        for (std::string line : Utils::Split(contents, "\n"))
+        {
+            if (Utils::StartsWith(line, "WorkshopModsEnabled="))
+            {
+                std::string sub = line.substr(20);
+                for (std::string s : Utils::Split(sub, ","))
+                    Settings::WorkshopModsEnabled.push_back(s);
+            }
+            else if (Utils::StartsWith(line, "CustomModsEnabled="))
+            {
+                std::string sub = line.substr(18);
+                for (std::string s : Utils::Split(sub, ","))
+                    Settings::CustomModsEnabled.push_back(s);
+            }
+        }
+
+        //update UI to reflect changes
+        for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
+        {
+            Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+            Glib::ustring workshopid = row[workshopColumns.workshopid];
+
+            row[workshopColumns.enabled] = Settings::ModEnabled(workshopid.raw());
+        }
+
+        for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
+        {
+            Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+            Glib::ustring path = row[customColumns.path];
+            std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
+
+            row[customColumns.enabled] = Settings::ModEnabled(pathStr);
+        }
+
+        RefreshStatusLabel();
+    }
+}
+
+void MainWindow::btnPresetSave_Clicked()
+{
+    PutModsToSettings();
+
+    Gtk::FileChooserDialog fcDialog(*this, "Name your Preset", Gtk::FILE_CHOOSER_ACTION_SAVE);
+    fcDialog.add_button("_Save", 1);
+    fcDialog.add_button("_Cancel", 0);
+    std::string path = Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory;
+    fcDialog.set_current_folder(path);
+    int result = fcDialog.run();
+
+    if (result)
+    {
+        std::string fname = fcDialog.get_filename();
+        Settings::ModPreset = fname.substr(fname.find_last_of('/') + 1);
+        RefreshStatusLabel();
+
+        std::string outfile = "WorkshopModsEnabled=";
+        for (std::string s : Settings::WorkshopModsEnabled)
+            outfile += s + ",";
+        outfile += "\nCustomModsEnabled=";
+        for (std::string s : Settings::CustomModsEnabled)
+            outfile += Utils::Replace(s, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
+
+        path = fcDialog.get_filename();
+        Filesystem::WriteAllText(path, outfile);
+    }
+}
+
 bool MainWindow::onExit(GdkEventAny *event)
 {
     LOG(1, "onExit() -> restoring Arma3.cfg");
@@ -415,6 +507,8 @@ void MainWindow::WorkshopToggleBox_Toggled(Glib::ustring path) //path is index n
     //std::cout << path << std::endl;
     Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(path));
     row[workshopColumns.enabled] = !row[workshopColumns.enabled];
+    if (Settings::ModPreset[Settings::ModPreset.length() - 1] != '*')
+        Settings::ModPreset += "*";
     RefreshStatusLabel();
 }
 
@@ -423,6 +517,8 @@ void MainWindow::CustomToggleBox_Toggled(Glib::ustring path) //path is index num
     //std::cout << path << std::endl;
     Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(path));
     row[customColumns.enabled] = !row[customColumns.enabled];
+    if (Settings::ModPreset[Settings::ModPreset.length() - 1] != '*')
+        Settings::ModPreset += "*";
     RefreshStatusLabel();
 }
 
@@ -767,7 +863,9 @@ void MainWindow::RefreshStatusLabel()
     lblSelectedMods->set_text("Selected " + std::to_string(workshopMods + customMods)
                               + " mods (" + std::to_string(workshopMods)
                               + " from workshop, " + std::to_string(customMods)
-                              + " custom)");
+                              + " custom)"
+                              + "\t"
+                              + "Mod Preset: " + Settings::ModPreset);
 }
 
 void MainWindow::Init()

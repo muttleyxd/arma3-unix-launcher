@@ -71,6 +71,8 @@ namespace Settings
 
     bool Host = false;
 
+    string ModPreset = "default";
+
     std::vector<std::string> WorkshopModsEnabled;
     std::vector<std::string> WorkshopModsOrder;
 
@@ -165,6 +167,8 @@ namespace Settings
                     PasswordValue = line.substr(14);
                 else if (Utils::StartsWith(line, "Host="))
                     Host = strtol(line.substr(5).c_str(), NULL, 10);
+                else if (Utils::StartsWith(line, "ModPreset="))
+                    ModPreset = line.substr(10);
                 else if (Utils::StartsWith(line, "WorkshopModsEnabled="))
                 {
                     string sub = line.substr(20);
@@ -239,6 +243,7 @@ namespace Settings
                          + "\nPassword=" + Utils::ToString(Password)
                          + "\nPasswordValue=" + PasswordValue
                          + "\nHost=" + Utils::ToString(Host)
+                         + "\nModPreset=" + (ModPreset[ ModPreset.length() - 1 ] == '*' ? "default" : ModPreset)
                          + "\nWorkshopModsEnabled=";
 
 
