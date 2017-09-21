@@ -17,6 +17,7 @@
 namespace Utils
 {
     std::vector<std::string> Split(std::string textToSplit, std::string delimiters);
+    bool EndsWith(std::string textToCheck, std::string textToFind);
     bool StartsWith(std::string textToCheck, std::string textToFind);
     std::string Replace(std::string str, std::string from, std::string to);
     std::string Trim(const std::string &s);

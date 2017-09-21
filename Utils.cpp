@@ -34,8 +34,18 @@ namespace Utils
                 response.push_back(strPtr);
             strPtr = strtok(NULL, delimiters.c_str());
         }
-		delete[] text;
+        delete[] text;
         return response;
+    }
+
+    bool EndsWith(string textToCheck, string textToFind)
+    {
+        if (textToFind.size() > textToCheck.size())
+            return false;
+        char *textToCheckPtr = (char *)textToCheck.c_str() + textToCheck.size() - textToFind.size();
+        if (strcmp(textToCheckPtr, textToFind.c_str()) == 0)
+            return true;
+        return false;
     }
 
     bool StartsWith(string textToCheck, string textToFind)

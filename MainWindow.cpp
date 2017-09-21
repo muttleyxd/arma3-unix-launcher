@@ -403,6 +403,17 @@ void MainWindow::btnPresetLoad_Clicked()
     fcDialog.add_button("_Open", 1);
     fcDialog.add_button("_Cancel", 0);
     fcDialog.set_current_folder(Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory);
+
+    Glib::RefPtr<Gtk::FileFilter> fcFilter = Gtk::FileFilter::create();
+    fcFilter->set_name("Preset files (*.a3ulm)");
+    fcFilter->add_pattern("*.a3ulm");
+    fcDialog.add_filter(fcFilter);
+
+    Glib::RefPtr<Gtk::FileFilter> fcFilterAll = Gtk::FileFilter::create();
+    fcFilterAll->set_name("All files (*)");
+    fcFilterAll->add_pattern("*");
+    fcDialog.add_filter(fcFilterAll);
+
     int result = fcDialog.run();
 
     if (result)
@@ -463,11 +474,20 @@ void MainWindow::btnPresetSave_Clicked()
     fcDialog.add_button("_Cancel", 0);
     std::string path = Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory;
     fcDialog.set_current_folder(path);
+
+    Glib::RefPtr<Gtk::FileFilter> fcFilter = Gtk::FileFilter::create();
+    fcFilter->set_name("Preset files (*.a3ulm)");
+    fcFilter->add_pattern("*.a3ulm");
+    fcDialog.add_filter(fcFilter);
+
     int result = fcDialog.run();
 
     if (result)
     {
         std::string fname = fcDialog.get_filename();
+        // Check if file name ends with .a3ulm, if not, then append
+        if (!Utils::EndsWith(fname, ".a3ulm"))
+            fname += ".a3ulm";
         Settings::ModPreset = fname.substr(fname.find_last_of('/') + 1);
         RefreshStatusLabel();
 
@@ -478,8 +498,7 @@ void MainWindow::btnPresetSave_Clicked()
         for (std::string s : Settings::CustomModsEnabled)
             outfile += Utils::Replace(s, Filesystem::ArmaDirMark, Settings::ArmaPath) + ",";
 
-        path = fcDialog.get_filename();
-        Filesystem::WriteAllText(path, outfile);
+        Filesystem::WriteAllText(fname, outfile);
     }
 }
 
