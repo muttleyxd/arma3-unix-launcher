@@ -31,7 +31,7 @@ Launcher detects and symlinks all mods from Workshop and ArmA's main directory. 
 Please build arma3-unix-launcher from source. 
 .deb files are outdated
 
-~~There is a .deb package available in releases tab!
+~~There is a .deb package available in releases tab!~~
 
 [Releases tab](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
