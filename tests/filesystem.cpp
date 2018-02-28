@@ -2,6 +2,8 @@
 
 #include "filesystem.hpp"
 
+#include <dirent.h>
+
 #include <algorithm>
 #include <string>
 
@@ -25,7 +27,7 @@ std::string RemoveLastElement(std::string s, bool removeSlash, int count)
     return s;
 }
 
-std::string getworkdir()
+std::string GetWorkDir()
 {
     std::string ret = "";
     char buf[1024];
@@ -38,10 +40,25 @@ std::string getworkdir()
     return ret;
 }
 
+std::vector<std::string> Ls(std::string path)
+{
+    std::vector<std::string> ret;
+    DIR *dir = opendir(path.c_str());
+    if (!dir)
+        return ret;
+
+    dirent *dp;
+    while (dp = readdir(dir))
+        ret.push_back(dp->d_name);
+    closedir(dir);
+    std::sort(ret.begin(), ret.end());
+    return ret;
+}
+
 class FilesystemTests : public ::testing::Test
 {
 public:
-    std::string dir = getworkdir() + "/fs-tests";
+    std::string dir = GetWorkDir() + "/fs-tests";
 
     virtual void SetUp()
     {
@@ -164,9 +181,21 @@ TEST_F(FilesystemTests, GetSubdirectories)
 
 TEST_F(FilesystemTests, Symlinks)
 {
-    /*
-     * test flow:
-     * create dir with files and subdirectories
-     * create symlinks, check if they work
-     */
+    for (int i = 0; i < 10; i++)
+    {
+        std::string dir_name = "dir" + std::to_string(i);
+        ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/" + dir_name), 0);
+        ASSERT_EQ(Filesystem::FileCreate(dir + "/" + dir_name + "/file" + std::to_string(i)), 0);
+        ASSERT_EQ(Filesystem::SymlinkCreate(dir + "/" + dir_name + "_symlink", dir_name), 0);
+        ASSERT_EQ(Filesystem::SymlinkCreate(dir + "/" + dir_name + "_symlink_absolute", dir + "/" + dir_name), 0);
+        std::vector<std::string> lsResult, lsResultSymlink, lsResultSymlinkAbsolute;
+        lsResult = Ls(dir + "/" + dir_name);
+        lsResultSymlink = Ls(dir + "/" + dir_name + "_symlink");
+        lsResultSymlinkAbsolute = Ls(dir + "/" + dir_name + "_symlink_absolute");
+        ASSERT_EQ(lsResult, lsResultSymlink);
+        ASSERT_EQ(lsResult, lsResultSymlinkAbsolute);
+
+        ASSERT_EQ(Filesystem::SymlinkGetTarget(dir + "/" + dir_name + "_symlink"), dir_name);
+        ASSERT_EQ(Filesystem::SymlinkGetTarget(dir + "/" + dir_name + "_symlink_absolute"), dir + "/" + dir_name);
+    }
 }

@@ -98,4 +98,14 @@ namespace Filesystem
         std::vector<std::string> ret;
         return ret;
     }
+
+    int SymlinkCreate(std::string source, std::string target)
+    {
+        return 0;
+    }
+
+    std::string SymlinkGetTarget(std::string source)
+    {
+        return "";
+    }
 }

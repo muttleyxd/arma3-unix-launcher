@@ -19,8 +19,8 @@ namespace Filesystem
     // This is not recursive
     std::vector<std::string> GetSubdirectories(std::string path);
 
-    int CreateSymlink(std::string source, std::string target);
-    std::string GetSymlinkTarget(std::string source);
+    int SymlinkCreate(std::string source, std::string target);
+    std::string SymlinkGetTarget(std::string source);
 }
 
 #endif
