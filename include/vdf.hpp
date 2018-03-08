@@ -10,7 +10,10 @@
 class VDF
 {
   public:
-    VDF(std::string path);
+    VDF(std::string path = "");
+
+    int LoadFromFile(std::string path, bool append = false);
+    int LoadFromText(std::string text, bool append = false);
 
     std::map<std::string, std::string> KeyValue;
     std::vector<std::string> GetValuesWithFilter(std::string filter);

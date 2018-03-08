@@ -1,0 +1,35 @@
+"VDFTests"
+{
+	"Branch1"
+	{
+		"SubBranch1"
+		{
+			"Application1"
+			{
+				"SomeKey"		"5"
+				"SomeKeyWithValues"
+				{
+					"KeyValue"		"text"
+					"KeyValueInt"		"155"
+				}
+			}
+		}
+		"SubBranch2"
+		{
+			"KeyValue" "8"
+		}
+	}
+	"Branch2"
+	{
+		"SubBranch2"
+		{
+			"Directories"
+			{
+				"BaseInstallFolder_1"		"/mnt/games/SteamLibrary"
+				"BaseInstallFolder_2"		"/home/user/SteamLibrary"
+				"BaseInstallFolder_3"		"/run/media/user/SteamLibrary"
+				"BaseInstallFolder_4"		"/somerandompath/steamlibrary"
+			}
+		}
+	}
+}
