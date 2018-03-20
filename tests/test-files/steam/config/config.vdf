@@ -1,0 +1,14 @@
+"InstallConfigStore"
+{
+	"Software"
+	{
+		"Valve"
+		{
+			"Steam"
+			{
+				"BaseInstallFolder_1"		"/mnt/games/SteamLibrary"
+				"BaseInstallFolder_2"		"/mnt/disk2/steamgames"
+			}
+		}
+	}
+}
