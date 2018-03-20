@@ -6,21 +6,21 @@
 
 namespace Filesystem
 {
-    int FileCreate(std::string path, std::string content = "");
-    int FileDelete(std::string path);
-    int FileExists(std::string path);
+    int FileCreate(const std::string &path, const std::string &content = "");
+    int FileDelete(const std::string &path);
+    int FileExists(const std::string &path);
 
-    std::string FileReadAllText(std::string path);
+    std::string FileReadAllText(const std::string &path);
 
-    int DirectoryCreate(std::string path);
-    int DirectoryDelete(std::string path, bool recursive = false);
-    int DirectoryExists(std::string path);
+    int DirectoryCreate(const std::string &path);
+    int DirectoryDelete(const std::string &path, bool recursive = false);
+    int DirectoryExists(const std::string &path);
 
     // This is not recursive
-    std::vector<std::string> GetSubdirectories(std::string path);
+    std::vector<std::string> GetSubdirectories(const std::string &path);
 
-    int SymlinkCreate(std::string source, std::string target);
-    std::string SymlinkGetTarget(std::string source);
+    int SymlinkCreate(const std::string &source, const std::string &target);
+    std::string SymlinkGetTarget(const std::string &source);
 }
 
 #endif

@@ -1,16 +1,16 @@
 #include "mod.hpp"
 
-Mod::Mod(std::string path)
+Mod::Mod(const std::string &path)
 {
 }
 
-int Mod::LoadFromFile(std::string path, bool append)
+int Mod::LoadFromFile(const std::string &path, bool append)
 {
     errno = ENOSYS;
     return -1;
 }
 
-int LoadFromText(std::string text, bool append)
+int LoadFromText(const std::string &text, bool append)
 {
     errno = ENOSYS;
     return -1;

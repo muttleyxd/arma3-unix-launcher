@@ -9,12 +9,12 @@
 
 namespace Filesystem
 {
-    int DirectoryCreate(std::string path)
+    int DirectoryCreate(const std::string &path)
     {
         return mkdir(path.c_str(), 0755);
     }
 
-    int DirectoryDelete(std::string path, bool recursive)
+    int DirectoryDelete(const std::string &path, bool recursive)
     {
         if (!recursive)
             return rmdir(path.c_str());
@@ -22,7 +22,7 @@ namespace Filesystem
         return system(("rm -rf " + path).c_str());
     }
 
-    int DirectoryExists(std::string path)
+    int DirectoryExists(const std::string &path)
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
@@ -43,7 +43,7 @@ namespace Filesystem
             return result;
     }
 
-    int FileCreate(std::string path, std::string content)
+    int FileCreate(const std::string &path, const std::string &content)
     {
         int fd = creat(path.c_str(), 0644);
         if (fd == -1)
@@ -58,12 +58,12 @@ namespace Filesystem
         return 0;
     }
 
-    int FileDelete(std::string path)
+    int FileDelete(const std::string &path)
     {
         return unlink(path.c_str());
     }
 
-    int FileExists(std::string path)
+    int FileExists(const std::string &path)
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
@@ -80,7 +80,7 @@ namespace Filesystem
             return result;
     }
 
-    std::string FileReadAllText(std::string path)
+    std::string FileReadAllText(const std::string &path)
     {
         int fd = open(path.c_str(), 0);
         if (fd == -1)
@@ -93,18 +93,18 @@ namespace Filesystem
         return buffer.get();
     }
 
-    std::vector<std::string> GetSubdirectories(std::string path)
+    std::vector<std::string> GetSubdirectories(const std::string &path)
     {
         std::vector<std::string> ret;
         return ret;
     }
 
-    int SymlinkCreate(std::string source, std::string target)
+    int SymlinkCreate(const std::string &source, const std::string &target)
     {
         return 0;
     }
 
-    std::string SymlinkGetTarget(std::string source)
+    std::string SymlinkGetTarget(const std::string &source)
     {
         return "";
     }

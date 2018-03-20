@@ -6,13 +6,13 @@
 
 class Mod
 {
-  public:
-    Mod(std::string path);
+    public:
+        Mod(const std::string &path = "");
 
-    std::map<std::string, std::string> KeyValue;
+        std::map<std::string, std::string> KeyValue;
 
-    int LoadFromFile(std::string path, bool append = false);
-    int LoadFromText(std::string text, bool append = false);
+        int LoadFromFile(const std::string &path, bool append = false);
+        int LoadFromText(const std::string &text, bool append = false);
 };
 
 #endif
