@@ -163,7 +163,9 @@ int main(int argc, char *argv[])
             }
             else
             {
-                Settings::WorkshopPath = Utils::RemoveLastElement(Settings::ArmaPath, false, 2) + "workshop/content/107410";
+                char *resolved_path = realpath((Utils::RemoveLastElement(Settings::ArmaPath, false, 2) + "workshop/content/107410").c_str(), NULL);
+                Settings::WorkshopPath = resolved_path;
+                free(resolved_path);
                 LOG(1, "Workaround workshop path: " + Settings::WorkshopPath);
             }
         }
