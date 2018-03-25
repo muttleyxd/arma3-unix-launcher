@@ -87,6 +87,10 @@ namespace Filesystem
         }
         else
             LOG(1, "Can't open " + HomeDirectory + SteamConfigFile + "\nCritical error\n");
+
+        string home_steam_dir = HomeDirectory + LocalSharePrefix + "/Steam/steamapps/common";
+        if (DirectoryExists(home_steam_dir))
+            response.push_back(home_steam_dir);
         return response;
     }
 

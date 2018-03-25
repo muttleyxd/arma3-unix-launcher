@@ -25,6 +25,11 @@ namespace Filesystem
     extern std::string DIR_NOT_FOUND;
     extern std::string NOT_A_SYMLINK;
 
+    extern std::string LocalSharePrefix;
+    extern std::string BohemiaInteractivePrefix;
+    extern std::string SteamPath;
+    extern std::string LauncherSettingsDirectory;
+
     extern std::string SteamConfigFile;
     extern std::string SteamAppsArmaPath;
     extern std::string SteamAppsModWorkshopPath;
