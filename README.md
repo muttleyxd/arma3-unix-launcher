@@ -51,6 +51,7 @@ Gtkmm3 is required
 
 #### Debian package
     apt-get install libgtkmm-3.0-1v5
+    apt-get install libgtkmm3.0-dev
 
 #### Arch Linux
     pacman -S gtkmm3
