@@ -1,20 +1,23 @@
 #include "filesystem.hpp"
 
+#include <dirent.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <cstring>
 #include <memory>
 
 namespace Filesystem
 {
-    int DirectoryCreate(const std::string &path)
+    int DirectoryCreate(const std::string &path) noexcept
     {
         return mkdir(path.c_str(), 0755);
     }
 
-    int DirectoryDelete(const std::string &path, bool recursive)
+    int DirectoryDelete(const std::string &path, bool recursive) noexcept
     {
         if (!recursive)
             return rmdir(path.c_str());
@@ -22,7 +25,7 @@ namespace Filesystem
         return system(("rm -rf " + path).c_str());
     }
 
-    int DirectoryExists(const std::string &path)
+    int DirectoryExists(const std::string &path) noexcept
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
@@ -43,7 +46,7 @@ namespace Filesystem
             return result;
     }
 
-    int FileCreate(const std::string &path, const std::string &content)
+    int FileCreate(const std::string &path, const std::string &content) noexcept
     {
         int fd = creat(path.c_str(), 0644);
         if (fd == -1)
@@ -58,12 +61,12 @@ namespace Filesystem
         return 0;
     }
 
-    int FileDelete(const std::string &path)
+    int FileDelete(const std::string &path) noexcept
     {
         return unlink(path.c_str());
     }
 
-    int FileExists(const std::string &path)
+    int FileExists(const std::string &path) noexcept
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
@@ -93,19 +96,55 @@ namespace Filesystem
         return buffer.get();
     }
 
+    /*
+     * GetSubdirectories - returns directories found in 'path'
+     * This function is NOT recursive
+     *
+     * This function throws exceptions
+     */
     std::vector<std::string> GetSubdirectories(const std::string &path)
     {
         std::vector<std::string> ret;
+
+        DIR *dirp = opendir(path.c_str());
+        if (dirp == NULL)
+            throw std::invalid_argument("Error: " + std::to_string(errno) + " " + strerror(errno));
+
+        struct dirent *dp;
+        while (true)
+        {
+            dp = readdir(dirp);
+            if (!dp)
+                break;
+            std::string name = dp->d_name;
+            if (name != "." && name != "..")
+                ret.push_back(dp->d_name);
+        }
+
+        closedir(dirp);
         return ret;
     }
 
-    int SymlinkCreate(const std::string &source, const std::string &target)
+    int SymlinkCreate(const std::string &source, const std::string &target) noexcept
     {
-        return 0;
+        return symlink(target.c_str(), source.c_str());
     }
 
     std::string SymlinkGetTarget(const std::string &source)
     {
-        return "";
+        struct stat st;
+        if (lstat(source.c_str(), &st) < 0)
+            throw std::invalid_argument("Error: " + std::to_string(errno) + " " + strerror(errno));
+
+        if (!S_ISLNK(st.st_mode))
+            throw std::invalid_argument("Error: Not a symlink");
+
+        std::unique_ptr<char> buffer = std::make_unique<char>(PATH_MAX + 1);
+        ssize_t target_length = readlink(source.c_str(), buffer.get(), PATH_MAX);
+        if (target_length == -1)
+            throw std::invalid_argument("Error: " + std::to_string(errno) + " " + strerror(errno));
+        buffer.get()[target_length] = 0; // terminate string
+
+        return buffer.get();
     }
 }

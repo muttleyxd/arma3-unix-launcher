@@ -8,17 +8,17 @@
 
 class FilesystemTests : public ::testing::Test
 {
-public:
-    std::string dir = GetWorkDir() + "/fs-tests";
+    public:
+        std::string dir = GetWorkDir() + "/fs-tests";
 
-    virtual void SetUp()
-    {
-        Filesystem::DirectoryCreate(dir);
-    }
-    virtual void TearDown()
-    {
-        Filesystem::DirectoryDelete(dir, true);
-    }
+        virtual void SetUp()
+        {
+            Filesystem::DirectoryCreate(dir);
+        }
+        virtual void TearDown()
+        {
+            Filesystem::DirectoryDelete(dir, true);
+        }
 };
 
 /*
@@ -57,7 +57,7 @@ TEST_F(FilesystemTests, FileCreateExistsDelete)
 
     std::array<std::string, 3> file_names{"/file", "/dir with spaces/file-in-subdir", "/dir with spaces/file with spaces"};
 
-    for (auto& file_name: file_names)
+    for (auto &file_name : file_names)
     {
         ASSERT_EQ(Filesystem::FileCreate(dir + file_name), 0);
         ASSERT_EQ(Filesystem::FileExists(dir + file_name), 0);
@@ -97,28 +97,30 @@ TEST_F(FilesystemTests, GetSubdirectories)
 {
     std::array<std::string, 8> dir_names
     {
-        "/dir1", "/dir2", "/dir3", "/dir4",
-        "/dir5", "/dir6", "/dir7", "/dir8"
+        "dir1", "dir2", "dir3", "dir4",
+        "dir5", "dir6", "dir7", "dir8"
     };
 
     std::array<std::string, 2> subdir_names
     {
-        "/Addons", "/Keys"
+        "Addons", "Keys"
     };
 
     std::array<std::string, 2> file_names
     {
-        "/something.pbo", "/some.key"
+        "something.pbo", "some.key"
     };
 
-    for (auto& dir_name: dir_names)
+    std::string s = "/"; //separator;
+
+    for (auto &dir_name : dir_names)
     {
-        ASSERT_EQ(Filesystem::DirectoryCreate(dir + dir_name), 0);
-        for (auto &subdir_name: subdir_names)
+        ASSERT_EQ(Filesystem::DirectoryCreate(dir + s + dir_name), 0);
+        for (auto &subdir_name : subdir_names)
         {
-            ASSERT_EQ(Filesystem::DirectoryCreate(dir + dir_name + subdir_name), 0);
-            for (auto &file_name: file_names)
-                ASSERT_EQ(Filesystem::FileCreate(dir + dir_name + subdir_name + file_name), 0);
+            ASSERT_EQ(Filesystem::DirectoryCreate(dir + s + dir_name + s + subdir_name), 0);
+            for (auto &file_name : file_names)
+                ASSERT_EQ(Filesystem::FileCreate(dir + s + dir_name + s + subdir_name + s + file_name), 0);
         }
     }
 
@@ -126,8 +128,32 @@ TEST_F(FilesystemTests, GetSubdirectories)
     std::sort(subdirectories.begin(), subdirectories.end());
 
     ASSERT_EQ(subdirectories.size(), 8);
-    for (size_t i = 0; i < sizeof(dir_names); i++)
+    for (size_t i = 0; i < dir_names.size(); i++)
         ASSERT_EQ(subdirectories[i], dir_names[i]);
+
+    try
+    {
+        errno = 0;
+        std::vector<std::string> call_on_file = Filesystem::GetSubdirectories(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]);
+        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
+    }
+    catch (std::exception &ex)
+    {
+        std::string_view exception_message(ex.what());
+        ASSERT_EQ(exception_message, std::string("Error: 20 Not a directory"));
+    }
+
+    try
+    {
+        errno = 0;
+        std::vector<std::string> not_exists = Filesystem::GetSubdirectories(dir + s + "nowhere");
+        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
+    }
+    catch (std::exception &ex)
+    {
+        std::string_view exception_message(ex.what());
+        ASSERT_EQ(exception_message, "Error: 2 No such file or directory");
+    }
 }
 
 TEST_F(FilesystemTests, Symlinks)
@@ -148,5 +174,29 @@ TEST_F(FilesystemTests, Symlinks)
 
         ASSERT_EQ(Filesystem::SymlinkGetTarget(dir + "/" + dir_name + "_symlink"), dir_name);
         ASSERT_EQ(Filesystem::SymlinkGetTarget(dir + "/" + dir_name + "_symlink_absolute"), dir + "/" + dir_name);
+    }
+
+    try
+    {
+        errno = 0;
+        Filesystem::SymlinkGetTarget(dir);
+        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
+    }
+    catch (std::exception &ex)
+    {
+        std::string_view exception_message(ex.what());
+        ASSERT_EQ(exception_message, "Error: Not a symlink");
+    }
+
+    try
+    {
+        errno = 0;
+        Filesystem::SymlinkGetTarget(dir + "/nowhere");
+        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
+    }
+    catch (std::exception &ex)
+    {
+        std::string_view exception_message(ex.what());
+        ASSERT_EQ(exception_message, "Error: 2 No such file or directory");
     }
 }
