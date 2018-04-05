@@ -34,7 +34,7 @@ TEST(StringUtilsTests, Replace)
     ASSERT_EQ(Replace("tests", "testss", "ab"), "tests");
     ASSERT_EQ(Replace("tests", "tests", "ab"), "ab");
 
-    ASSERT_EQ(Replace("first line\nsecond line\nthird line", "line", "l"), "first l\nsecond line\nthird line");
+    ASSERT_EQ(Replace("first line\nsecond line\nthird line", "line", "l"), "first l\nsecond l\nthird l");
     ASSERT_EQ(Replace("whole\tstring", "\t", "\n"), "whole\nstring");
 }
 

@@ -2,9 +2,19 @@
 
 namespace StringUtils
 {
-    std::string RemoveElementsFromPath(const std::string &text, bool remove_slash, int count)
+    size_type find_last_nth(const std::string &text, const char c, int count)
     {
-        return "";
+
+    }
+
+    std::string_view RemoveElementsFromPath(std::string text, bool remove_slash, int count)
+    {
+        if (text.length() == 0)
+            return text;
+
+
+
+        return text;
     }
 
     std::string Replace(const std::string &text, const std::string &from, const std::string &to)

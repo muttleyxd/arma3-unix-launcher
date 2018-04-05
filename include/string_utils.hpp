@@ -7,7 +7,7 @@
 
 namespace StringUtils
 {
-    std::string RemoveElementsFromPath(const std::string &text, bool remove_slash = true, int count = 1);
+    std::string_view RemoveElementsFromPath(const std::string &text, bool remove_slash = true, int count = 1);
     std::string Replace(const std::string &text, const std::string &from, const std::string &to);
     std::string Trim(const std::string &text);
     std::string TrimLeft(const std::string &text);
