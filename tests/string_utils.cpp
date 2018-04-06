@@ -14,9 +14,13 @@ TEST(StringUtilsTests, RemoveElementsFromPath)
     ASSERT_EQ(RemoveElementsFromPath(path, true, 2), "/mnt/folder1");
     ASSERT_EQ(RemoveElementsFromPath(path, false, 2), "/mnt/folder1/");
     ASSERT_EQ(RemoveElementsFromPath(path, false, 4), "/");
+    ASSERT_EQ(RemoveElementsFromPath(path, true, 4), "");
+
+    ASSERT_EQ(RemoveElementsFromPath(path, false, 32), "/");
+    ASSERT_EQ(RemoveElementsFromPath(path, true, 32), "");
 
     ASSERT_EQ(RemoveElementsFromPath("/"), "");
-    ASSERT_EQ(RemoveElementsFromPath("thisisnotapath"), "");
+    ASSERT_EQ(RemoveElementsFromPath("thisisnotapath"), "thisisnotapath");
 }
 
 TEST(StringUtilsTests, Replace)
@@ -51,6 +55,13 @@ TEST(StringUtilsTests, Trim)
     ASSERT_EQ(TrimRight(to_trim), trimmed_right);
 
     ASSERT_EQ(Trim(trimmed), trimmed);
+
+    std::string trim_with_copy = Trim<std::string, std::string>(to_trim);
+    ASSERT_EQ(trim_with_copy, trimmed);
+
+    std::string_view trim_with_view_argument(to_trim);
+    std::string_view trimmed_view = Trim<std::string_view, std::string_view>(trim_with_view_argument);
+    ASSERT_EQ(trimmed_view, trimmed);
 }
 
 TEST(StringUtilsTests, StartsWith)
@@ -79,7 +90,6 @@ TEST(StringUtilsTests, EndsWith)
     ASSERT_TRUE(EndsWith(text, "This is some text"));
     ASSERT_FALSE(EndsWith(text, "this is some text"));
     ASSERT_FALSE(EndsWith(text, "\ntext"));
-    ASSERT_FALSE(EndsWith(text, "text"));
 }
 
 TEST(StringUtilsTests, Split)
