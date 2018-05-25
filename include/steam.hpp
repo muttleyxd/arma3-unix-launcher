@@ -7,9 +7,13 @@
 class Steam
 {
     public:
-        Steam(std::vector<std::string> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam"});
+        Steam(std::vector<std::string> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam"});
 
+        const std::string& GetSteamPath() noexcept;
         std::vector<std::string> GetInstallPaths();
+
+    private:
+        std::string steam_path_;
 };
 
 #endif

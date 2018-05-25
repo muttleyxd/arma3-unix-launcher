@@ -25,7 +25,7 @@ namespace Filesystem
         return system(("rm -rf " + path).c_str());
     }
 
-    int DirectoryExists(const std::string &path) noexcept
+    bool DirectoryExists(const std::string &path) noexcept
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
@@ -36,14 +36,13 @@ namespace Filesystem
          * else return it exists
          */
         if (result != 0)
-            return result;
+            return false;
         else if (!S_ISDIR(st.st_mode))
         {
             errno = EEXIST;
-            return 1;
+            return false;
         }
-        else
-            return result;
+        return true;
     }
 
     int FileCreate(const std::string &path, const std::string &content) noexcept
@@ -66,21 +65,20 @@ namespace Filesystem
         return unlink(path.c_str());
     }
 
-    int FileExists(const std::string &path) noexcept
+    bool FileExists(const std::string &path) noexcept
     {
         struct stat st;
         int result = stat(path.c_str(), &st);
 
         // As in DirectoryExists
         if (result != 0)
-            return result;
+            return false;
         else if (S_ISDIR(st.st_mode))
         {
             errno = EEXIST;
-            return 1;
+            return false;
         }
-        else
-            return result;
+        return true;
     }
 
     std::string FileReadAllText(const std::string &path)

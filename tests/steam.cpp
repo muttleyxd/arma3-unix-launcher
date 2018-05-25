@@ -23,13 +23,17 @@ TEST_F(SteamTests, FindInstallPaths)
 
 TEST_F(SteamTests, InvalidPaths)
 {
-    try
+    ASSERT_THROW(Steam steam(std::vector<std::string> { "/nowhere"}), std::invalid_argument);
+}
+
+TEST_F(SteamTests, GetSteamPath)
+{
+    Steam steam;
+    std::string home_path = getenv("HOME");
+    std::string steam_path = steam.GetSteamPath();
+    if (steam_path != home_path + "/.steam/steam" && steam_path != home_path + "/.local/share/Steam")
     {
-        Steam steam(std::vector<std::string> { "/nowhere"});
-        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
-    }
-    catch (std::invalid_argument exception)
-    {
-        ASSERT_EQ(exception.what(), "Steam::Steam() - Cannot find Steam install");
+        EXPECT_EQ(home_path + "/.steam", steam.GetSteamPath());
+        EXPECT_EQ(home_path + "/.local/share/Steam", steam.GetSteamPath());
     }
 }

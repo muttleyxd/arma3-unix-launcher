@@ -28,17 +28,17 @@ class FilesystemTests : public ::testing::Test
 TEST_F(FilesystemTests, DirectoryCreateExistsDelete)
 {
     ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/subdir"), 0);
-    ASSERT_EQ(Filesystem::DirectoryExists(dir + "/subdir"), 0);
+    ASSERT_TRUE(Filesystem::DirectoryExists(dir + "/subdir"));
     ASSERT_EQ(Filesystem::DirectoryDelete(dir + "/subdir"), 0);
     errno = 0;
-    ASSERT_EQ(Filesystem::DirectoryExists(dir + "/subdir"), -1);
+    ASSERT_FALSE(Filesystem::DirectoryExists(dir + "/subdir"));
     EXPECT_EQ(errno, ENOENT);
 
     ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/dir with spaces"), 0);
-    ASSERT_EQ(Filesystem::DirectoryExists(dir + "/dir with spaces"), 0);
+    ASSERT_TRUE(Filesystem::DirectoryExists(dir + "/dir with spaces"));
     ASSERT_EQ(Filesystem::DirectoryDelete(dir + "/dir with spaces"), 0);
     errno = 0;
-    ASSERT_EQ(Filesystem::DirectoryExists(dir + "/dir with spaces"), -1);
+    ASSERT_FALSE(Filesystem::DirectoryExists(dir + "/dir with spaces"));
     EXPECT_EQ(errno, ENOENT);
 
     errno = 0;
@@ -53,19 +53,23 @@ TEST_F(FilesystemTests, DirectoryCreateExistsDelete)
 TEST_F(FilesystemTests, FileCreateExistsDelete)
 {
     ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/dir with spaces"), 0);
-    ASSERT_EQ(Filesystem::DirectoryExists(dir + "/dir with spaces"), 0);
+    ASSERT_TRUE(Filesystem::DirectoryExists(dir + "/dir with spaces"));
 
     std::array<std::string, 3> file_names{"/file", "/dir with spaces/file-in-subdir", "/dir with spaces/file with spaces"};
 
     for (auto &file_name : file_names)
     {
         ASSERT_EQ(Filesystem::FileCreate(dir + file_name), 0);
-        ASSERT_EQ(Filesystem::FileExists(dir + file_name), 0);
+        ASSERT_TRUE(Filesystem::FileExists(dir + file_name));
         ASSERT_EQ(Filesystem::FileDelete(dir + file_name), 0);
         errno = 0;
-        ASSERT_EQ(Filesystem::FileExists(dir + file_name), -1);
+        ASSERT_FALSE(Filesystem::FileExists(dir + file_name));
         EXPECT_EQ(errno, ENOENT);
     }
+
+    errno = 0;
+    ASSERT_FALSE(Filesystem::FileExists("/invalid-dir/invalid-file"));
+    EXPECT_EQ(errno, ENOENT);
 }
 
 
