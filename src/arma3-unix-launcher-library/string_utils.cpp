@@ -1,5 +1,7 @@
 #include "string_utils.hpp"
 
+#include <iostream>
+
 namespace StringUtils
 {
     size_t find_last_nth(const std::string &text, const char c, int count = 1)
@@ -34,9 +36,22 @@ namespace StringUtils
         return std::string_view(text.c_str(), pos);
     }
 
-    std::string Replace(const std::string &text, const std::string &from, const std::string &to)
+    std::string Replace(std::string text, const std::string &from, const std::string &to)
     {
-        return "";
+        if (from.empty())
+            return text;
+
+        size_t start_pos = 0;
+        while (start_pos != std::string::npos)
+        {
+            start_pos = text.find(from, start_pos);
+            if (start_pos == std::string::npos)
+                return text;
+            text.replace(start_pos, from.length(), to);
+            //move start_pos forward so it doesn't replace the same string over and over
+            start_pos += to.length() - from.length() + 2;
+        }
+        return text;
     }
 
     bool EndsWith(const std::string &text, const std::string &find)
@@ -53,8 +68,31 @@ namespace StringUtils
         return find == std::string_view(text.c_str(), find.size());
     }
 
-    std::vector<std::string_view> Split(const std::string &text_to_split, const char delimiter)
+    std::vector<std::string_view> Split(const std::string &text_to_split, const std::string &delimiters)
     {
-        return std::vector<std::string_view>();
+        std::vector<std::string_view> ret;
+
+        size_t start_trim_size = text_to_split.find_first_not_of(delimiters);
+        size_t end_trim_size = text_to_split.find_last_not_of(delimiters);
+        if (start_trim_size == std::string::npos || end_trim_size == std::string::npos)
+            return ret;
+        std::string_view trimmed(text_to_split.c_str() + start_trim_size, end_trim_size - start_trim_size + 1);
+
+        size_t start_pos = 0;
+        size_t end_pos = std::string::npos;
+        while (true)
+        {
+            start_pos = trimmed.find_first_not_of(delimiters, start_pos);
+            end_pos = trimmed.find_first_of(delimiters, start_pos);
+            if (end_pos == std::string::npos)
+            {
+                ret.push_back(trimmed.substr(start_pos, trimmed.size() - start_pos));
+                break;
+            }
+            ret.push_back(trimmed.substr(start_pos, end_pos - start_pos));
+            start_pos = end_pos;
+        }
+
+        return ret;
     }
 }

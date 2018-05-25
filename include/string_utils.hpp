@@ -9,12 +9,12 @@
 namespace StringUtils
 {
     std::string_view RemoveElementsFromPath(const std::string &text, bool remove_slash = true, int count = 1);
-    std::string Replace(const std::string &text, const std::string &from, const std::string &to);
+    std::string Replace(std::string text, const std::string &from, const std::string &to);
 
     bool EndsWith(const std::string &text, const std::string &find);
     bool StartsWith(const std::string &text, const std::string &find);
 
-    std::vector<std::string_view> Split(const std::string &text_to_split, const char delimiter);
+    std::vector<std::string_view> Split(const std::string &text_to_split, const std::string &delimiters);
 
     template<typename ret_type = std::string_view, typename argument = std::string>
     ret_type TrimLeft(const argument &text)

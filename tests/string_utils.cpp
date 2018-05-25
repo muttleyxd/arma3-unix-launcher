@@ -29,7 +29,7 @@ TEST(StringUtilsTests, Replace)
     ASSERT_EQ(Replace("aaaa", "aa", "a"), "aa");
     ASSERT_EQ(Replace("aaba", "aa", "a"), "aba");
     ASSERT_EQ(Replace("aaaaa", "aa", "a"), "aaa");
-    ASSERT_EQ(Replace("this is a text", " a ", ""), "this is text");
+    ASSERT_EQ(Replace("this is a text", " a", ""), "this is text");
 
     // Shouldn't be able to find empty string
     ASSERT_EQ(Replace("testing", "", "test"), "testing");
@@ -101,11 +101,11 @@ TEST(StringUtilsTests, Split)
     {
         std::string_view(text.c_str(), 4),
         std::string_view(text.c_str() + 5, 2),
-        std::string_view(text.c_str() + 9, 4),
-        std::string_view(text.c_str() + 15, 4)
+        std::string_view(text.c_str() + 8, 4),
+        std::string_view(text.c_str() + 13, 4)
     };
 
-    ASSERT_EQ(Split(text, ' '), text_split_by_space);
+    ASSERT_EQ(Split(text, " "), text_split_by_space);
 
     std::vector<std::string_view> text_split_by_t
     {
@@ -113,5 +113,7 @@ TEST(StringUtilsTests, Split)
         std::string_view(text.c_str() + 14, 2),
     };
 
-    ASSERT_EQ(Split(text, 't'), text_split_by_t);
+    ASSERT_EQ(Split(text, "Tt"), text_split_by_t);
+
+    ASSERT_EQ(Split("  ", " "), std::vector<std::string_view>());
 }
