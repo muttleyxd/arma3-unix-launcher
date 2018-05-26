@@ -6,8 +6,8 @@
 
 class ModTests : public ::testing::Test
 {
-public:
-    std::string dir = GetWorkDir() + "/test-files";
+    public:
+        std::string dir = GetWorkDir() + "/test-files";
 };
 
 TEST_F(ModTests, BasicParser)
@@ -47,8 +47,8 @@ TEST_F(ModTests, BasicParser)
 
     Mod remove_stamina_mod(dir + "/mod-remove-stamina.cpp");
     Mod big_mod_mod(dir + "/mod-all-keys.cpp");
-    ASSERT_EQ(remove_stamina_mod.KeyValue, remove_stamina_map);
-    ASSERT_EQ(big_mod_mod.KeyValue, big_mod_map);
+    ASSERT_EQ(remove_stamina_map, remove_stamina_mod.KeyValue);
+    ASSERT_EQ(big_mod_map, big_mod_mod.KeyValue);
 }
 
 TEST_F(ModTests, MissingQuotesAndWhitespaces)

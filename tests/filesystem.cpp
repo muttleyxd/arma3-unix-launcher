@@ -3,6 +3,9 @@
 #include "filesystem.hpp"
 #include "setup.hpp"
 
+#include "exceptions/not_a_symlink.hpp"
+#include "exceptions/path_no_access.hpp"
+
 #include <algorithm>
 #include <string>
 
@@ -95,6 +98,9 @@ TEST_F(FilesystemTests, ReadWriteText)
     ASSERT_EQ(Filesystem::FileCreate(dir + file_name, string1), string1.length());
     ASSERT_EQ(Filesystem::FileReadAllText(dir + file_name), string1);
     ASSERT_EQ(Filesystem::FileDelete(dir + file_name), 0);
+
+    // Exception when trying to read missing file
+    ASSERT_THROW(Filesystem::FileReadAllText(dir + "/nowhere"), PathNoAccessException);
 }
 
 TEST_F(FilesystemTests, GetSubdirectories)
@@ -135,29 +141,8 @@ TEST_F(FilesystemTests, GetSubdirectories)
     for (size_t i = 0; i < dir_names.size(); i++)
         ASSERT_EQ(subdirectories[i], dir_names[i]);
 
-    try
-    {
-        errno = 0;
-        std::vector<std::string> call_on_file = Filesystem::GetSubdirectories(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]);
-        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
-    }
-    catch (std::exception &ex)
-    {
-        std::string_view exception_message(ex.what());
-        ASSERT_EQ(exception_message, std::string("Error: 20 Not a directory"));
-    }
-
-    try
-    {
-        errno = 0;
-        std::vector<std::string> not_exists = Filesystem::GetSubdirectories(dir + s + "nowhere");
-        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
-    }
-    catch (std::exception &ex)
-    {
-        std::string_view exception_message(ex.what());
-        ASSERT_EQ(exception_message, "Error: 2 No such file or directory");
-    }
+    ASSERT_THROW(Filesystem::GetSubdirectories(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]), PathNoAccessException);
+    ASSERT_THROW(Filesystem::GetSubdirectories(dir + s + "nowhere"), PathNoAccessException);
 }
 
 TEST_F(FilesystemTests, Symlinks)
@@ -180,27 +165,6 @@ TEST_F(FilesystemTests, Symlinks)
         ASSERT_EQ(Filesystem::SymlinkGetTarget(dir + "/" + dir_name + "_symlink_absolute"), dir + "/" + dir_name);
     }
 
-    try
-    {
-        errno = 0;
-        Filesystem::SymlinkGetTarget(dir);
-        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
-    }
-    catch (std::exception &ex)
-    {
-        std::string_view exception_message(ex.what());
-        ASSERT_EQ(exception_message, "Error: Not a symlink");
-    }
-
-    try
-    {
-        errno = 0;
-        Filesystem::SymlinkGetTarget(dir + "/nowhere");
-        ASSERT_FALSE(true) << "This should not be executed - exception should be thrown earlier";
-    }
-    catch (std::exception &ex)
-    {
-        std::string_view exception_message(ex.what());
-        ASSERT_EQ(exception_message, "Error: 2 No such file or directory");
-    }
+    ASSERT_THROW(Filesystem::SymlinkGetTarget(dir), NotASymlinkException);
+    ASSERT_THROW(Filesystem::SymlinkGetTarget(dir + "/nowhere"), PathNoAccessException);
 }

@@ -9,14 +9,39 @@
 
 class VDF
 {
-  public:
-    VDF(std::string path = "");
+    public:
+        VDF() noexcept;
 
-    int LoadFromFile(std::string path, bool append = false);
-    int LoadFromText(std::string text, bool append = false);
+        void LoadFromFile(const std::string &path, bool append = false);
+        void LoadFromText(const std::string &text, bool append = false);
 
-    std::map<std::string, std::string> KeyValue;
-    std::vector<std::string> GetValuesWithFilter(std::string filter);
+        std::vector<std::string> GetValuesWithFilter(std::string filter);
+
+        std::map<std::string, std::string> KeyValue;
+
+    private:
+        void AddKeyValuePair(std::vector<std::string> &hierarchy, std::string &key, std::string &value);
+        std::string RemoveWhitespaces(const std::string &text);
+        void ParseVDF(const std::string &text);
+        void ProcessChar(char c);
+        void LookForKey(char c);
+        void LookForValue(char c);
+        void ReadKey(char c);
+        void ReadValue(char c);
+
+        enum class VDFState
+        {
+            LookingForKey,
+            LookingForValue,
+            ReadingKey,
+            ReadingValue,
+            QuoteOrBracketExpectedError,
+            MissingBracketAtEndError
+        };
+        VDFState state_;
+        std::string key;
+        std::string value;
+        std::vector<std::string> hierarchy;
 };
 
 #endif

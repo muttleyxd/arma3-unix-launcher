@@ -5,6 +5,7 @@
 
 #include "filesystem.hpp"
 #include "string_utils.hpp"
+#include "vdf.hpp"
 
 using namespace Filesystem;
 using namespace StringUtils;
@@ -15,11 +16,10 @@ Steam::Steam(std::vector<std::string> search_paths)
     for (std::string &path : search_paths)
     {
         std::string replace_var = Replace(path, "$HOME", getenv("HOME"));
-        std::string config_path = "/config/config.vdf";
-        std::string final_path = replace_var + config_path;
+        std::string final_path = replace_var + config_path_;
         if (FileExists(final_path))
         {
-            steam_path_ = path;
+            steam_path_ = replace_var;
             break;
         }
     }
@@ -27,12 +27,20 @@ Steam::Steam(std::vector<std::string> search_paths)
         throw std::invalid_argument("Steam::Steam() - Cannot find Steam install");
 }
 
-const std::string& Steam::GetSteamPath() noexcept
+const std::string &Steam::GetSteamPath() noexcept
 {
     return steam_path_;
 }
 
 std::vector<std::string> Steam::GetInstallPaths()
 {
-    return std::vector<std::string>();
+    std::vector<std::string> ret;
+    ret.emplace_back(steam_path_);
+
+    VDF vdf;
+    vdf.LoadFromFile(steam_path_ + config_path_);
+    for (auto &key : vdf.GetValuesWithFilter("BaseInstallFolder"))
+        ret.push_back(key);
+
+    return ret;
 }

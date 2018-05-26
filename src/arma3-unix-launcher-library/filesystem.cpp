@@ -10,6 +10,9 @@
 #include <cstring>
 #include <memory>
 
+#include "exceptions/not_a_symlink.hpp"
+#include "exceptions/path_no_access.hpp"
+
 namespace Filesystem
 {
     int DirectoryCreate(const std::string &path) noexcept
@@ -85,7 +88,7 @@ namespace Filesystem
     {
         int fd = open(path.c_str(), 0);
         if (fd == -1)
-            return "";
+            throw PathNoAccessException(path + "\nError: " + std::to_string(errno) + " " + strerror(errno));
         off_t file_size = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
 
@@ -106,7 +109,7 @@ namespace Filesystem
 
         DIR *dirp = opendir(path.c_str());
         if (dirp == NULL)
-            throw std::invalid_argument("Error: " + std::to_string(errno) + " " + strerror(errno));
+            throw PathNoAccessException(path + "\nError: " + std::to_string(errno) + " " + strerror(errno));
 
         struct dirent *dp;
         while (true)
@@ -132,10 +135,10 @@ namespace Filesystem
     {
         struct stat st;
         if (lstat(source.c_str(), &st) < 0)
-            throw std::invalid_argument("Error: " + std::to_string(errno) + " " + strerror(errno));
+            throw PathNoAccessException(source + "\nError: " + std::to_string(errno) + " " + strerror(errno));
 
         if (!S_ISLNK(st.st_mode))
-            throw std::invalid_argument("Error: Not a symlink");
+            throw NotASymlinkException(source);
 
         std::unique_ptr<char> buffer = std::make_unique<char>(PATH_MAX + 1);
         ssize_t target_length = readlink(source.c_str(), buffer.get(), PATH_MAX);

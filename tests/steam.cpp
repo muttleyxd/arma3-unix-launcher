@@ -2,7 +2,12 @@
 
 #include "filesystem.hpp"
 #include "setup.hpp"
+
+#define private public
+#define protected public
 #include "steam.hpp"
+#undef private
+#undef protected
 
 #include <exception>
 #include <string>
@@ -16,24 +21,18 @@ class SteamTests : public ::testing::Test
 
 TEST_F(SteamTests, FindInstallPaths)
 {
-    Steam steam(std::vector<std::string> { dir + "/steam"});
-    std::vector<std::string> paths { "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
+    Steam steam({dir + "/steam"});
+    std::vector<std::string> paths { dir + "/steam", "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
     ASSERT_EQ(steam.GetInstallPaths(), paths);
 }
 
 TEST_F(SteamTests, InvalidPaths)
 {
-    ASSERT_THROW(Steam steam(std::vector<std::string> { "/nowhere"}), std::invalid_argument);
+    ASSERT_THROW(Steam steam(std::vector<std::string> {"/nowhere"}), std::invalid_argument);
 }
 
 TEST_F(SteamTests, GetSteamPath)
 {
-    Steam steam;
-    std::string home_path = getenv("HOME");
-    std::string steam_path = steam.GetSteamPath();
-    if (steam_path != home_path + "/.steam/steam" && steam_path != home_path + "/.local/share/Steam")
-    {
-        EXPECT_EQ(home_path + "/.steam", steam.GetSteamPath());
-        EXPECT_EQ(home_path + "/.local/share/Steam", steam.GetSteamPath());
-    }
+    Steam steam({dir + "/steam"});
+    ASSERT_EQ(dir + "/steam", steam.GetSteamPath());
 }
