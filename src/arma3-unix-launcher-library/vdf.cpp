@@ -25,7 +25,7 @@ std::vector<std::string> VDF::GetValuesWithFilter(std::string filter)
 void VDF::LoadFromFile(const std::string &path, bool append)
 {
     std::string text = Filesystem::FileReadAllText(path);
-    return LoadFromText(text, append);
+    LoadFromText(text, append);
 }
 
 void VDF::LoadFromText(const std::string &text, bool append)
@@ -48,10 +48,25 @@ void VDF::AddKeyValuePair(std::vector<std::string> &hierarchy, std::string &key,
 
 std::string VDF::RemoveWhitespaces(const std::string &text)
 {
-    std::regex regex("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-    std::string text_without_whitespaces = std::regex_replace(text, regex, "");
-
-    return text_without_whitespaces;
+    /*
+     * This crashes, is the string too long?
+     * std::regex regex("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+     * std::string text_without_whitespaces = std::regex_replace(text, regex, "");
+     * return text_without_whitespaces;
+     *
+     * Anyways, here is very dumb implementation
+     */
+    std::string ret = "";
+    ret.reserve(text.length());
+    bool in_quotes = false;
+    for (auto c : text)
+    {
+        if (c == '"')
+            in_quotes = !in_quotes;
+        if (!std::isspace(c) || in_quotes)
+            ret.push_back(c);
+    }
+    return ret;
 }
 
 void VDF::ParseVDF(const std::string &text)

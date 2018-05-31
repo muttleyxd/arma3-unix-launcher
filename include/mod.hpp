@@ -11,8 +11,12 @@ class Mod
 
         std::map<std::string, std::string> KeyValue;
 
-        int LoadFromFile(const std::string &path, bool append = false);
-        int LoadFromText(const std::string &text, bool append = false);
+        void LoadFromFile(const std::string &path, bool append = false);
+        void LoadFromText(const std::string &text, bool append = false);
+
+    private:
+        std::string RemoveWhitespacesAndComments(const std::string &text);
+        void ParseCPP(const std::string &text);
 };
 
 #endif

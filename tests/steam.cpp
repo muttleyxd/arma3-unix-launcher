@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+#include <exceptions/steam_install_not_found.hpp>
+
 class SteamTests : public ::testing::Test
 {
     public:
@@ -28,11 +30,17 @@ TEST_F(SteamTests, FindInstallPaths)
 
 TEST_F(SteamTests, InvalidPaths)
 {
-    ASSERT_THROW(Steam steam(std::vector<std::string> {"/nowhere"}), std::invalid_argument);
+    ASSERT_THROW(Steam steam(std::vector<std::string> {"/nowhere"}), SteamInstallNotFoundException);
 }
 
 TEST_F(SteamTests, GetSteamPath)
 {
     Steam steam({dir + "/steam"});
     ASSERT_EQ(dir + "/steam", steam.GetSteamPath());
+}
+
+TEST_F(SteamTests, GetWorkshopDir)
+{
+    Steam steam({dir + "/steam"});
+    ASSERT_NO_THROW(ASSERT_EQ(dir + "/steam/steamapps/workshop/content/107410", steam.GetWorkshopPath("107410")));
 }

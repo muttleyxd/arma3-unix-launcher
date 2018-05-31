@@ -66,15 +66,6 @@ TEST_F(ModTests, MissingQuotesAndWhitespaces)
     Mod remove_stamina_missing_quotes_mod(dir + "/mod-remove-stamina-missing-quotes.cpp");
     Mod remove_stamina_no_whitespaces_mod(dir + "/mod-remove-stamina-no-whitespaces.cpp");
 
-    ASSERT_EQ(remove_stamina_missing_quotes_mod.KeyValue, remove_stamina_map);
-    ASSERT_EQ(remove_stamina_no_whitespaces_mod.KeyValue, remove_stamina_map);
-}
-
-TEST_F(ModTests, MissingSemicolon)
-{
-    Mod remove_stamina_missing_semicolon;
-    errno = 0;
-    int result = remove_stamina_missing_semicolon.LoadFromFile(dir + "/mod-remove-stamina-missing-semicolon.cpp");
-    ASSERT_EQ(result, -1);
-    EXPECT_EQ(errno, EFAULT);
+    ASSERT_EQ(remove_stamina_map, remove_stamina_missing_quotes_mod.KeyValue);
+    ASSERT_EQ(remove_stamina_map, remove_stamina_no_whitespaces_mod.KeyValue);
 }

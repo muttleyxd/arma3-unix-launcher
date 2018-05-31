@@ -7,11 +7,11 @@
 class Steam
 {
     public:
-        Steam() = delete;
         Steam(std::vector<std::string> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam"});
 
         const std::string &GetSteamPath() noexcept;
         std::vector<std::string> GetInstallPaths();
+        std::string GetWorkshopPath(std::string appid);
 
     private:
         std::string steam_path_;

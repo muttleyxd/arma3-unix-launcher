@@ -105,7 +105,7 @@ TEST(StringUtilsTests, Split)
         std::string_view(text.c_str() + 13, 4)
     };
 
-    ASSERT_EQ(Split(text, " "), text_split_by_space);
+    ASSERT_EQ(text_split_by_space, Split(text, " "));
 
     std::vector<std::string_view> text_split_by_t
     {
@@ -113,7 +113,15 @@ TEST(StringUtilsTests, Split)
         std::string_view(text.c_str() + 14, 2),
     };
 
-    ASSERT_EQ(Split(text, "Tt"), text_split_by_t);
+    ASSERT_EQ(text_split_by_t, Split(text, "Tt"));
 
-    ASSERT_EQ(Split("  ", " "), std::vector<std::string_view>());
+    ASSERT_EQ(std::vector<std::string_view>(), Split("  ", " "));
+
+    const std::string remove_stamina_text = "name=\"Remove Stamina\"";
+    std::vector<std::string_view> remove_stamina
+    {
+        std::string_view(remove_stamina_text.c_str(), 4),
+        std::string_view(remove_stamina_text.c_str() + 5, 16)
+    };
+    ASSERT_EQ(remove_stamina, Split(remove_stamina_text, "="));
 }
