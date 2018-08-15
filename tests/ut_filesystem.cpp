@@ -30,26 +30,26 @@ class FilesystemTests : public ::testing::Test
  */
 TEST_F(FilesystemTests, DirectoryCreateExistsDelete)
 {
-    ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/subdir"), 0);
+    ASSERT_EQ(0, Filesystem::DirectoryCreate(dir + "/subdir"));
     ASSERT_TRUE(Filesystem::DirectoryExists(dir + "/subdir"));
-    ASSERT_EQ(Filesystem::DirectoryDelete(dir + "/subdir"), 0);
+    ASSERT_EQ(0, Filesystem::DirectoryDelete(dir + "/subdir"));
     errno = 0;
     ASSERT_FALSE(Filesystem::DirectoryExists(dir + "/subdir"));
-    EXPECT_EQ(errno, ENOENT);
+    EXPECT_EQ(ENOENT, errno);
 
-    ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/dir with spaces"), 0);
+    ASSERT_EQ(0, Filesystem::DirectoryCreate(dir + "/dir with spaces"));
     ASSERT_TRUE(Filesystem::DirectoryExists(dir + "/dir with spaces"));
-    ASSERT_EQ(Filesystem::DirectoryDelete(dir + "/dir with spaces"), 0);
+    ASSERT_EQ(0, Filesystem::DirectoryDelete(dir + "/dir with spaces"));
     errno = 0;
     ASSERT_FALSE(Filesystem::DirectoryExists(dir + "/dir with spaces"));
-    EXPECT_EQ(errno, ENOENT);
+    EXPECT_EQ(ENOENT, errno);
 
     errno = 0;
-    ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/not-existing-dir/subdirectory"), -1);
-    EXPECT_EQ(errno, ENOENT);
+    ASSERT_EQ(-1, Filesystem::DirectoryCreate(dir + "/not-existing-dir/subdirectory"));
+    EXPECT_EQ(ENOENT, errno);
 
     errno = 0;
-    ASSERT_EQ(Filesystem::DirectoryCreate("/rootdir"), -1);
+    ASSERT_EQ(-1, Filesystem::DirectoryCreate("/rootdir"));
     EXPECT_EQ(errno, EACCES);
 }
 
@@ -62,17 +62,17 @@ TEST_F(FilesystemTests, FileCreateExistsDelete)
 
     for (auto &file_name : file_names)
     {
-        ASSERT_EQ(Filesystem::FileCreate(dir + file_name), 0);
+        ASSERT_EQ(0, Filesystem::FileCreate(dir + file_name));
         ASSERT_TRUE(Filesystem::FileExists(dir + file_name));
-        ASSERT_EQ(Filesystem::FileDelete(dir + file_name), 0);
+        ASSERT_EQ(0, Filesystem::FileDelete(dir + file_name));
         errno = 0;
         ASSERT_FALSE(Filesystem::FileExists(dir + file_name));
-        EXPECT_EQ(errno, ENOENT);
+        EXPECT_EQ(ENOENT, errno);
     }
 
     errno = 0;
     ASSERT_FALSE(Filesystem::FileExists("/invalid-dir/invalid-file"));
-    EXPECT_EQ(errno, ENOENT);
+    EXPECT_EQ(ENOENT, errno);
 }
 
 
@@ -83,21 +83,21 @@ TEST_F(FilesystemTests, ReadWriteText)
     std::string string2 = "123456789\n01234567\n";
 
     // Check reading from existing file
-    ASSERT_EQ(Filesystem::FileCreate(dir + file_name, string1), string1.length());
-    ASSERT_EQ(Filesystem::FileReadAllText(dir + file_name), string1);
+    ASSERT_EQ(string1.length(), Filesystem::FileCreate(dir + file_name, string1));
+    ASSERT_EQ(string1, Filesystem::FileReadAllText(dir + file_name));
 
-    ASSERT_EQ(Filesystem::FileCreate(dir + file_name, string2), string1.length());
-    ASSERT_EQ(Filesystem::FileReadAllText(dir + file_name), string2);
+    ASSERT_EQ(string1.length(), Filesystem::FileCreate(dir + file_name, string2));
+    ASSERT_EQ(string2, Filesystem::FileReadAllText(dir + file_name));
 
-    ASSERT_EQ(Filesystem::FileCreate(dir + file_name, string1), string1.length());
-    ASSERT_EQ(Filesystem::FileReadAllText(dir + file_name), string1);
+    ASSERT_EQ(string1.length(), Filesystem::FileCreate(dir + file_name, string1));
+    ASSERT_EQ(string1, Filesystem::FileReadAllText(dir + file_name));
 
-    ASSERT_EQ(Filesystem::FileDelete(dir + file_name), 0);
+    ASSERT_EQ(0, Filesystem::FileDelete(dir + file_name));
 
     // Create new file with WriteAllText
-    ASSERT_EQ(Filesystem::FileCreate(dir + file_name, string1), string1.length());
-    ASSERT_EQ(Filesystem::FileReadAllText(dir + file_name), string1);
-    ASSERT_EQ(Filesystem::FileDelete(dir + file_name), 0);
+    ASSERT_EQ(string1.length(), Filesystem::FileCreate(dir + file_name, string1));
+    ASSERT_EQ(string1, Filesystem::FileReadAllText(dir + file_name));
+    ASSERT_EQ(0, Filesystem::FileDelete(dir + file_name));
 
     // Exception when trying to read missing file
     ASSERT_THROW(Filesystem::FileReadAllText(dir + "/nowhere"), PathNoAccessException);
@@ -125,12 +125,12 @@ TEST_F(FilesystemTests, GetSubdirectories)
 
     for (auto &dir_name : dir_names)
     {
-        ASSERT_EQ(Filesystem::DirectoryCreate(dir + s + dir_name), 0);
+        ASSERT_EQ(0, Filesystem::DirectoryCreate(dir + s + dir_name));
         for (auto &subdir_name : subdir_names)
         {
-            ASSERT_EQ(Filesystem::DirectoryCreate(dir + s + dir_name + s + subdir_name), 0);
+            ASSERT_EQ(0, Filesystem::DirectoryCreate(dir + s + dir_name + s + subdir_name));
             for (auto &file_name : file_names)
-                ASSERT_EQ(Filesystem::FileCreate(dir + s + dir_name + s + subdir_name + s + file_name), 0);
+                ASSERT_EQ(0, Filesystem::FileCreate(dir + s + dir_name + s + subdir_name + s + file_name));
         }
     }
 

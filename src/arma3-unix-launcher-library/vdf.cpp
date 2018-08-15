@@ -19,7 +19,7 @@ std::vector<std::string> VDF::GetValuesWithFilter(std::string filter)
         if (key.find(filter) != std::string::npos)
             result.emplace_back(value);
     }
-    return std::move(result);
+    return result;
 }
 
 void VDF::LoadFromFile(const std::string &path, bool append)

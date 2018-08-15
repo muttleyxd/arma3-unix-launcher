@@ -25,7 +25,7 @@ TEST_F(SteamTests, FindInstallPaths)
 {
     Steam steam({dir + "/steam"});
     std::vector<std::string> paths { dir + "/steam", "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
-    ASSERT_EQ(steam.GetInstallPaths(), paths);
+    ASSERT_EQ(paths, steam.GetInstallPaths());
 }
 
 TEST_F(SteamTests, InvalidPaths)
