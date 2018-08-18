@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <dirent.h>
 
+#include "Filesystem.h"
 #include "Logger.h"
 
 using namespace std;
@@ -179,5 +180,16 @@ namespace Utils
     string BashAdaptPath(string path)
     {
         return Utils::Replace(path, " ", "\\ ");
+    }
+
+    bool ContainsAddons(const std::string &path)
+    {
+        for (auto dir : Filesystem::GetSubDirectories(path))
+        {
+            std::transform(dir.begin(), dir.end(), dir.begin(), ::tolower);
+            if (dir == "addons")
+                return true;
+        }
+        return false;
     }
 }

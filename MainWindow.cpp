@@ -325,7 +325,7 @@ void MainWindow::btnAdd_Clicked()
         LOG(0, "Selected filename: " + fcDialog.get_filename());
         LOG(0, "Current folder: " + fcDialog.get_current_folder());
         std::string selectedPath = fcDialog.get_filename();
-        if (!Filesystem::DirectoryExists(selectedPath + "/addons") && !Filesystem::DirectoryExists(selectedPath + "/Addons"))
+        if (!Utils::ContainsAddons(selectedPath))
             selectedPath = fcDialog.get_current_folder();
 
         if (selectedPath == Settings::ArmaPath)
@@ -336,7 +336,7 @@ void MainWindow::btnAdd_Clicked()
             return;
         }
 
-        if (!Filesystem::DirectoryExists(selectedPath + "/addons") && !Filesystem::DirectoryExists(selectedPath + "/Addons"))
+        if (!Utils::ContainsAddons(selectedPath))
         {
             Gtk::MessageDialog msgDialog("Couldn't find Addons folder in selected directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
             msgDialog.run();
