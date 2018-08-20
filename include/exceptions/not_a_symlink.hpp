@@ -6,15 +6,18 @@
 class NotASymlinkException : public std::exception
 {
     public:
-        NotASymlinkException(std::string path) : path_(path) {}
-
-        const char *what() const throw()
+        NotASymlinkException(std::string path)
         {
-            return ("Not a symlink: " + path_).c_str();
+            msg_ = "Not a symlink: " + path;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string path_;
+        std::string msg_;
 };
 
 #endif

@@ -6,15 +6,18 @@
 class NotADirectoryException : public std::exception
 {
     public:
-        NotADirectoryException(std::string path) : path_(path) {}
-
-        const char *what() const throw()
+        NotADirectoryException(std::string path)
         {
-            return ("Not a directory: " + path_).c_str();
+            msg_ = "Not a directory: " + path;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string path_;
+        std::string msg_;
 };
 
 #endif

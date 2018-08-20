@@ -6,15 +6,18 @@
 class PathNoAccessException : public std::exception
 {
     public:
-        PathNoAccessException(const std::string& path) : path_(path) {}
-
-        const char *what() const throw()
+        PathNoAccessException(const std::string &path)
         {
-            return ("Cannot access path: " + path_).c_str();
+            msg_ = "Cannot access path: " + path;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string path_;
+        std::string msg_;
 };
 
 #endif

@@ -6,15 +6,18 @@
 class SteamWorkshopDirectoryNotFoundException : public std::exception
 {
     public:
-        SteamWorkshopDirectoryNotFoundException(std::string appid) : appid_(appid) {}
-
-        const char *what() const throw()
+        SteamWorkshopDirectoryNotFoundException(std::string appid)
         {
-            return ("Steam Workshop directory not found for appid: " + appid_).c_str();
+            msg_ = "Steam Workshop directory not found for appid: " + appid;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string appid_;
+        std::string msg_;
 };
 
 #endif

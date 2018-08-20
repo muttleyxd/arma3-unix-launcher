@@ -6,15 +6,18 @@
 class DirectoryNoAccessException : public std::exception
 {
     public:
-        DirectoryNoAccessException(const std::string& path) : path_(path) {}
-
-        const char *what() const throw()
+        DirectoryNoAccessException(const std::string &path)
         {
-            return ("Cannot access directory: " + path_).c_str();
+            msg_ = "Cannot access directory" + path;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string path_;
+        std::string msg_;
 };
 
 #endif

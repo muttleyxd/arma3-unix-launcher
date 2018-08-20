@@ -8,64 +8,31 @@ class ModTests : public ::testing::Test
 {
     public:
         std::string dir = GetWorkDir() + "/test-files";
+        std::string arma3_dir = "/arma3/!workshop";
+        std::string remove_stamina_dir = "/@Remove stamina";
+        std::string big_mod_dir = "/@bigmod";
 };
 
 TEST_F(ModTests, BasicParser)
 {
-    std::map<std::string, std::string> remove_stamina_map
-    {
-        {"name", "Remove Stamina"},
-        {"picture", "logo.paa"},
-        {"hidePicture", "false"},
-        {"hideName", "false"},
-        {"logo", "logo.paa"},
-        {"description", "Simple mod which removes stamina from ArmA 3"},
-        {"author", "Muttley"}
-    };
+    Mod remove_stamina{.path_ = dir + arma3_dir + remove_stamina_dir, {}};
+    remove_stamina.LoadFromFile(dir + arma3_dir + remove_stamina_dir + "/mod.cpp");
+    ASSERT_EQ(remove_stamina_map, remove_stamina.KeyValue);
+    ASSERT_EQ(dir + arma3_dir + remove_stamina_dir, remove_stamina.path_);
 
-    std::map<std::string, std::string> big_mod_map
-    {
-        {"dir", "@bigmod"},
-        {"name", "Big Mod"},
-        {"picture", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\picture.paa"},
-        {"actionName", "$STR_MOD_LAUNCHER_ACTION"},
-        {"action", "https://bigmod.somewhere"},
-        {"description", "Bugtracker: https://bigmod.somewhere/issues<br/>Documentation: https://bigmod.somewhere/wiki"},
-        {"hideName", "1"},
-        {"hidePicture", "0"},
-        {"logo", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
-        {"logoOver", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
-        {"tooltip", "Big Mod"},
-        {"tooltipOwned", "Big Mod Owned"},
-        {"overview", "Big Mod is very Big."},
-        {"author", "Big Modders"},
-        {"overviewPicture", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
-        {"overviewText", "Big Mod for Arma 3"},
-        {"overviewFootnote", "<br /><br /><t color='#aa00aa'>Some random bla bla with HTML tags.<br />This will be <t /><t color='#ffaa00'>annoying<t /> to parse"},
-        {"version", "1.0a"}
-    };
-
-    Mod remove_stamina_mod(dir + "/mod-remove-stamina.cpp");
-    Mod big_mod_mod(dir + "/mod-all-keys.cpp");
-    ASSERT_EQ(remove_stamina_map, remove_stamina_mod.KeyValue);
-    ASSERT_EQ(big_mod_map, big_mod_mod.KeyValue);
+    Mod big_mod{.path_ = dir + arma3_dir + big_mod_dir, {}};
+    big_mod.LoadFromFile(dir + arma3_dir + big_mod_dir + "/mod.cpp");
+    ASSERT_EQ(big_mod_map, big_mod.KeyValue);
+    ASSERT_EQ(dir + arma3_dir + big_mod_dir, big_mod.path_);
 }
 
 TEST_F(ModTests, MissingQuotesAndWhitespaces)
 {
-    std::map<std::string, std::string> remove_stamina_map
-    {
-        {"name", "Remove Stamina"},
-        {"picture", "logo.paa"},
-        {"hidePicture", "false"},
-        {"hideName", "false"},
-        {"logo", "logo.paa"},
-        {"description", "Simple mod which removes stamina from ArmA 3"},
-        {"author", "Muttley"}
-    };
-    Mod remove_stamina_missing_quotes_mod(dir + "/mod-remove-stamina-missing-quotes.cpp");
-    Mod remove_stamina_no_whitespaces_mod(dir + "/mod-remove-stamina-no-whitespaces.cpp");
+    Mod remove_stamina_missing_quotes{.path_ = dir, {}};
+    remove_stamina_missing_quotes.LoadFromFile(dir + "/mod-remove-stamina-missing-quotes.cpp");
+    Mod remove_stamina_no_whitespaces{.path_ = dir, {}};
+    remove_stamina_no_whitespaces.LoadFromFile(dir + "/mod-remove-stamina-no-whitespaces.cpp");
 
-    ASSERT_EQ(remove_stamina_map, remove_stamina_missing_quotes_mod.KeyValue);
-    ASSERT_EQ(remove_stamina_map, remove_stamina_no_whitespaces_mod.KeyValue);
+    ASSERT_EQ(remove_stamina_map, remove_stamina_missing_quotes.KeyValue);
+    ASSERT_EQ(remove_stamina_map, remove_stamina_no_whitespaces.KeyValue);
 }

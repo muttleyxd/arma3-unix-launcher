@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 
@@ -98,12 +99,12 @@ namespace Filesystem
     }
 
     /*
-     * GetSubdirectories - returns directories found in 'path'
+     * Ls - returns entries found in 'path'
      * This function is NOT recursive
      *
      * This function throws exceptions
      */
-    std::vector<std::string> GetSubdirectories(const std::string &path)
+    std::vector<std::string> Ls(const std::string &path, bool set_to_lowercase)
     {
         std::vector<std::string> ret;
 
@@ -118,8 +119,10 @@ namespace Filesystem
             if (!dp)
                 break;
             std::string name = dp->d_name;
+            if (set_to_lowercase)
+                std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             if (name != "." && name != "..")
-                ret.push_back(dp->d_name);
+                ret.push_back(name);
         }
 
         closedir(dirp);
@@ -129,6 +132,17 @@ namespace Filesystem
     int SymlinkCreate(const std::string &source, const std::string &target) noexcept
     {
         return symlink(target.c_str(), source.c_str());
+    }
+
+    bool SymlinkExists(const std::string &path) noexcept
+    {
+        struct stat st;
+        int result = lstat(path.c_str(), &st);
+
+        // As in DirectoryExists
+        if (result == 0 && S_ISLNK(st.st_mode))
+            return true;
+        return false;
     }
 
     std::string SymlinkGetTarget(const std::string &source)

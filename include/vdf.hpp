@@ -1,8 +1,6 @@
 #ifndef __VDF_HPP
 #define __VDF_HPP
 
-#include "vdfkey.hpp"
-
 #include <map>
 #include <string>
 #include <vector>
@@ -20,7 +18,7 @@ class VDF
         std::map<std::string, std::string> KeyValue;
 
     private:
-        void AddKeyValuePair(std::vector<std::string> &hierarchy, std::string &key, std::string &value);
+        void AddKeyValuePair();
         std::string RemoveWhitespaces(const std::string &text);
         void ParseVDF(const std::string &text);
         void ProcessChar(char c);
@@ -39,9 +37,9 @@ class VDF
             MissingBracketAtEndError
         };
         VDFState state_;
-        std::string key;
-        std::string value;
-        std::vector<std::string> hierarchy;
+        std::string key_;
+        std::string value_;
+        std::vector<std::string> hierarchy_;
 };
 
 #endif

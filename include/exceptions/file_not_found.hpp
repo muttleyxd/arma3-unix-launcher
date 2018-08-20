@@ -6,15 +6,18 @@
 class FileNotFoundException : public std::exception
 {
     public:
-        FileNotFoundException(std::string path) : path_(path) {}
-
-        const char *what() const throw()
+        FileNotFoundException(std::string path)
         {
-            return ("File not found: " + path_).c_str();
+            msg_ = "File not found: " + path;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string path_;
+        std::string msg_;
 };
 
 #endif

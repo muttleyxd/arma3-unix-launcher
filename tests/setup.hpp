@@ -1,6 +1,7 @@
 #ifndef __SETUP_HPP
 #define __SETUP_HPP
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -53,5 +54,38 @@ std::vector<std::string> Ls(std::string path)
     std::sort(ret.begin(), ret.end());
     return ret;
 }
+
+std::map<std::string, std::string> remove_stamina_map
+{
+    {"name", "Remove Stamina"},
+    {"picture", "logo.paa"},
+    {"hidePicture", "false"},
+    {"hideName", "false"},
+    {"logo", "logo.paa"},
+    {"description", "Simple mod which removes stamina from ArmA 3"},
+    {"author", "Muttley"}
+};
+
+std::map<std::string, std::string> big_mod_map
+{
+    {"dir", "@bigmod"},
+    {"name", "Big Mod"},
+    {"picture", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\picture.paa"},
+    {"actionName", "$STR_MOD_LAUNCHER_ACTION"},
+    {"action", "https://bigmod.somewhere"},
+    {"description", "Bugtracker: https://bigmod.somewhere/issues<br/>Documentation: https://bigmod.somewhere/wiki"},
+    {"hideName", "1"},
+    {"hidePicture", "0"},
+    {"logo", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
+    {"logoOver", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
+    {"tooltip", "Big Mod"},
+    {"tooltipOwned", "Big Mod Owned"},
+    {"overview", "Big Mod is very Big."},
+    {"author", "Big Modders"},
+    {"overviewPicture", "bigmod\\addons\\not\\nice\\path\\with\\backslashes\\logo.paa"},
+    {"overviewText", "Big Mod for Arma 3"},
+    {"overviewFootnote", "<br /><br /><t color='#aa00aa'>Some random bla bla with HTML tags.<br />This will be <t /><t color='#ffaa00'>annoying<t /> to parse"},
+    {"version", "1.0a"}
+};
 
 #endif

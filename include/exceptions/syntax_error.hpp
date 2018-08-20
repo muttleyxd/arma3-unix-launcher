@@ -6,15 +6,18 @@
 class SyntaxErrorException : public std::exception
 {
     public:
-        SyntaxErrorException(const std::string& error) : error_(error) {}
-
-        const char *what() const throw()
+        SyntaxErrorException(const std::string &error)
         {
-            return ("Syntax error: " + error_).c_str();
+            msg_ = "Syntax error: " + error;
+        }
+
+        const char *what() const noexcept override
+        {
+            return msg_.c_str();
         }
 
     private:
-        std::string error_;
+        std::string msg_;
 };
 
 #endif

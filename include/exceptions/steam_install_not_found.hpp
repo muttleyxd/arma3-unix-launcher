@@ -6,7 +6,7 @@
 class SteamInstallNotFoundException : public std::exception
 {
     public:
-        const char *what() const throw()
+        const char *what() const noexcept override
         {
             return "Steam installation not found";
         }

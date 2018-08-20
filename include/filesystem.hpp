@@ -17,9 +17,10 @@ namespace Filesystem
     bool DirectoryExists(const std::string &path) noexcept;
 
     // This is not recursive
-    std::vector<std::string> GetSubdirectories(const std::string &path);
+    std::vector<std::string> Ls(const std::string &path, bool set_to_lowercase = false);
 
     int SymlinkCreate(const std::string &source, const std::string &target) noexcept;
+    bool SymlinkExists(const std::string &path) noexcept;
     std::string SymlinkGetTarget(const std::string &source);
 }
 

@@ -103,20 +103,20 @@ TEST_F(FilesystemTests, ReadWriteText)
     ASSERT_THROW(Filesystem::FileReadAllText(dir + "/nowhere"), PathNoAccessException);
 }
 
-TEST_F(FilesystemTests, GetSubdirectories)
+TEST_F(FilesystemTests, Ls)
 {
-    std::array<std::string, 8> dir_names
+    std::vector<std::string> dir_names
     {
         "dir1", "dir2", "dir3", "dir4",
         "dir5", "dir6", "dir7", "dir8"
     };
 
-    std::array<std::string, 2> subdir_names
+    std::vector<std::string> subdir_names
     {
         "Addons", "Keys"
     };
 
-    std::array<std::string, 2> file_names
+    std::vector<std::string> file_names
     {
         "something.pbo", "some.key"
     };
@@ -134,15 +134,23 @@ TEST_F(FilesystemTests, GetSubdirectories)
         }
     }
 
-    std::vector<std::string> subdirectories = Filesystem::GetSubdirectories(dir);
+    std::vector<std::string> subdirectories = Filesystem::Ls(dir);
     std::sort(subdirectories.begin(), subdirectories.end());
 
     ASSERT_EQ(subdirectories.size(), 8);
     for (size_t i = 0; i < dir_names.size(); i++)
         ASSERT_EQ(subdirectories[i], dir_names[i]);
 
-    ASSERT_THROW(Filesystem::GetSubdirectories(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]), PathNoAccessException);
-    ASSERT_THROW(Filesystem::GetSubdirectories(dir + s + "nowhere"), PathNoAccessException);
+    ASSERT_THROW(Filesystem::Ls(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]), PathNoAccessException);
+    ASSERT_THROW(Filesystem::Ls(dir + s + "nowhere"), PathNoAccessException);
+
+    ASSERT_EQ(file_names, Filesystem::Ls(dir + s + dir_names[0] + s + subdir_names[0]));
+
+    std::vector<std::string> subdir_names_lowercase
+    {
+        "addons", "keys"
+    };
+    ASSERT_EQ(subdir_names_lowercase, Filesystem::Ls(dir + s + dir_names[0], true));
 }
 
 TEST_F(FilesystemTests, Symlinks)
@@ -151,9 +159,12 @@ TEST_F(FilesystemTests, Symlinks)
     {
         std::string dir_name = "dir" + std::to_string(i);
         ASSERT_EQ(Filesystem::DirectoryCreate(dir + "/" + dir_name), 0);
+        ASSERT_FALSE(Filesystem::SymlinkExists(dir + "/" + dir_name));
         ASSERT_EQ(Filesystem::FileCreate(dir + "/" + dir_name + "/file" + std::to_string(i)), 0);
         ASSERT_EQ(Filesystem::SymlinkCreate(dir + "/" + dir_name + "_symlink", dir_name), 0);
+        ASSERT_TRUE(Filesystem::SymlinkExists(dir + "/" + dir_name + "_symlink"));
         ASSERT_EQ(Filesystem::SymlinkCreate(dir + "/" + dir_name + "_symlink_absolute", dir + "/" + dir_name), 0);
+        ASSERT_TRUE(Filesystem::SymlinkExists(dir + "/" + dir_name + "_symlink_absolute"));
         std::vector<std::string> lsResult, lsResultSymlink, lsResultSymlinkAbsolute;
         lsResult = Ls(dir + "/" + dir_name);
         lsResultSymlink = Ls(dir + "/" + dir_name + "_symlink");

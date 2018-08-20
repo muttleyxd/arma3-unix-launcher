@@ -7,16 +7,19 @@
 #include "filesystem.hpp"
 #include "string_utils.hpp"
 
-Mod::Mod(const std::string &path)
+void Mod::LoadAllCPP()
 {
-    if (!path.empty())
-        LoadFromFile(path, false);
+    KeyValue.clear();
+    for (const auto &cppfile : Filesystem::Ls(path_))
+    {
+        if (StringUtils::EndsWith(cppfile, ".cpp"))
+            LoadFromFile(path_ + "/" + cppfile, true);
+    }
 }
 
 void Mod::LoadFromFile(const std::string &path, bool append)
 {
-    std::string text = Filesystem::FileReadAllText(path);
-    return LoadFromText(text, append);
+    return LoadFromText(Filesystem::FileReadAllText(path), append);
 }
 
 void Mod::LoadFromText(const std::string &text, bool append)

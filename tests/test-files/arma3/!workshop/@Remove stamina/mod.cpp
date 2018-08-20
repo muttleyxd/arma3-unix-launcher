@@ -1,0 +1,1 @@
+../../../mod-remove-stamina.cpp

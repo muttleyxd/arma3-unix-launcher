@@ -35,15 +35,15 @@ void VDF::LoadFromText(const std::string &text, bool append)
     ParseVDF(RemoveWhitespaces(text));
 }
 
-void VDF::AddKeyValuePair(std::vector<std::string> &hierarchy, std::string &key, std::string &value)
+void VDF::AddKeyValuePair()
 {
     std::string key_path = "";
-    for (const auto &str : hierarchy)
+    for (const auto &str : hierarchy_)
         key_path += str + "/";
-    key_path += key;
-    KeyValue[key_path] = value;
-    key = "";
-    value = "";
+    key_path += key_;
+    KeyValue[key_path] = value_;
+    key_ = "";
+    value_ = "";
 }
 
 std::string VDF::RemoveWhitespaces(const std::string &text)
@@ -72,13 +72,13 @@ std::string VDF::RemoveWhitespaces(const std::string &text)
 void VDF::ParseVDF(const std::string &text)
 {
     state_ = VDFState::LookingForKey;
-    key = "";
-    value = "";
-    hierarchy.clear();
+    key_ = "";
+    value_ = "";
+    hierarchy_.clear();
     for (auto c : text)
         ProcessChar(c);
 
-    if (hierarchy.size() != 0)
+    if (hierarchy_.size() != 0)
         throw SyntaxErrorException("Unclosed brackets in VDF");
 }
 
@@ -99,7 +99,7 @@ void VDF::LookForKey(char c)
     if (c == '"')
         state_ = VDFState::ReadingKey;
     else if (c == '}')
-        hierarchy.pop_back();
+        hierarchy_.pop_back();
     else
         throw SyntaxErrorException("VDF: Quote or bracket expected");
 }
@@ -110,14 +110,14 @@ void VDF::LookForValue(char c)
         state_ = VDFState::ReadingValue;
     else if (c == '{')
     {
-        hierarchy.emplace_back(key);
-        key = "";
+        hierarchy_.emplace_back(key_);
+        key_ = "";
         state_ = VDFState::LookingForKey;
     }
     else if (c == '}')
     {
-        hierarchy.pop_back();
-        key = "";
+        hierarchy_.pop_back();
+        key_ = "";
         state_ = VDFState::LookingForKey;
     }
     else
@@ -127,7 +127,7 @@ void VDF::LookForValue(char c)
 void VDF::ReadKey(char c)
 {
     if (c != '"')
-        key += c;
+        key_ += c;
     else
         state_ = VDFState::LookingForValue;
 }
@@ -135,10 +135,10 @@ void VDF::ReadKey(char c)
 void VDF::ReadValue(char c)
 {
     if (c != '"')
-        value += c;
+        value_ += c;
     else
     {
         state_ = VDFState::LookingForKey;
-        AddKeyValuePair(hierarchy, key, value);
+        AddKeyValuePair();
     }
 }
