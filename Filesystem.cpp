@@ -194,8 +194,7 @@ namespace Filesystem
                     || s == "Jets" || s == "Kart" || s == "Mark" || s == "Argo"
                     || s == "Orange") //skip DLCs
                 continue;
-            if (DirectoryExists(path + "/" + s + "/Addons")
-                    || DirectoryExists(path + "/" + s + "/addons"))
+            if (Utils::ContainsAddons(path + "/" + s))
             {
                 if (isdigit(s.at(0)))
                     response.push_back(Mod(path + "/" + s, s));
