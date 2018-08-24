@@ -60,7 +60,7 @@ TEST_F(ARMA3ClientTests, CreateWorkshopSymlink)
     std::string workshop_dir = arma3_dir + "/!workshop";
     std::string steam_workshop_dir = dir + "/steam/steamapps/workshop/content/107410";
     std::string executable_name = EXECUTABLE_NAME;
-    std::vector<std::string> ls_result{"@Remove Stamina", "@bigmod"};
+    std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
 
     ASSERT_EQ(0, Filesystem::DirectoryCreate(arma3_dir));
     ASSERT_EQ(0, Filesystem::FileCreate(arma3_dir + "/" + executable_name));
@@ -68,5 +68,7 @@ TEST_F(ARMA3ClientTests, CreateWorkshopSymlink)
     ARMA3Client a3c(arma3_dir, steam_workshop_dir, true);
     EXPECT_TRUE(a3c.CreateSymlinkToWorkshop());
     ASSERT_TRUE(Filesystem::DirectoryExists(workshop_dir));
-    ASSERT_EQ(ls_result, Filesystem::Ls(workshop_dir));
+    std::vector<std::string> ls_result_actual = Filesystem::Ls(workshop_dir);
+    std::sort(ls_result_actual.begin(), ls_result_actual.end());
+    ASSERT_EQ(ls_result_expected, ls_result_actual);
 }

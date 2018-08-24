@@ -118,7 +118,7 @@ TEST_F(FilesystemTests, Ls)
 
     std::vector<std::string> file_names
     {
-        "something.pbo", "some.key"
+        "some.key", "something.pbo"
     };
 
     std::string s = "/"; //separator;
@@ -144,13 +144,17 @@ TEST_F(FilesystemTests, Ls)
     ASSERT_THROW(Filesystem::Ls(dir + s + dir_names[0] + s + subdir_names[0] + s + file_names[0]), PathNoAccessException);
     ASSERT_THROW(Filesystem::Ls(dir + s + "nowhere"), PathNoAccessException);
 
-    ASSERT_EQ(file_names, Filesystem::Ls(dir + s + dir_names[0] + s + subdir_names[0]));
+    std::vector<std::string> ls_result = Filesystem::Ls(dir + s + dir_names[0] + s + subdir_names[0]);
+    std::sort(ls_result.begin(), ls_result.end());
+    ASSERT_EQ(file_names, ls_result);
 
     std::vector<std::string> subdir_names_lowercase
     {
         "addons", "keys"
     };
-    ASSERT_EQ(subdir_names_lowercase, Filesystem::Ls(dir + s + dir_names[0], true));
+    ls_result = Filesystem::Ls(dir + s + dir_names[0], true);
+    std::sort(ls_result.begin(), ls_result.end());
+    ASSERT_EQ(subdir_names_lowercase, ls_result);
 }
 
 TEST_F(FilesystemTests, Symlinks)
