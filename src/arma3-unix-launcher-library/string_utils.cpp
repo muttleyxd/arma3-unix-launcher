@@ -1,5 +1,6 @@
 #include "string_utils.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 namespace StringUtils
@@ -94,5 +95,11 @@ namespace StringUtils
         }
 
         return ret;
+    }
+
+    std::string Lowercase(std::string text)
+    {
+        std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+        return text;
     }
 }

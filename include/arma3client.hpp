@@ -15,7 +15,7 @@
 class ARMA3Client
 {
     public:
-        ARMA3Client(std::string path, std::string target_workshop_path, bool skip_initialization = false);
+        ARMA3Client(std::string arma_path, std::string target_workshop_path, bool skip_initialization = false);
 
         bool CreateSymlinkToWorkshop();
         bool CreateArmaCfg(const std::vector<Mod> &mod_list);

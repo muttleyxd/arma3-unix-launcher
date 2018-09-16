@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 
-#include "filesystem.hpp"
 #include "setup.hpp"
 
 #define private public
@@ -27,10 +26,10 @@ TEST_F(VdfTests, BasicFilter)
             std::string number = std::to_string(i + 1);
             vdf.KeyValue[key + number] = value + number;
         }
-        ASSERT_EQ(vdf.GetValuesWithFilter("This should be empty").size(), 0);
-        ASSERT_EQ(vdf.GetValuesWithFilter("Key").size(), vdf.KeyValue.size());
+        ASSERT_EQ(static_cast<size_t>(0), vdf.GetValuesWithFilter("This should be empty").size());
+        ASSERT_EQ(vdf.KeyValue.size(), vdf.GetValuesWithFilter("Key").size());
 
-        ASSERT_EQ(vdf.GetValuesWithFilter("Key1").size(), 2);
+        ASSERT_EQ(static_cast<size_t>(2), vdf.GetValuesWithFilter("Key1").size());
     });
 }
 
@@ -42,7 +41,7 @@ TEST_F(VdfTests, BasicParser)
         std::string simple_key_value = "\"Key\"\"Value\"";
         vdf.ParseVDF(simple_key_value);
         ASSERT_EQ("Value", vdf.KeyValue["Key"]);
-        ASSERT_EQ(1, vdf.KeyValue.size());
+        ASSERT_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }));
 
     ASSERT_NO_THROW((
@@ -51,7 +50,7 @@ TEST_F(VdfTests, BasicParser)
         std::string simple_key_value = "\"Branch\"{\"Key\"\"Value\"}";
         vdf.ParseVDF(simple_key_value);
         ASSERT_EQ("Value", vdf.KeyValue["Branch/Key"]);
-        ASSERT_EQ(1, vdf.KeyValue.size());
+        ASSERT_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }));
 }
 
@@ -63,7 +62,7 @@ TEST_F(VdfTests, LoadFromFile)
         vdf.LoadFromFile(dir + "/vdf-valid.vdf");
         vdfWithTabs.LoadFromFile(dir + "/vdf-valid-mixed-spaces-with-tabs.vdf");
         ASSERT_EQ(vdf.KeyValue, vdfWithTabs.KeyValue);
-        ASSERT_EQ(8, vdf.KeyValue.size());
+        ASSERT_EQ(static_cast<size_t>(8), vdf.KeyValue.size());
     }));
 }
 

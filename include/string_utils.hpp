@@ -16,6 +16,8 @@ namespace StringUtils
 
     std::vector<std::string_view> Split(const std::string &text_to_split, const std::string &delimiters);
 
+    std::string Lowercase(std::string text);
+
     template<typename ret_type = std::string_view, typename argument = std::string>
     ret_type TrimLeft(const argument &text)
     {

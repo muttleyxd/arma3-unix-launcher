@@ -1,11 +1,11 @@
 #include "vdf.hpp"
 
+#include <filesystem>
 #include <string>
-#include <regex>
-
-#include "filesystem.hpp"
 
 #include "exceptions/syntax_error.hpp"
+
+#include "std_utils.hpp"
 
 VDF::VDF() noexcept
 {
@@ -24,7 +24,7 @@ std::vector<std::string> VDF::GetValuesWithFilter(std::string filter)
 
 void VDF::LoadFromFile(const std::string &path, bool append)
 {
-    std::string text = Filesystem::FileReadAllText(path);
+    std::string text = StdUtils::FileReadAllText(path);
     LoadFromText(text, append);
 }
 

@@ -1,12 +1,14 @@
 #include "gtest/gtest.h"
 
-#include "filesystem.hpp"
 #include "setup.hpp"
 
 #include "exceptions/file_not_found.hpp"
 #include "exceptions/path_no_access.hpp"
 
+#include "std_utils.hpp"
+
 #include <algorithm>
+#include <filesystem>
 #include <string>
 
 #include "arma3client.hpp"
@@ -19,12 +21,11 @@ class ARMA3ClientTests : public ::testing::Test
 
         virtual void SetUp()
         {
-            Filesystem::DirectoryCreate(work_dir);
-            int a = 0;
+            std::filesystem::create_directory(work_dir);
         }
         virtual void TearDown()
         {
-            Filesystem::DirectoryDelete(work_dir, true);
+            std::filesystem::remove_all(work_dir);
         }
 };
 
@@ -60,15 +61,15 @@ TEST_F(ARMA3ClientTests, CreateWorkshopSymlink)
     std::string workshop_dir = arma3_dir + "/!workshop";
     std::string steam_workshop_dir = dir + "/steam/steamapps/workshop/content/107410";
     std::string executable_name = EXECUTABLE_NAME;
-    std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
+    std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
 
-    ASSERT_EQ(0, Filesystem::DirectoryCreate(arma3_dir));
-    ASSERT_EQ(0, Filesystem::FileCreate(arma3_dir + "/" + executable_name));
+    ASSERT_TRUE(std::filesystem::create_directory(arma3_dir));
+    ASSERT_TRUE(StdUtils::CreateFile(std::filesystem::path(arma3_dir) / executable_name));
 
     ARMA3Client a3c(arma3_dir, steam_workshop_dir, true);
     EXPECT_TRUE(a3c.CreateSymlinkToWorkshop());
-    ASSERT_TRUE(Filesystem::DirectoryExists(workshop_dir));
-    std::vector<std::string> ls_result_actual = Filesystem::Ls(workshop_dir);
+    ASSERT_TRUE(std::filesystem::exists(workshop_dir));
+    std::vector<std::string> ls_result_actual = StdUtils::Ls(workshop_dir);
     std::sort(ls_result_actual.begin(), ls_result_actual.end());
     ASSERT_EQ(ls_result_expected, ls_result_actual);
 }

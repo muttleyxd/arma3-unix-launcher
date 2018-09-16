@@ -1,26 +1,26 @@
 #include "arma3client.hpp"
 
 #include <algorithm>
+#include <filesystem>
 
-#include "filesystem.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
 
 #include "exceptions/file_not_found.hpp"
 
 using namespace std;
+using namespace std::filesystem;
 
-using namespace Filesystem;
 using namespace StdUtils;
 using namespace StringUtils;
 
-ARMA3Client::ARMA3Client(std::string path, std::string target_workshop_path, bool skip_initialization)
+ARMA3Client::ARMA3Client(std::string arma_path, std::string target_workshop_path, bool skip_initialization)
 {
-    path_ = path;
+    path_ = arma_path;
     path_executable_ = path_ + "/" + executable_name_;
     path_workshop_local_ = path_ + "/" + symlink_workshop_name_;
     path_workshop_target_ = target_workshop_path;
-    if (!Filesystem::FileExists(path_executable_))
+    if (!exists(path_executable_))
         throw FileNotFoundException(path_executable_);
 
     if (skip_initialization)
@@ -37,7 +37,6 @@ bool ARMA3Client::CreateArmaCfg(const std::vector<Mod> &mod_list)
 
 bool ARMA3Client::Start(const std::string &arguments)
 {
-
     return false;
 }
 
@@ -51,7 +50,6 @@ bool ARMA3Client::RefreshMods()
 
     return false;
 }
-#include <iostream>
 
 std::string PickModName(const Mod &mod, const std::vector<std::string> &names)
 {
@@ -60,19 +58,24 @@ std::string PickModName(const Mod &mod, const std::vector<std::string> &names)
         if (ContainsKey(mod.KeyValue, name))
             return mod.KeyValue.at(name);
     }
-    return "";
+    return filesystem::path(mod.path_).filename();
 }
 
 bool ARMA3Client::CreateSymlinkToWorkshop()
 {
     bool status = true;
 
-    DirectoryCreate(path_workshop_local_);
+    create_directory(path_workshop_local_);
 
-    for (const auto &dir : Filesystem::Ls(path_workshop_target_))
+    for (const auto &entity : filesystem::directory_iterator(path_workshop_target_))
     {
-        string mod_dir = path_workshop_target_ + "/" + dir;
-        std::vector<std::string> entities = Filesystem::Ls(path_workshop_target_ + "/" + dir, true);
+        if (!entity.is_directory())
+            continue;
+
+        path dir = entity.path().filename();
+        path mod_dir = path_workshop_target_ / dir;
+
+        std::vector<std::string> entities = StdUtils::Ls(mod_dir, true);
         if (!Contains(entities, "addons"))
             continue;
         Mod m{mod_dir, {}};
@@ -86,10 +89,15 @@ bool ARMA3Client::CreateSymlinkToWorkshop()
             link_name.insert(link_name.begin(), '@');
 
         std::string source_path = path_workshop_local_ + "/" + link_name;
-        if (SymlinkExists(source_path) && SymlinkGetTarget(source_path) == mod_dir)
+        directory_entry entry(source_path);
+        if (entry.exists() && entry.is_symlink() && read_symlink(source_path) == mod_dir)
             continue;
 
-        if (SymlinkCreate(source_path, mod_dir) != 0)
+        remove(source_path);
+        std::error_code ec;
+        create_directory_symlink(mod_dir, source_path, ec);
+
+        if (ec.value() != 0)
             status = false;
     }
 
@@ -98,14 +106,14 @@ bool ARMA3Client::CreateSymlinkToWorkshop()
 
 void ARMA3Client::AddModsFromDirectory(std::string dir, std::vector<Mod> &target)
 {
-    if (!DirectoryExists(dir))
+    if (!exists(dir))
         return;
 
-    for (const auto &ent : Filesystem::Ls(dir))
+    for (const auto &ent : StdUtils::Ls(dir))
     {
         std::string mod_dir = dir + "/" + ent;
         Mod m{mod_dir, {}};
-        for (const auto &cppfile : Filesystem::Ls(mod_dir))
+        for (const auto &cppfile : StdUtils::Ls(mod_dir))
             if (StringUtils::EndsWith(cppfile, ".cpp"))
                 m.LoadFromFile(mod_dir + "/" + cppfile, true);
         target.emplace_back(std::move(m));

@@ -1,16 +1,15 @@
 #include "steam.hpp"
 
 #include <exception>
+#include <filesystem>
 #include <stdexcept>
 
-#include "filesystem.hpp"
 #include "string_utils.hpp"
 #include "vdf.hpp"
 
 #include "exceptions/steam_install_not_found.hpp"
 #include "exceptions/steam_workshop_directory_not_found.hpp"
 
-using namespace Filesystem;
 using namespace StringUtils;
 
 Steam::Steam(std::vector<std::string> search_paths)
@@ -20,7 +19,7 @@ Steam::Steam(std::vector<std::string> search_paths)
     {
         std::string replace_var = Replace(path, "$HOME", getenv("HOME"));
         std::string final_path = replace_var + config_path_;
-        if (FileExists(final_path))
+        if (std::filesystem::exists(final_path))
         {
             steam_path_ = replace_var;
             break;
@@ -56,7 +55,7 @@ std::string Steam::GetWorkshopPath(std::string appid)
     for (const auto &path : install_paths)
     {
         std::string proposed_path = path + "/steamapps/workshop/content/" + appid;
-        if (DirectoryExists(proposed_path))
+        if (std::filesystem::exists(proposed_path))
             return proposed_path;
     }
 
