@@ -7,7 +7,7 @@ namespace StdUtils
         return std::any_of(vec.begin(), vec.end(), std::bind2nd(std::equal_to<std::string>(), std::string(t)));
     }
 
-    bool CreateFile(const std::filesystem::path& path)
+    bool CreateFile(const std::filesystem::path &path)
     {
         return creat(path.c_str(), 0644);
     }

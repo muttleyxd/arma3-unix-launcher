@@ -40,7 +40,7 @@ namespace StdUtils
         return map.find(std::string(key)) != map.end();
     }
 
-    bool CreateFile(const std::filesystem::path& path);
+    bool CreateFile(const std::filesystem::path &path);
     std::vector<std::string> Ls(const std::filesystem::path &path, bool set_lowercase = false);
     std::string FileReadAllText(const std::filesystem::path &path);
 }

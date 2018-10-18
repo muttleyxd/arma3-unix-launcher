@@ -81,7 +81,7 @@ bool ARMA3Client::CreateSymlinkToWorkshop()
         Mod m{mod_dir, {}};
         m.LoadAllCPP();
 
-        std::string link_name = PickModName(m, std::vector<std::string>{"dir", "name", "tooltip"});
+        std::string link_name = PickModName(m, std::vector<std::string> {"dir", "name", "tooltip"});
         if (link_name.empty())
             link_name = dir;
 
