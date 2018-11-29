@@ -41,7 +41,7 @@ TEST_F(ARMA3ClientTests, Constructor)
     }, FileNotFoundException);
 }
 
-TEST_F(ARMA3ClientTests, GetMods)
+TEST_F(ARMA3ClientTests, RefreshMods)
 {
     std::string arma3_dir = "/arma3";
     std::string workshop_dir = "/!workshop";
@@ -72,4 +72,11 @@ TEST_F(ARMA3ClientTests, CreateWorkshopSymlink)
     std::vector<std::string> ls_result_actual = StdUtils::Ls(workshop_dir);
     std::sort(ls_result_actual.begin(), ls_result_actual.end());
     ASSERT_EQ(ls_result_expected, ls_result_actual);
+}
+
+/*bool CreateArmaCfg(const std::vector<Mod> &mod_list);
+bool Start(const std::string &arguments);*/
+TEST_F(ARMA3ClientTests, CreateArmaCfg)
+{
+
 }

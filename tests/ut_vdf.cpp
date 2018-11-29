@@ -1,12 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "setup.hpp"
-
-#define private public
-#define protected public
 #include "vdf.hpp"
-#undef private
-#undef protected
 
 class VdfTests : public ::testing::Test
 {
@@ -39,7 +34,7 @@ TEST_F(VdfTests, BasicParser)
     {
         VDF vdf;
         std::string simple_key_value = "\"Key\"\"Value\"";
-        vdf.ParseVDF(simple_key_value);
+        vdf.LoadFromText(simple_key_value);
         ASSERT_EQ("Value", vdf.KeyValue["Key"]);
         ASSERT_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }));
@@ -48,7 +43,7 @@ TEST_F(VdfTests, BasicParser)
     {
         VDF vdf;
         std::string simple_key_value = "\"Branch\"{\"Key\"\"Value\"}";
-        vdf.ParseVDF(simple_key_value);
+        vdf.LoadFromText(simple_key_value);
         ASSERT_EQ("Value", vdf.KeyValue["Branch/Key"]);
         ASSERT_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }));

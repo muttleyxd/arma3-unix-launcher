@@ -1,2 +1,7 @@
 build*
+
+#Qt Creator
 CMakeLists.txt.user
+
+#CLion
+.idea/*
