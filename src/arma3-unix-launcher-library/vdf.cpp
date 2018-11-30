@@ -142,3 +142,77 @@ void VDF::ReadValue(char c)
         AddKeyValuePair();
     }
 }
+
+#include <doctest.h>
+
+class VdfTests
+{
+    public:
+        std::string dir = GetWorkDir() + "/test-files";
+};
+
+
+TEST_CASE_FIXTURE(VdfTests, "BasicFilter")
+{
+    VDF vdf;
+    std::string key = "Key";
+    std::string value = "Value";
+    for (int i = 0; i < 10; i++)
+    {
+        std::string number = std::to_string(i + 1);
+        vdf.KeyValue[key + number] = value + number;
+    }
+    CHECK_EQ(static_cast<size_t>(0), vdf.GetValuesWithFilter("This should be empty").size());
+    CHECK_EQ(vdf.KeyValue.size(), vdf.GetValuesWithFilter("Key").size());
+
+    CHECK_EQ(static_cast<size_t>(2), vdf.GetValuesWithFilter("Key1").size());
+}
+
+TEST_CASE_FIXTURE(VdfTests, "BasicParser")
+{
+    GIVEN("VDF")
+    {
+        VDF vdf;
+        WHEN("\"Key\" \"Value\"")
+        {
+            std::string simple_key_value = "\"Key\"\"Value\"";
+            vdf.LoadFromText(simple_key_value);
+            THEN("Key points to Value")
+            {
+                CHECK_EQ("Value", vdf.KeyValue["Key"]);
+                CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
+            }
+        }
+
+        WHEN("\"Branch\" { \"Key\" \"Value\" }")
+        {
+            std::string simple_key_value = "\"Branch\"{\"Key\"\"Value\"}";
+            vdf.LoadFromText(simple_key_value);
+            THEN("Branch\\Key points to Value")
+            {
+                CHECK_EQ("Value", vdf.KeyValue["Branch/Key"]);
+                CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
+            }
+        }
+    }
+}
+
+TEST_CASE_FIXTURE(VdfTests, "LoadFromFile")
+{
+    VDF vdf, vdfWithTabs;
+    vdf.LoadFromFile(dir + "/vdf-valid.vdf");
+    vdfWithTabs.LoadFromFile(dir + "/vdf-valid-mixed-spaces-with-tabs.vdf");
+    CHECK_EQ(vdf.KeyValue, vdfWithTabs.KeyValue);
+    CHECK_EQ(static_cast<size_t>(8), vdf.KeyValue.size());
+}
+
+TEST_CASE_FIXTURE(VdfTests, "ParserThenFilter")
+{
+    VDF vdf;
+    vdf.LoadFromFile(dir + "/vdf-valid.vdf");
+    std::vector<std::string> filtered = vdf.GetValuesWithFilter("BaseInstallFolder");
+    std::vector<std::string> paths{"/mnt/games/SteamLibrary", "/home/user/SteamLibrary", "/run/media/user/SteamLibrary", "/somerandompath/steamlibrary"};
+    std::sort(filtered.begin(), filtered.end());
+    std::sort(paths.begin(), paths.end());
+    CHECK_EQ(filtered, paths);
+}

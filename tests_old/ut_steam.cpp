@@ -39,15 +39,3 @@ TEST_F(SteamTests, GetWorkshopDir)
     Steam steam({dir + "/steam"});
     ASSERT_NO_THROW(ASSERT_EQ(dir + "/steam/steamapps/workshop/content/107410", steam.GetWorkshopPath("107410")));
 }
-
-void im_retarded()
-{
-    char *ptr = (char*)42;
-    *ptr = 42;
-}
-
-int main()
-{
-    im_retarded();
-    return 5;
-}
