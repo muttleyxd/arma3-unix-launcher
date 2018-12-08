@@ -1,5 +1,5 @@
-#ifndef __ARMA3Client_HPP
-#define __ARMA3Client_HPP
+#ifndef ARMA3Client_HPP_
+#define ARMA3Client_HPP_
 
 #include <string>
 #include <vector>
@@ -28,6 +28,7 @@ class ARMA3Client
 
     private:
         void AddModsFromDirectory(std::string dir, std::vector<Mod> &target);
+        std::string PickModName(const Mod &mod, const std::vector<std::string> &names);
 
         std::string path_;
         std::string path_executable_;

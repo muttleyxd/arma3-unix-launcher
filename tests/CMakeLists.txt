@@ -1,4 +1,4 @@
-add_executable(tests tests.cpp)
+add_executable(tests src/tests.cpp)
 target_link_libraries(tests arma3-unix-launcher-library)
 
 add_custom_target(link_target ALL

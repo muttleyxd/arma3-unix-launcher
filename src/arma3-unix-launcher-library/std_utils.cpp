@@ -1,5 +1,8 @@
 #include "std_utils.hpp"
 
+#include <fstream>
+#include <filesystem>
+
 namespace StdUtils
 {
     bool Contains(const std::vector<std::string> &vec, const char *t)
@@ -27,20 +30,20 @@ namespace StdUtils
 
     std::string FileReadAllText(const std::filesystem::path &path)
     {
-        int fd = open(path.c_str(), 0);
-        if (fd == -1)
-            throw PathNoAccessException(std::string(path) + "\nError: " + std::to_string(errno) + " " + strerror(errno));
-        size_t file_size = static_cast<size_t>(lseek(fd, 0, SEEK_END));
-        lseek(fd, 0, SEEK_SET);
+        auto file_size = std::filesystem::file_size(path);
+        std::unique_ptr<char[]> buffer = std::make_unique<char[]>(file_size + 1);
 
-        std::unique_ptr<char[]> buffer = std::make_unique<char[]>(file_size);
-        read(fd, buffer.get(), file_size);
-        close(fd);
-        return buffer.get();
+        std::ifstream file(path);
+        std::stringstream str;
+        str << file.rdbuf();
+        return str.str();
     }
 }
 
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
 #include <doctest.h>
+#include "tests.hpp"
 
 TEST_SUITE_BEGIN("std_utils");
 
@@ -86,4 +89,38 @@ TEST_CASE("ContainsKey")
     }
 }
 
+TEST_CASE("FileReadAllText")
+{
+    using namespace StdUtils;
+
+    std::string work_dir = Tests::Utils::GetWorkDir();
+
+    WHEN("File exists")
+    {
+        THEN("File should be read correctly")
+        {
+            const std::string text = "name=\"Remove Stamina\";"
+                                     "picture=\"logo.paa\";"
+                                     "hidePicture=\"false\";"
+                                     "hideName=\"false\";"
+                                     "logo=\"logo.paa\";"
+                                     "description=\"Simple mod which removes stamina from ArmA 3\";"
+                                     "author=\"Muttley\";";
+            CHECK_EQ(text, FileReadAllText(work_dir + "/test-files/mod-remove-stamina-no-whitespaces.cpp"));
+        }
+    }
+
+    WHEN("File does not exist")
+    {
+        THEN("Exception is thrown")
+        {
+            using namespace std::filesystem;
+            CHECK_THROWS_AS(FileReadAllText(work_dir + "/test-files/not-existing-file"), filesystem_error);
+        }
+    }
+}
+
 TEST_SUITE_END();
+
+//GCOV_EXCL_STOP
+#endif

@@ -1,5 +1,5 @@
-#ifndef __STD_UTILS_HPP
-#define __STD_UTILS_HPP
+#ifndef STD_UTILS_HPP_
+#define STD_UTILS_HPP_
 
 #include <errno.h>
 #include <fcntl.h>

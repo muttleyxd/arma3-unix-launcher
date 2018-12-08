@@ -1,5 +1,5 @@
-#ifndef __VDF_HPP
-#define __VDF_HPP
+#ifndef VDF_HPP_
+#define VDF_HPP_
 
 #include <map>
 #include <string>

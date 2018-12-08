@@ -51,7 +51,7 @@ bool ARMA3Client::RefreshMods()
     return false;
 }
 
-std::string PickModName(const Mod &mod, const std::vector<std::string> &names)
+std::string ARMA3Client::PickModName(const Mod &mod, const std::vector<std::string> &names)
 {
     for (const auto &name : names)
     {
@@ -119,3 +119,74 @@ void ARMA3Client::AddModsFromDirectory(std::string dir, std::vector<Mod> &target
         target.emplace_back(std::move(m));
     }
 }
+
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
+#include "doctest.h"
+#include "tests.hpp"
+
+class ARMA3ClientTests
+{
+    public:
+        ARMA3ClientTests()
+        {
+            std::filesystem::create_directory(work_dir);
+        }
+
+        ~ARMA3ClientTests()
+        {
+            std::filesystem::remove_all(work_dir);
+        }
+
+        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
+        std::string work_dir = Tests::Utils::GetWorkDir() + "/arma3-client-tests";
+};
+
+TEST_CASE_FIXTURE(ARMA3ClientTests, "Constructor")
+{
+    ARMA3Client a3c(dir + "/arma3", dir + "/arma3/!workshop", true);
+    CHECK_THROWS_AS(ARMA3Client(dir + "/farma3", dir + "/farma3/!workshop", true), FileNotFoundException);
+}
+
+TEST_CASE_FIXTURE(ARMA3ClientTests, "RefreshMods")
+{
+    std::string arma3_dir = "/arma3";
+    std::string workshop_dir = "/!workshop";
+    std::string mods_dir = dir + arma3_dir + workshop_dir;
+    std::string remove_stamina_dir = mods_dir + "/@Remove stamina";
+    std::string big_mod_dir = mods_dir + "/@bigmod";
+
+    ARMA3Client a3c(dir + arma3_dir, mods_dir, true);
+    a3c.RefreshMods();
+    std::vector<Mod> mods{{{remove_stamina_dir, Tests::Utils::remove_stamina_map}, {big_mod_dir, Tests::Utils::big_mod_map}}};
+    CHECK_EQ(mods, a3c.mods_workshop_);
+}
+
+TEST_CASE_FIXTURE(ARMA3ClientTests, "CreateWorkshopSymlink")
+{
+    std::string arma3_dir = work_dir + "/arma3";
+    std::string workshop_dir = arma3_dir + "/!workshop";
+    std::string steam_workshop_dir = dir + "/steam/steamapps/workshop/content/107410";
+    std::string executable_name = EXECUTABLE_NAME;
+    std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
+
+    CHECK(std::filesystem::create_directory(arma3_dir));
+    CHECK(StdUtils::CreateFile(std::filesystem::path(arma3_dir) / executable_name));
+
+    ARMA3Client a3c(arma3_dir, steam_workshop_dir, true);
+    CHECK(a3c.CreateSymlinkToWorkshop());
+    CHECK(std::filesystem::exists(workshop_dir));
+    std::vector<std::string> ls_result_actual = StdUtils::Ls(workshop_dir);
+    std::sort(ls_result_actual.begin(), ls_result_actual.end());
+    CHECK_EQ(ls_result_expected, ls_result_actual);
+}
+
+/*bool CreateArmaCfg(const std::vector<Mod> &mod_list);
+bool Start(const std::string &arguments);*/
+TEST_CASE_FIXTURE(ARMA3ClientTests, "CreateArmaCfg")
+{
+
+}
+
+//GCOV_EXCL_STOP
+#endif

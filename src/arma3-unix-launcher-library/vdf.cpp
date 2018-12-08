@@ -143,34 +143,59 @@ void VDF::ReadValue(char c)
     }
 }
 
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
 #include <doctest.h>
+#include "tests.hpp"
 
 class VdfTests
 {
     public:
-        std::string dir = GetWorkDir() + "/test-files";
+        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
 };
 
 
 TEST_CASE_FIXTURE(VdfTests, "BasicFilter")
 {
-    VDF vdf;
-    std::string key = "Key";
-    std::string value = "Value";
-    for (int i = 0; i < 10; i++)
+    GIVEN("VDF filled with KeyX/ValueX pairs")
     {
-        std::string number = std::to_string(i + 1);
-        vdf.KeyValue[key + number] = value + number;
-    }
-    CHECK_EQ(static_cast<size_t>(0), vdf.GetValuesWithFilter("This should be empty").size());
-    CHECK_EQ(vdf.KeyValue.size(), vdf.GetValuesWithFilter("Key").size());
+        VDF vdf;
+        std::string key = "Key";
+        std::string value = "Value";
+        for (int i = 0; i < 10; i++)
+        {
+            std::string number = std::to_string(i + 1);
+            vdf.KeyValue[key + number] = value + number;
+        }
+        WHEN("Filtering VDF with non-existing filter")
+        {
+            THEN("Result should be empty (zero size)")
+            {
+                CHECK_EQ(static_cast<size_t>(0), vdf.GetValuesWithFilter("This should be empty").size());
+            }
+        }
 
-    CHECK_EQ(static_cast<size_t>(2), vdf.GetValuesWithFilter("Key1").size());
+        WHEN("Filtering VDF with filter matching all keys")
+        {
+            THEN("Result shold contain all values")
+            {
+                CHECK_EQ(vdf.KeyValue.size(), vdf.GetValuesWithFilter("Key").size());
+            }
+        }
+
+        WHEN("Filtering VDF with filter matching two keys")
+        {
+            THEN("Result should contain two keys")
+            {
+                CHECK_EQ(static_cast<size_t>(2), vdf.GetValuesWithFilter("Key1").size());
+            }
+        }
+    }
 }
 
 TEST_CASE_FIXTURE(VdfTests, "BasicParser")
 {
-    GIVEN("VDF")
+    GIVEN("Empty VDF")
     {
         VDF vdf;
         WHEN("\"Key\" \"Value\"")
@@ -199,20 +224,42 @@ TEST_CASE_FIXTURE(VdfTests, "BasicParser")
 
 TEST_CASE_FIXTURE(VdfTests, "LoadFromFile")
 {
-    VDF vdf, vdfWithTabs;
-    vdf.LoadFromFile(dir + "/vdf-valid.vdf");
-    vdfWithTabs.LoadFromFile(dir + "/vdf-valid-mixed-spaces-with-tabs.vdf");
-    CHECK_EQ(vdf.KeyValue, vdfWithTabs.KeyValue);
-    CHECK_EQ(static_cast<size_t>(8), vdf.KeyValue.size());
+    GIVEN("Two empty VDFs")
+    {
+        VDF vdf, vdfWithTabs;
+        WHEN("load VDF 1 with valid file, load VDF 2 with file using mixed spaces and tabs")
+        {
+            vdf.LoadFromFile(dir + "/vdf-valid.vdf");
+            vdfWithTabs.LoadFromFile(dir + "/vdf-valid-mixed-spaces-with-tabs.vdf");
+            THEN("Both VDFs should be equal")
+            {
+                CHECK_EQ(vdf.KeyValue, vdfWithTabs.KeyValue);
+                CHECK_EQ(static_cast<size_t>(8), vdf.KeyValue.size());
+            }
+        }
+    }
 }
 
 TEST_CASE_FIXTURE(VdfTests, "ParserThenFilter")
 {
-    VDF vdf;
-    vdf.LoadFromFile(dir + "/vdf-valid.vdf");
-    std::vector<std::string> filtered = vdf.GetValuesWithFilter("BaseInstallFolder");
-    std::vector<std::string> paths{"/mnt/games/SteamLibrary", "/home/user/SteamLibrary", "/run/media/user/SteamLibrary", "/somerandompath/steamlibrary"};
-    std::sort(filtered.begin(), filtered.end());
-    std::sort(paths.begin(), paths.end());
-    CHECK_EQ(filtered, paths);
+    GIVEN("Valid Steam VDF with various key-value pairs, list of valid paths")
+    {
+        VDF vdf;
+        vdf.LoadFromFile(dir + "/vdf-valid.vdf");
+        std::vector<std::string> paths{"/mnt/games/SteamLibrary", "/home/user/SteamLibrary", "/run/media/user/SteamLibrary", "/somerandompath/steamlibrary"};
+
+        WHEN("Filtering valid VDF by BaseInstallFolder and sorting output")
+        {
+            std::vector<std::string> filtered = vdf.GetValuesWithFilter("BaseInstallFolder");
+            std::sort(filtered.begin(), filtered.end());
+            std::sort(paths.begin(), paths.end());
+            THEN("Sorted output should be equal to paths")
+            {
+                CHECK_EQ(filtered, paths);
+            }
+        }
+    }
 }
+
+//GCOV_EXCL_STOP
+#endif

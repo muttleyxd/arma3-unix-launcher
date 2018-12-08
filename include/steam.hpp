@@ -1,5 +1,5 @@
-#ifndef __STEAM_HPP
-#define __STEAM_HPP
+#ifndef STEAM_HPP_
+#define STEAM_HPP_
 
 #include <string>
 #include <vector>

@@ -1,5 +1,5 @@
-#ifndef __MOD_HPP
-#define __MOD_HPP
+#ifndef MOD_HPP_
+#define MOD_HPP_
 
 #include <map>
 #include <string>

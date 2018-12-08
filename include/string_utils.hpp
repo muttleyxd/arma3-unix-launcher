@@ -1,5 +1,5 @@
-#ifndef __STRING_UTILS_HPP
-#define __STRING_UTILS_HPP
+#ifndef STRING_UTILS_HPP_
+#define STRING_UTILS_HPP_
 
 #include <type_traits>
 #include <string>

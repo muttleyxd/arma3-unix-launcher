@@ -56,3 +56,44 @@ void Mod::ParseCPP(const std::string &text)
         KeyValue[std::string(line.substr(0, split_place))] = std::string(line.substr(value_start, value_end - value_start));
     }
 }
+
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
+#include <doctest.h>
+#include "tests.hpp"
+
+class ModTests
+{
+    public:
+        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
+        std::string arma3_dir = "/arma3/!workshop";
+        std::string remove_stamina_dir = "/@Remove stamina";
+        std::string big_mod_dir = "/@bigmod";
+};
+
+TEST_CASE_FIXTURE(ModTests, "BasicParser")
+{
+    Mod remove_stamina{dir + arma3_dir + remove_stamina_dir, {}};
+    remove_stamina.LoadFromFile(dir + arma3_dir + remove_stamina_dir + "/mod.cpp");
+    CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina.KeyValue);
+    CHECK_EQ(dir + arma3_dir + remove_stamina_dir, remove_stamina.path_);
+
+    Mod big_mod{dir + arma3_dir + big_mod_dir, {}};
+    big_mod.LoadFromFile(dir + arma3_dir + big_mod_dir + "/mod.cpp");
+    CHECK_EQ(Tests::Utils::big_mod_map, big_mod.KeyValue);
+    CHECK_EQ(dir + arma3_dir + big_mod_dir, big_mod.path_);
+}
+
+TEST_CASE_FIXTURE(ModTests, "MissingQuotesAndWhitespaces")
+{
+    Mod remove_stamina_missing_quotes{dir, {}};
+    remove_stamina_missing_quotes.LoadFromFile(dir + "/mod-remove-stamina-missing-quotes.cpp");
+    Mod remove_stamina_no_whitespaces{dir, {}};
+    remove_stamina_no_whitespaces.LoadFromFile(dir + "/mod-remove-stamina-no-whitespaces.cpp");
+
+    CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina_missing_quotes.KeyValue);
+    CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina_no_whitespaces.KeyValue);
+}
+
+//GCOV_EXCL_STOP
+#endif

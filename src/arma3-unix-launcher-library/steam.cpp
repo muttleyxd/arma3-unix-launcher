@@ -41,6 +41,7 @@ std::vector<std::string> Steam::GetInstallPaths()
 
     VDF vdf;
     vdf.LoadFromFile(steam_path_ + config_path_);
+
     for (const auto &key : vdf.GetValuesWithFilter("BaseInstallFolder"))
         ret.push_back(key);
 
@@ -61,3 +62,41 @@ std::string Steam::GetWorkshopPath(std::string appid)
 
     throw SteamWorkshopDirectoryNotFoundException(appid);
 }
+
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
+#include <doctest.h>
+#include "tests.hpp"
+
+class SteamTests
+{
+    public:
+        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
+};
+
+TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths")
+{
+    Steam steam({dir + "/steam"});
+    std::vector<std::string> paths { dir + "/steam", "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
+    CHECK_EQ(paths, steam.GetInstallPaths());
+}
+
+TEST_CASE_FIXTURE(SteamTests, "InvalidPaths")
+{
+    CHECK_THROWS_AS(Steam(std::vector<std::string> {"/nowhere"}), SteamInstallNotFoundException);
+}
+
+TEST_CASE_FIXTURE(SteamTests, "GetSteamPath")
+{
+    Steam steam({dir + "/steam"});
+    CHECK_EQ(dir + "/steam", steam.GetSteamPath());
+}
+
+TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir")
+{
+    Steam steam({dir + "/steam"});
+    CHECK_EQ(dir + "/steam/steamapps/workshop/content/107410", steam.GetWorkshopPath("107410"));
+}
+
+//GCOV_EXCL_STOP
+#endif

@@ -104,6 +104,8 @@ namespace StringUtils
     }
 }
 
+#ifndef DOCTEST_CONFIG_DISABLE
+//GCOV_EXCL_START
 #include <doctest.h>
 
 TEST_SUITE_BEGIN("StringUtils");
@@ -124,6 +126,8 @@ TEST_CASE("RemoveElementsFromPath")
 
     CHECK_EQ(RemoveElementsFromPath("/"), "");
     CHECK_EQ(RemoveElementsFromPath("thisisnotapath"), "thisisnotapath");
+
+    CHECK_EQ(RemoveElementsFromPath(""), "");
 }
 
 TEST_CASE("Replace")
@@ -192,6 +196,7 @@ TEST_CASE("EndsWith")
     CHECK(EndsWith(text, " text"));
     CHECK(EndsWith(text, "This is some text"));
     CHECK_FALSE(EndsWith(text, "this is some text"));
+    CHECK_FALSE(EndsWith(text, " This is some text"));
     CHECK_FALSE(EndsWith(text, "\ntext"));
 }
 
@@ -230,3 +235,6 @@ TEST_CASE("Split")
 }
 
 TEST_SUITE_END();
+
+//GCOV_EXCL_STOP
+#endif
