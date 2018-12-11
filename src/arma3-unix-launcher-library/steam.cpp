@@ -1,7 +1,6 @@
 #include "steam.hpp"
 
 #include <exception>
-#include <filesystem>
 #include <stdexcept>
 
 #include "string_utils.hpp"
@@ -12,13 +11,13 @@
 
 using namespace StringUtils;
 
-Steam::Steam(std::vector<std::string> search_paths)
+Steam::Steam(std::vector<std::filesystem::path> search_paths)
 {
     steam_path_ = "";
-    for (std::string &path : search_paths)
+    for (const auto &path : search_paths)
     {
-        std::string replace_var = Replace(path, "$HOME", getenv("HOME"));
-        std::string final_path = replace_var + config_path_;
+        std::filesystem::path replace_var = Replace(path.c_str(), "$HOME", getenv("HOME"));
+        std::string final_path = replace_var / config_path_;
         if (std::filesystem::exists(final_path))
         {
             steam_path_ = replace_var;
@@ -29,18 +28,18 @@ Steam::Steam(std::vector<std::string> search_paths)
         throw SteamInstallNotFoundException();
 }
 
-const std::string &Steam::GetSteamPath() noexcept
+const std::filesystem::path &Steam::GetSteamPath() noexcept
 {
     return steam_path_;
 }
 
-std::vector<std::string> Steam::GetInstallPaths()
+std::vector<std::filesystem::path> Steam::GetInstallPaths()
 {
-    std::vector<std::string> ret;
+    std::vector<std::filesystem::path> ret;
     ret.emplace_back(steam_path_);
 
     VDF vdf;
-    vdf.LoadFromFile(steam_path_ + config_path_);
+    vdf.LoadFromFile(steam_path_ / config_path_);
 
     for (const auto &key : vdf.GetValuesWithFilter("BaseInstallFolder"))
         ret.push_back(key);
@@ -48,14 +47,14 @@ std::vector<std::string> Steam::GetInstallPaths()
     return ret;
 }
 
-std::string Steam::GetWorkshopPath(std::string appid)
+std::filesystem::path Steam::GetWorkshopPath(std::string appid)
 {
     auto install_paths = GetInstallPaths();
     install_paths.emplace_back(steam_path_);
 
     for (const auto &path : install_paths)
     {
-        std::string proposed_path = path + "/steamapps/workshop/content/" + appid;
+        std::filesystem::path proposed_path = path / "steamapps/workshop/content" / appid;
         if (std::filesystem::exists(proposed_path))
             return proposed_path;
     }
@@ -68,35 +67,33 @@ std::string Steam::GetWorkshopPath(std::string appid)
 #include <doctest.h>
 #include "tests.hpp"
 
-class SteamTests
-{
-    public:
-        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
-};
+TEST_SUITE_BEGIN("Steam");
 
-TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths")
+TEST_CASE_FIXTURE(Tests::Fixture, "FindInstallPaths")
 {
-    Steam steam({dir + "/steam"});
-    std::vector<std::string> paths { dir + "/steam", "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
+    Steam steam({test_files_path / "steam"});
+    std::vector<std::filesystem::path> paths { test_files_path / "steam", "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames" };
     CHECK_EQ(paths, steam.GetInstallPaths());
 }
 
-TEST_CASE_FIXTURE(SteamTests, "InvalidPaths")
+TEST_CASE_FIXTURE(Tests::Fixture, "InvalidPaths")
 {
-    CHECK_THROWS_AS(Steam(std::vector<std::string> {"/nowhere"}), SteamInstallNotFoundException);
+    CHECK_THROWS_AS(Steam(std::vector<std::filesystem::path> {"/nowhere"}), SteamInstallNotFoundException);
 }
 
-TEST_CASE_FIXTURE(SteamTests, "GetSteamPath")
+TEST_CASE_FIXTURE(Tests::Fixture, "GetSteamPath")
 {
-    Steam steam({dir + "/steam"});
-    CHECK_EQ(dir + "/steam", steam.GetSteamPath());
+    Steam steam({test_files_path / "steam"});
+    CHECK_EQ(test_files_path / "steam", steam.GetSteamPath());
 }
 
-TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir")
+TEST_CASE_FIXTURE(Tests::Fixture, "GetWorkshopDir")
 {
-    Steam steam({dir + "/steam"});
-    CHECK_EQ(dir + "/steam/steamapps/workshop/content/107410", steam.GetWorkshopPath("107410"));
+    Steam steam({test_files_path / "steam"});
+    CHECK_EQ(test_files_path / "steam/steamapps/workshop/content/107410", steam.GetWorkshopPath("107410"));
 }
+
+TEST_SUITE_END();
 
 //GCOV_EXCL_STOP
 #endif

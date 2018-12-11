@@ -1,5 +1,5 @@
 #!/bin/bash
-dirs=( "include" "include/exceptions" "src/arma3-unix-launcher-library" "tests" )
+dirs=( "include" "include/exceptions" "src/arma3-unix-launcher-library" "tests/include" "tests/src" )
 astylerc=`realpath astylerc`
 for directory in "${dirs[@]}"
 do

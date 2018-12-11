@@ -1,6 +1,7 @@
 #ifndef VDF_HPP_
 #define VDF_HPP_
 
+#include <filesystem>
 #include <map>
 #include <string>
 #include <vector>
@@ -10,7 +11,7 @@ class VDF
     public:
         VDF() noexcept;
 
-        void LoadFromFile(const std::string &path, bool append = false);
+        void LoadFromFile(const std::filesystem::path &path, bool append = false);
         void LoadFromText(const std::string &text, bool append = false);
 
         std::vector<std::string> GetValuesWithFilter(std::string filter);

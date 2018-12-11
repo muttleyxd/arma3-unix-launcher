@@ -1,6 +1,7 @@
 #ifndef MOD_HPP_
 #define MOD_HPP_
 
+#include <filesystem>
 #include <map>
 #include <string>
 
@@ -11,7 +12,7 @@ class Mod
         std::map<std::string, std::string> KeyValue;
 
         void LoadAllCPP();
-        void LoadFromFile(const std::string &path, bool append = false);
+        void LoadFromFile(const std::filesystem::path &path, bool append = false);
         void LoadFromText(const std::string &text, bool append = false);
 
         bool operator==(const Mod &other) const
@@ -21,7 +22,7 @@ class Mod
 
         friend ::std::ostream &operator<<(::std::ostream &os, const Mod &mod)
         {
-            std::string out_string = mod.path_ + "\n";
+            std::string out_string = "Path: " + mod.path_ + "\n";
             for (const auto &[key, value] : mod.KeyValue)
                 out_string += "Key: " + key + " Value: " + value + "\n";
             return os << out_string;

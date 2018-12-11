@@ -5039,6 +5039,7 @@ int Context::run() {
 
         // print the name of the test and don't execute it
         if(p->list_test_cases) {
+            g_con_rep.s << tc.m_test_suite << "::";
             g_con_rep.output_c_string_with_newline(tc.m_name);
             continue;
         }

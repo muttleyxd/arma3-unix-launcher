@@ -30,9 +30,9 @@ namespace Tests::Utils
         return s;
     }
 
-    std::string GetWorkDir()
+    std::filesystem::path GetWorkDir()
     {
-        std::string ret = "";
+        std::filesystem::path ret;
         char buf[1024];
         ssize_t result = readlink("/proc/self/exe", buf, sizeof(buf));
         if (result != 0)
@@ -89,5 +89,11 @@ namespace Tests::Utils
         {"overviewText", "Big Mod for Arma 3"},
         {"overviewFootnote", "<br /><br /><t color='#aa00aa'>Some random bla bla with HTML tags.<br />This will be <t /><t color='#ffaa00'>annoying<t /> to parse"},
         {"version", "1.0a"}
+    };
+
+    std::map<std::string, std::string> random_mod_map
+    {
+        {"name", "Random Mod"},
+        {"description", "Another mod for unit-tests"}
     };
 }

@@ -1,47 +1,62 @@
 #ifndef ARMA3Client_HPP_
 #define ARMA3Client_HPP_
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
 #include "mod.hpp"
 
+namespace ARMA3::Definitions
+{
+    static std::string home_directory = getenv("HOME");
+
+    static constexpr const char *app_id = "107410";
+
+    static const std::array<const char *, 20> exclusions{"!custom", "!workshop", "Addons", "Argo", "BattlEye", "Curator", "Dta", "Expansion", "Heli", "Jets", "Kart", "Keys", "MPMissions", "Mark", "Missions", "Orange", "Tacops", "Tank", "legal", "steam_shader_cache"};
+
+    static constexpr const char *symlink_workshop_name = "!workshop";
+    static constexpr const char *symlink_custom_name = "!custom";
+    static constexpr const char *do_not_change_name = "!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
+
 #ifdef __linux
-    #define EXECUTABLE_NAME "arma3.x86_64"
-#else
-    #define EXECUTABLE_NAME "ArmA3.app"
+    static constexpr const char *executable_name = "arma3.x86_64";
+    static constexpr const char *local_share_prefix = ".local/share";
+    static constexpr const char *bohemia_interactive_prefix = "bohemiainteractive/arma3";
+    static constexpr const char *game_config_path = "GameDocuments/Arma 3/Arma3.cfg";
+#else //__APPLE__
+    static constexpr const char *executable_name "ArmA3.app"
+    static constexpr const char *local_share_prefix = "Library/Application Support";
 #endif
 
-class ARMA3Client
+}
+
+namespace ARMA3
 {
-    public:
-        ARMA3Client(std::string arma_path, std::string target_workshop_path, bool skip_initialization = false);
+    class Client
+    {
+        public:
+            Client(std::filesystem::path arma_path, std::filesystem::path target_workshop_path, bool skip_initialization = false);
 
-        bool CreateSymlinkToWorkshop();
-        bool CreateArmaCfg(const std::vector<Mod> &mod_list);
-        bool RefreshMods();
-        bool Start(const std::string &arguments);
+            bool CreateSymlinkToWorkshop();
+            bool CreateArmaCfg(const std::vector<Mod> &mod_list, std::filesystem::path cfg_path);
+            bool RefreshMods();
+            bool Start(const std::string &arguments);
 
-        std::vector<Mod> mods_custom_;
-        std::vector<Mod> mods_home_;
-        std::vector<Mod> mods_workshop_;
+            std::vector<Mod> mods_custom_;
+            std::vector<Mod> mods_home_;
+            std::vector<Mod> mods_workshop_;
 
-    private:
-        void AddModsFromDirectory(std::string dir, std::vector<Mod> &target);
-        std::string PickModName(const Mod &mod, const std::vector<std::string> &names);
+        private:
+            void AddModsFromDirectory(const std::filesystem::path &dir, std::vector<Mod> &target);
+            std::string PickModName(const Mod &mod, const std::vector<std::string> &names);
+            std::filesystem::path GetCfgPath();
 
-        std::string path_;
-        std::string path_executable_;
-        std::string path_workshop_local_;
-        std::string path_workshop_target_;
-
-        const std::string symlink_workshop_name_ = "!workshop";
-        const std::string symlink_custom_name_ = "!custom";
-        const std::vector<std::string> exclusions{"Addons", "dupa"};
-
-        const std::string appid = "107410";
-
-        const std::string executable_name_ = EXECUTABLE_NAME;
-};
+            std::filesystem::path path_;
+            std::filesystem::path path_executable_;
+            std::filesystem::path path_workshop_local_;
+            std::filesystem::path path_workshop_target_;
+    };
+}
 
 #endif

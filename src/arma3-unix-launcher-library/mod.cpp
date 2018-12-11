@@ -18,7 +18,7 @@ void Mod::LoadAllCPP()
     }
 }
 
-void Mod::LoadFromFile(const std::string &path, bool append)
+void Mod::LoadFromFile(const std::filesystem::path &path, bool append)
 {
     return LoadFromText(StdUtils::FileReadAllText(path), append);
 }
@@ -62,38 +62,39 @@ void Mod::ParseCPP(const std::string &text)
 #include <doctest.h>
 #include "tests.hpp"
 
-class ModTests
-{
-    public:
-        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
-        std::string arma3_dir = "/arma3/!workshop";
-        std::string remove_stamina_dir = "/@Remove stamina";
-        std::string big_mod_dir = "/@bigmod";
-};
+TEST_SUITE_BEGIN("Mod");
 
-TEST_CASE_FIXTURE(ModTests, "BasicParser")
+TEST_CASE_FIXTURE(Tests::Fixture, "BasicParser")
 {
-    Mod remove_stamina{dir + arma3_dir + remove_stamina_dir, {}};
-    remove_stamina.LoadFromFile(dir + arma3_dir + remove_stamina_dir + "/mod.cpp");
+    std::filesystem::path workshop_path = test_files_path
+            / arma3_dir
+            / workshop_dir;
+
+    std::filesystem::path remove_stamina_path = workshop_path / remove_stamina_dir;
+    Mod remove_stamina{remove_stamina_path, {}};
+    remove_stamina.LoadFromFile(remove_stamina_path / "mod.cpp");
     CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina.KeyValue);
-    CHECK_EQ(dir + arma3_dir + remove_stamina_dir, remove_stamina.path_);
+    CHECK_EQ(remove_stamina_path, remove_stamina.path_);
 
-    Mod big_mod{dir + arma3_dir + big_mod_dir, {}};
-    big_mod.LoadFromFile(dir + arma3_dir + big_mod_dir + "/mod.cpp");
+    std::filesystem::path big_mod_path = workshop_path / big_mod_dir;
+    Mod big_mod{big_mod_path, {}};
+    big_mod.LoadFromFile(big_mod_path / "mod.cpp");
     CHECK_EQ(Tests::Utils::big_mod_map, big_mod.KeyValue);
-    CHECK_EQ(dir + arma3_dir + big_mod_dir, big_mod.path_);
+    CHECK_EQ(big_mod_path, big_mod.path_);
 }
 
-TEST_CASE_FIXTURE(ModTests, "MissingQuotesAndWhitespaces")
+TEST_CASE_FIXTURE(Tests::Fixture, "MissingQuotesAndWhitespaces")
 {
-    Mod remove_stamina_missing_quotes{dir, {}};
-    remove_stamina_missing_quotes.LoadFromFile(dir + "/mod-remove-stamina-missing-quotes.cpp");
-    Mod remove_stamina_no_whitespaces{dir, {}};
-    remove_stamina_no_whitespaces.LoadFromFile(dir + "/mod-remove-stamina-no-whitespaces.cpp");
+    Mod remove_stamina_missing_quotes{test_files_path, {}};
+    remove_stamina_missing_quotes.LoadFromFile(test_files_path / "mod-remove-stamina-missing-quotes.cpp");
+    Mod remove_stamina_no_whitespaces{test_files_path, {}};
+    remove_stamina_no_whitespaces.LoadFromFile(test_files_path / "mod-remove-stamina-no-whitespaces.cpp");
 
     CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina_missing_quotes.KeyValue);
     CHECK_EQ(Tests::Utils::remove_stamina_map, remove_stamina_no_whitespaces.KeyValue);
 }
+
+TEST_SUITE_END();
 
 //GCOV_EXCL_STOP
 #endif

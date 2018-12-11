@@ -22,7 +22,7 @@ std::vector<std::string> VDF::GetValuesWithFilter(std::string filter)
     return result;
 }
 
-void VDF::LoadFromFile(const std::string &path, bool append)
+void VDF::LoadFromFile(const std::filesystem::path &path, bool append)
 {
     std::string text = StdUtils::FileReadAllText(path);
     LoadFromText(text, append);
@@ -148,14 +148,9 @@ void VDF::ReadValue(char c)
 #include <doctest.h>
 #include "tests.hpp"
 
-class VdfTests
-{
-    public:
-        std::string dir = Tests::Utils::GetWorkDir() + "/test-files";
-};
+TEST_SUITE_BEGIN("VDF");
 
-
-TEST_CASE_FIXTURE(VdfTests, "BasicFilter")
+TEST_CASE_FIXTURE(Tests::Fixture, "BasicFilter")
 {
     GIVEN("VDF filled with KeyX/ValueX pairs")
     {
@@ -193,7 +188,7 @@ TEST_CASE_FIXTURE(VdfTests, "BasicFilter")
     }
 }
 
-TEST_CASE_FIXTURE(VdfTests, "BasicParser")
+TEST_CASE_FIXTURE(Tests::Fixture, "BasicParser")
 {
     GIVEN("Empty VDF")
     {
@@ -222,15 +217,15 @@ TEST_CASE_FIXTURE(VdfTests, "BasicParser")
     }
 }
 
-TEST_CASE_FIXTURE(VdfTests, "LoadFromFile")
+TEST_CASE_FIXTURE(Tests::Fixture, "LoadFromFile")
 {
     GIVEN("Two empty VDFs")
     {
         VDF vdf, vdfWithTabs;
         WHEN("load VDF 1 with valid file, load VDF 2 with file using mixed spaces and tabs")
         {
-            vdf.LoadFromFile(dir + "/vdf-valid.vdf");
-            vdfWithTabs.LoadFromFile(dir + "/vdf-valid-mixed-spaces-with-tabs.vdf");
+            vdf.LoadFromFile(test_files_path / "vdf-valid.vdf");
+            vdfWithTabs.LoadFromFile(test_files_path / "vdf-valid-mixed-spaces-with-tabs.vdf");
             THEN("Both VDFs should be equal")
             {
                 CHECK_EQ(vdf.KeyValue, vdfWithTabs.KeyValue);
@@ -240,12 +235,12 @@ TEST_CASE_FIXTURE(VdfTests, "LoadFromFile")
     }
 }
 
-TEST_CASE_FIXTURE(VdfTests, "ParserThenFilter")
+TEST_CASE_FIXTURE(Tests::Fixture, "ParserThenFilter")
 {
     GIVEN("Valid Steam VDF with various key-value pairs, list of valid paths")
     {
         VDF vdf;
-        vdf.LoadFromFile(dir + "/vdf-valid.vdf");
+        vdf.LoadFromFile(test_files_path / "vdf-valid.vdf");
         std::vector<std::string> paths{"/mnt/games/SteamLibrary", "/home/user/SteamLibrary", "/run/media/user/SteamLibrary", "/somerandompath/steamlibrary"};
 
         WHEN("Filtering valid VDF by BaseInstallFolder and sorting output")
@@ -260,6 +255,8 @@ TEST_CASE_FIXTURE(VdfTests, "ParserThenFilter")
         }
     }
 }
+
+TEST_SUITE_END();
 
 //GCOV_EXCL_STOP
 #endif
