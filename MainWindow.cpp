@@ -14,13 +14,14 @@
 #include "Utils.h"
 
 #include <cstdlib>
-#include <thread>
 #include <chrono>
 
 MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade) :
     Gtk::Window(cobject), builder(refGlade)
 {
     Init();
+
+    dispatcher_.connect(sigc::mem_fun(*this, &MainWindow::notification_from_thread));
 
     workshopModsStore = Glib::RefPtr<Gtk::ListStore>::cast_dynamic(builder->get_object("workshopModsStore"));
     customModsStore = Glib::RefPtr<Gtk::ListStore>::cast_dynamic(builder->get_object("customModsStore"));
@@ -286,26 +287,42 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     RefreshStatusLabel();
 
-    std::thread t1(&MainWindow::ArmaStatusThread, this);
-    t1.detach();
+    stop_arma_thread.store(false);
+    armaStatusThread = new std::thread(&MainWindow::ArmaStatusThread, this);
+}
+
+void MainWindow::notify()
+{
+    dispatcher_.emit();
+}
+
+void MainWindow::notification_from_thread()
+{
+    pid_t pid = armaPid;
+    if (pid != -1)
+        lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
+    else
+        lblStatus->set_text("Status: ArmA 3 not running");
 }
 
 void MainWindow::ArmaStatusThread()
 {
     LOG(1, "Status monitoring thread started");
-    while (true)
+    while (!stop_arma_thread.load())
     {
         #ifdef __APPLE__
         armaPid = Utils::FindProcess("ArmA3");
         #else
         armaPid = Utils::FindProcess("./arma3.x86_64");
         #endif
-        if (armaPid != -1)
-            lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
+        this->notify();
+        /*if (armaPid != -1)
+            this->notify();
+            //lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
         else
-            lblStatus->set_text("Status: ArmA 3 not running");
-
-        //std::cout << "Hai";
+            this->notify();
+            //lblStatus->set_text("Status: ArmA 3 not running");
+        */
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
@@ -518,6 +535,9 @@ bool MainWindow::onExit(GdkEventAny *event)
     Settings::Save(Filesystem::HomeDirectory
                    + Filesystem::LauncherSettingsDirectory
                    + Filesystem::LauncherSettingsFilename);
+
+    stop_arma_thread.store(true);
+    armaStatusThread->join();
     return false;
 }
 

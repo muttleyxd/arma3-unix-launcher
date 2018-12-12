@@ -8,8 +8,10 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
+#include <atomic>
 #include <gtkmm.h>
 #include "Mod.h"
+#include <thread>
 #include <vector>
 
 class MainWindow : public Gtk::Window
@@ -127,11 +129,18 @@ class MainWindow : public Gtk::Window
     public:
         MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &refGlade);
 
+        void notify();
+
     protected:
         bool ignore;
-        pid_t armaPid;
+        std::atomic<pid_t> armaPid;
 
         std::vector<Mod> FullModList;
+
+        std::atomic<bool> stop_arma_thread;
+        std::thread *armaStatusThread;
+        Glib::Dispatcher dispatcher_;
+        void notification_from_thread();
 
         void ArmaStatusThread();
 
