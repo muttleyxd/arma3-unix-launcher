@@ -109,11 +109,11 @@ namespace Filesystem
                 DirName = SteamAppsModWorkshopPath;
                 break;
         }
-        DIR *dir = opendir((SteamPath + DirName).c_str());
+        DIR *dir = opendir((HomeDirectory + SteamPath + DirName).c_str());
         if (dir)
         {
             closedir(dir);
-            return SteamPath + DirName;
+            return HomeDirectory + SteamPath + DirName;
         }
         for (string s : GetSteamLibraries())
         {
@@ -192,7 +192,7 @@ namespace Filesystem
         {
             if (s == "Curator" || s == "Dta" || s == "Expansion" || s == "Heli"
                     || s == "Jets" || s == "Kart" || s == "Mark" || s == "Argo"
-                    || s == "Orange") //skip DLCs
+                    || s == "Orange" || s == "Tacops" || s == "Tank") //skip DLCs
                 continue;
             if (Utils::ContainsAddons(path + "/" + s))
             {
