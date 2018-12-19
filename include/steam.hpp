@@ -12,7 +12,7 @@ class Steam
 
         const std::filesystem::path &GetSteamPath() noexcept;
         std::vector<std::filesystem::path> GetInstallPaths();
-        std::filesystem::path GetWorkshopPath(std::string appid);
+        std::filesystem::path GetWorkshopPath(std::string const &appid);
 
     private:
         std::filesystem::path steam_path_;

@@ -36,7 +36,7 @@ namespace ARMA3
     class Client
     {
         public:
-            Client(std::filesystem::path arma_path, std::filesystem::path target_workshop_path, bool skip_initialization = false);
+            Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization = false);
 
             bool CreateSymlinkToWorkshop();
             bool CreateArmaCfg(const std::vector<Mod> &mod_list, std::filesystem::path cfg_path);

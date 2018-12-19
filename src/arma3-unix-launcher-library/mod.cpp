@@ -32,8 +32,8 @@ void Mod::LoadFromText(const std::string &text, bool append)
 
 std::string Mod::RemoveWhitespacesAndComments(const std::string &text)
 {
-    std::regex remove_whitespaces("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-    std::regex remove_comments("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+    std::regex remove_whitespaces(R"(\s+(?=([^"]*"[^"]*")*[^"]*$))");
+    std::regex remove_comments(R"(\s+(?=([^"]*"[^"]*")*[^"]*$))");
     return std::regex_replace(std::regex_replace(text, remove_comments, ""), remove_whitespaces, "");
 }
 
@@ -61,6 +61,15 @@ void Mod::ParseCPP(const std::string &text)
 //GCOV_EXCL_START
 #include <doctest.h>
 #include "tests.hpp"
+
+std::ostream& operator<< (std::ostream& os, const std::map<std::string, std::string> key_value)
+{
+    os << "\nMap begin:\n";
+    for (auto const& [key, value] : key_value)
+        os << key << ':' << value << '\n';
+    os << "Map end:\n\n";
+    return os;
+}
 
 TEST_SUITE_BEGIN("Mod");
 

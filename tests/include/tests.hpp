@@ -12,10 +12,14 @@ namespace Tests::Utils
 {
     std::string RemoveLastElement(std::string s, bool removeSlash, int count);
     std::filesystem::path GetWorkDir();
-    std::vector<std::string> Ls(std::string path);
+    std::vector<std::string> Ls(std::string const &path);
     extern std::map<std::string, std::string> remove_stamina_map;
     extern std::map<std::string, std::string> big_mod_map;
     extern std::map<std::string, std::string> random_mod_map;
+    extern std::string valid_config_file;
+    extern std::string valid_config_file_with_mod_classes;
+    extern std::string valid_config_file_with_unrelated_classes;
+    extern std::string valid_config_file_with_unrelated_and_mod_classes;
 }
 
 namespace Tests

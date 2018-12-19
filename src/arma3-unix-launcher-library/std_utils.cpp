@@ -7,7 +7,7 @@ namespace StdUtils
 {
     bool Contains(const std::vector<std::string> &vec, const char *t)
     {
-        return std::any_of(vec.begin(), vec.end(), std::bind2nd(std::equal_to<std::string>(), std::string(t)));
+        return std::find(vec.begin(), vec.end(), t) != vec.end();
     }
 
     bool CreateFile(const std::filesystem::path &path)

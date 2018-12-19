@@ -18,7 +18,7 @@ using namespace StringUtils;
 
 namespace ARMA3
 {
-    Client::Client(std::filesystem::path arma_path, std::filesystem::path target_workshop_path, bool skip_initialization)
+    Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization)
     {
         path_ = arma_path;
         path_executable_ = path_ / Definitions::executable_name;
@@ -163,6 +163,11 @@ public:
         std::filesystem::remove_all(client_tests_dir);
     }
 
+    ARMA3ClientFixture(ARMA3ClientFixture const&) = delete;
+    ARMA3ClientFixture(ARMA3ClientFixture &&) = delete;
+    ARMA3ClientFixture& operator= (ARMA3ClientFixture const&) = delete;
+    ARMA3ClientFixture& operator= (ARMA3ClientFixture &&) = delete;
+
     std::filesystem::path client_tests_dir = work_dir / "arma3-client-tests";
     std::filesystem::path steam_workshop_dir = "steam/steamapps/workshop/content/107410";
 
@@ -239,11 +244,74 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
     CHECK_EQ(ls_result_expected, ls_result_actual);
 }
 
-/*bool CreateArmaCfg(const std::vector<Mod> &mod_list);
-bool Start(const std::string &arguments);*/
+/*bool Start(const std::string &arguments);*/
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
 {
-    ARMA3::Client a3c(absolute_arma3_path, absolute_arma3_path / workshop_dir, true);
+    GIVEN("ARMA3::Client with valid home directory structure and valid mod list")
+    {
+        std::filesystem::path config_path = client_tests_dir / "arma3.cfg";
+        ARMA3::Client a3c(absolute_arma3_path, absolute_arma3_path / workshop_dir, true);
+        std::vector<Mod> mods_workshop{{{absolute_arma3_path / workshop_dir / remove_stamina_dir, Tests::Utils::remove_stamina_map},
+                {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}}};
+        WHEN("Creating Arma Config based on empty config file")
+        {
+            REQUIRE(StdUtils::CreateFile(client_tests_dir / "arma3.cfg"));
+            REQUIRE(a3c.CreateArmaCfg(mods_workshop, config_path));
+            THEN("Arma3 Config is created, containing only given mods")
+            {
+
+            }
+        }
+
+        WHEN("Creating Arma Config based on valid config file")
+        {
+            std::string valid_config_file = R"(steamLanguage=";
+                    language="English";
+                    forcedAdapterId=-1;
+                    detectedAdapterId=2;
+                    detectedAdapterVendorId=1;
+                    detectedAdapterDeviceId=1;
+                    detectedAdapterSubSysId=1;
+                    detectedAdapterRevision=1;
+                    detectedAdapterBenchmark=32;
+                    detectedCPUBenchmark=81;
+                    detectedCPUFrequency=4200;
+                    detectedCPUCores=8;
+                    detectedCPUDescription="Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz";
+                    winX=16;
+                    winY=32;
+                    winWidth=1280;
+                    winHeight=960;
+                    winDefWidth=1024;
+                    winDefHeight=768;
+                    fullScreenWidth=1680;
+                    fullScreenHeight=1050;
+                    renderWidth=1280;
+                    renderHeight=960;
+                    multiSampleCount=8;
+                    multiSampleQuality=0;
+                    particlesQuality=2;
+                    GPU_MaxFramesAhead=1000;
+                    GPU_DetectedFramesAhead=1;
+                    HDRPrecision=16;
+                    vsync=1;
+                    AToC=15;
+                    cloudsQuality=4;
+                    waterSSReflectionsQuality=0;
+                    pipQuality=3;
+                    dynamicLightsQuality=4;
+                    PPAA=7;
+                    ppSSAO=6;
+                    ppCaustics=1;
+                    tripleBuffering=0;
+                    ppBloom=1;
+                    ppRotBlur=1;
+                    ppRadialBlur=1;
+                    ppDOF=1;
+                    ppSharpen=1;
+                        ")";
+        }
+    }
 
     //a3c.CreateArmaCfg({});
 }

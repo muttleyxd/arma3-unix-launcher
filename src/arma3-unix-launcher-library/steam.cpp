@@ -42,12 +42,12 @@ std::vector<std::filesystem::path> Steam::GetInstallPaths()
     vdf.LoadFromFile(steam_path_ / config_path_);
 
     for (const auto &key : vdf.GetValuesWithFilter("BaseInstallFolder"))
-        ret.push_back(key);
+        ret.emplace_back(key);
 
     return ret;
 }
 
-std::filesystem::path Steam::GetWorkshopPath(std::string appid)
+std::filesystem::path Steam::GetWorkshopPath(std::string const &appid)
 {
     auto install_paths = GetInstallPaths();
     install_paths.emplace_back(steam_path_);

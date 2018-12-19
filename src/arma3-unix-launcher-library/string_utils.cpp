@@ -163,11 +163,11 @@ TEST_CASE("Trim")
 
     CHECK_EQ(Trim(trimmed), trimmed);
 
-    std::string trim_with_copy = Trim<std::string, std::string>(to_trim);
+    auto trim_with_copy = Trim<std::string, std::string>(to_trim);
     CHECK_EQ(trim_with_copy, trimmed);
 
     std::string_view trim_with_view_argument(to_trim);
-    std::string_view trimmed_view = Trim<std::string_view, std::string_view>(trim_with_view_argument);
+    auto trimmed_view = Trim<std::string_view, std::string_view>(trim_with_view_argument);
     CHECK_EQ(trimmed_view, trimmed);
 }
 

@@ -14,7 +14,7 @@ class VDF
         void LoadFromFile(const std::filesystem::path &path, bool append = false);
         void LoadFromText(const std::string &text, bool append = false);
 
-        std::vector<std::string> GetValuesWithFilter(std::string filter);
+        std::vector<std::string> GetValuesWithFilter(std::string const &filter);
 
         std::map<std::string, std::string> KeyValue;
 

@@ -9,9 +9,10 @@
 
 VDF::VDF() noexcept
 {
+    state_ = VDFState::LookingForKey;
 }
 
-std::vector<std::string> VDF::GetValuesWithFilter(std::string filter)
+std::vector<std::string> VDF::GetValuesWithFilter(std::string const &filter)
 {
     std::vector<std::string> result;
     for (const auto &[key, value] : KeyValue)
@@ -37,7 +38,7 @@ void VDF::LoadFromText(const std::string &text, bool append)
 
 void VDF::AddKeyValuePair()
 {
-    std::string key_path = "";
+    std::string key_path;
     for (const auto &str : hierarchy_)
         key_path += str + "/";
     key_path += key_;
@@ -56,7 +57,7 @@ std::string VDF::RemoveWhitespaces(const std::string &text)
      *
      * Anyways, here is very dumb implementation
      */
-    std::string ret = "";
+    std::string ret;
     ret.reserve(text.length());
     bool in_quotes = false;
     for (auto c : text)
@@ -78,7 +79,7 @@ void VDF::ParseVDF(const std::string &text)
     for (auto c : text)
         ProcessChar(c);
 
-    if (hierarchy_.size() != 0)
+    if (!hierarchy_.empty())
         throw SyntaxErrorException("Unclosed brackets in VDF");
 }
 
@@ -195,7 +196,7 @@ TEST_CASE_FIXTURE(Tests::Fixture, "BasicParser")
         VDF vdf;
         WHEN("\"Key\" \"Value\"")
         {
-            std::string simple_key_value = "\"Key\"\"Value\"";
+            std::string simple_key_value = R"("Key""Value")";
             vdf.LoadFromText(simple_key_value);
             THEN("Key points to Value")
             {
@@ -206,7 +207,7 @@ TEST_CASE_FIXTURE(Tests::Fixture, "BasicParser")
 
         WHEN("\"Branch\" { \"Key\" \"Value\" }")
         {
-            std::string simple_key_value = "\"Branch\"{\"Key\"\"Value\"}";
+            std::string simple_key_value = R"("Branch"{"Key""Value"})";
             vdf.LoadFromText(simple_key_value);
             THEN("Branch\\Key points to Value")
             {
