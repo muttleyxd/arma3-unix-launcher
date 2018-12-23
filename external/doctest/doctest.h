@@ -4284,21 +4284,21 @@ namespace {
             if(hasLoggedCurrentTestStart)
                 return;
 
-            separator_to_stream();
-            file_line_to_stream(tc->m_file, tc->m_line, "\n");
+            //separator_to_stream();
+            //file_line_to_stream(tc->m_file, tc->m_line, "\n");
             if(tc->m_description)
                 s << Color::Yellow << "DESCRIPTION: " << Color::None << tc->m_description << "\n";
-            if(tc->m_test_suite && tc->m_test_suite[0] != '\0')
+            /*if(tc->m_test_suite && tc->m_test_suite[0] != '\0')
                 s << Color::Yellow << "TEST SUITE: " << Color::None << tc->m_test_suite << "\n";
             if(strncmp(tc->m_name, "  Scenario:", 11) != 0)
-                s << Color::None << "TEST CASE:  ";
-            s << Color::None << tc->m_name << "\n";
+                s << Color::None << "TEST CASE:  ";*/
+            //s << Color::None << tc->m_name << "\n";
 
             for(auto& curr : subcasesStack)
                 if(curr.m_name[0] != '\0')
                     s << "  " << curr.m_name << "\n";
 
-            s << "\n";
+            //s << "\n";
 
             hasLoggedCurrentTestStart = true;
         }
@@ -5056,6 +5056,7 @@ int Context::run() {
 
         // execute the test if it passes all the filtering
         {
+            g_con_rep.s << Color::Green << "[  RUN  ] " << Color::None << tc.m_test_suite << "::" << tc.m_name << "\n";
             p->currentTest = &tc;
 
             p->failure_flags  = TestCaseFailureReason::None;
@@ -5154,7 +5155,14 @@ int Context::run() {
 
             // if any subcase has failed - the whole test case has failed
             if(p->failure_flags && !ok_to_fail)
+            {
+                g_con_rep.s << Color::Red << "[ FAILED] " << Color::None << tc.m_test_suite << "::" << tc.m_name << "\n";
                 p->numTestCasesFailed++;
+            }
+            else
+            {
+                g_con_rep.s << Color::Green << "[ PASSED] " << Color::None << tc.m_test_suite << "::" << tc.m_name << "\n";
+            }
 
             DOCTEST_ITERATE_THROUGH_REPORTERS(test_case_end, *g_cs);
 
