@@ -1,21 +1,17 @@
 #include "std_utils.hpp"
 
+#include <fmt/format.h>
 #include <fstream>
 #include <filesystem>
 
 namespace StdUtils
 {
-    bool Contains(const std::vector<std::string> &vec, const char *t)
-    {
-        return std::find(vec.begin(), vec.end(), t) != vec.end();
-    }
-
-    bool CreateFile(const std::filesystem::path &path)
+    bool CreateFile(std::filesystem::path const &path)
     {
         return creat(path.c_str(), 0644);
     }
 
-    std::vector<std::string> Ls(const std::filesystem::path &path, bool set_lowercase)
+    std::vector<std::string> Ls(std::filesystem::path const &path, bool set_lowercase)
     {
         std::vector<std::string> ret;
         for (const auto &entity : std::filesystem::directory_iterator(path))
@@ -28,7 +24,7 @@ namespace StdUtils
         return ret;
     }
 
-    std::string FileReadAllText(const std::filesystem::path &path)
+    std::string FileReadAllText(std::filesystem::path const &path)
     {
         auto file_size = std::filesystem::file_size(path);
         std::unique_ptr<char[]> buffer = std::make_unique<char[]>(file_size + 1);
@@ -37,6 +33,13 @@ namespace StdUtils
         std::stringstream str;
         str << file.rdbuf();
         return str.str();
+    }
+
+    void FileWriteAllText(std::filesystem::path const &path, const std::string &text)
+    {
+        if (!exists(path.parent_path()))
+                throw std::filesystem::filesystem_error("Parent dir does not exist", {});
+        std::ofstream(path, std::ios_base::trunc) << text;
     }
 }
 
@@ -93,7 +96,7 @@ TEST_CASE("FileReadAllText")
 {
     using namespace StdUtils;
 
-    std::string work_dir = Tests::Utils::GetWorkDir();
+    std::filesystem::path test_files_path = Tests::Utils::GetWorkDir() / "test-files";
 
     WHEN("File exists")
     {
@@ -106,7 +109,7 @@ TEST_CASE("FileReadAllText")
                                      "logo=\"logo.paa\";"
                                      "description=\"Simple mod which removes stamina from ArmA 3\";"
                                      "author=\"Muttley\";";
-            CHECK_EQ(text, FileReadAllText(work_dir + "/test-files/mod-remove-stamina-no-whitespaces.cpp"));
+            CHECK_EQ(text, FileReadAllText(test_files_path / "mod-remove-stamina-no-whitespaces.cpp"));
         }
     }
 
@@ -115,10 +118,59 @@ TEST_CASE("FileReadAllText")
         THEN("Exception is thrown")
         {
             using namespace std::filesystem;
-            CHECK_THROWS_AS(FileReadAllText(work_dir + "/test-files/not-existing-file"), filesystem_error);
+            CHECK_THROWS_AS(FileReadAllText(test_files_path / "not-existing-file"), filesystem_error);
         }
     }
 }
+
+TEST_CASE("FileWriteAllText")
+{
+    using namespace StdUtils;
+    using namespace std::filesystem;
+    path work_dir = Tests::Utils::GetWorkDir();
+    path text_file_path = work_dir / "test.txt";
+
+    GIVEN("Text to write")
+    {
+        std::string const text = "name=\"Remove Stamina\";"
+                                 "picture=\"logo.paa\";"
+                                 "hidePicture=\"false\";"
+                                 "hideName=\"false\";"
+                                 "logo=\"logo.paa\";"
+                                 "description=\"Simple mod which removes stamina from ArmA 3\";"
+                                 "author=\"Muttley\";";
+        WHEN("File does not exist")
+        {
+            THEN("New file is created and it contains text")
+            {
+                FileWriteAllText(text_file_path, text);
+                CHECK_EQ(text, FileReadAllText(text_file_path));
+            }
+        }
+
+        WHEN("File already exists and has some content inside")
+        {
+            FileWriteAllText(text_file_path, "trash");
+            CHECK_EQ("trash", FileReadAllText(text_file_path));
+
+            THEN("File should be truncated and filled")
+            {
+                FileWriteAllText(text_file_path, text);
+                CHECK_EQ(text, FileReadAllText(text_file_path));
+            }
+        }
+
+        WHEN("Directory does not exist")
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(FileWriteAllText(work_dir / "not-existing-directory/newfile.txt", text), filesystem_error);
+            }
+        }
+    }
+}
+
+
 
 TEST_SUITE_END();
 

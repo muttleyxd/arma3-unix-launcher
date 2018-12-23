@@ -5,10 +5,12 @@
 
 #include <fmt/format.h>
 
+#include "cppfilter.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
 
 #include "exceptions/file_not_found.hpp"
+#include "exceptions/syntax_error.hpp"
 
 using namespace std;
 using namespace std::filesystem;
@@ -34,14 +36,19 @@ namespace ARMA3
         RefreshMods();
     }
 
-    bool Client::CreateArmaCfg(const std::vector<Mod> &mod_list, std::filesystem::path cfg_path = "")
+    bool Client::CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path = "")
     {
         if (cfg_path.empty())
             cfg_path = GetCfgPath();
+        std::string existing_config = FileReadAllText(cfg_path);
+        if (!exists(cfg_path.parent_path()))
+            throw PathNoAccessException(cfg_path);
+        CppFilter cpp_filter;
+        cpp_filter.RemoveClass("class ModLauncherList");
         return false;
     }
 
-    bool Client::Start(const std::string &arguments)
+    bool Client::Start(std::string const &arguments)
     {
         return false;
     }
@@ -59,9 +66,9 @@ namespace ARMA3
         return true;
     }
 
-    std::string Client::PickModName(const Mod &mod, const std::vector<std::string> &names)
+    std::string Client::PickModName(Mod const &mod, std::vector<std::string> const &names)
     {
-        for (const auto &name : names)
+        for (auto const &name : names)
         {
             if (ContainsKey(mod.KeyValue, name))
                 return mod.KeyValue.at(name);
@@ -75,7 +82,7 @@ namespace ARMA3
 
         create_directory(path_workshop_local_);
 
-        for (const auto &entity : filesystem::directory_iterator(path_workshop_target_))
+        for (auto const &entity : filesystem::directory_iterator(path_workshop_target_))
         {
             if (!entity.is_directory())
                 continue;
@@ -112,12 +119,12 @@ namespace ARMA3
         return status;
     }
 
-    void Client::AddModsFromDirectory(const std::filesystem::path &dir, std::vector<Mod> &target)
+    void Client::AddModsFromDirectory(std::filesystem::path const &dir, std::vector<Mod> &target)
     {
         if (!exists(dir))
             return;
 
-        for (const auto &ent : StdUtils::Ls(dir))
+        for (auto const &ent : StdUtils::Ls(dir))
         {
             if (StdUtils::Contains(Definitions::exclusions, ent))
                 continue;
@@ -125,7 +132,7 @@ namespace ARMA3
             if (!is_directory(mod_dir))
                 continue;
             Mod m{mod_dir, {}};
-            for (const auto &cppfile : StdUtils::Ls(mod_dir))
+            for (auto const &cppfile : StdUtils::Ls(mod_dir))
                 if (StringUtils::EndsWith(cppfile, ".cpp"))
                     m.LoadFromFile(mod_dir / cppfile, true);
             target.emplace_back(std::move(m));
@@ -149,6 +156,19 @@ namespace ARMA3
 //GCOV_EXCL_START
 #include "doctest.h"
 #include "tests.hpp"
+
+#include <fmt/printf.h>
+
+void print(std::vector<std::string> const& v1, std::vector<std::string> const& v2)
+{
+    fmt::print("v1: ");
+    for (auto const &s1 : v1)
+        fmt::print("{} ", s1);
+    fmt::print("\nv2: ");
+    for (auto const &s2 : v2)
+        fmt::print("{} ", s2);
+    fmt::print("\n");
+}
 
 class ARMA3ClientFixture : public Tests::Fixture
 {
@@ -231,7 +251,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RefreshMods")
 
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
 {
-    std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
+    std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
 
     REQUIRE(std::filesystem::create_directory(testing_dir));
     REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -244,76 +264,78 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
     CHECK_EQ(ls_result_expected, ls_result_actual);
 }
 
-/*bool Start(const std::string &arguments);*/
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
 {
+    std::string config_file_mod_part = "class ModLauncherList" "\n"
+                                      "{{" "\n"
+                                      "    class Mod1" "\n"
+                                      "    {{" "\n"
+                                      R"(        dir="@bigmod";)" "\n"
+                                      R"(        name="Big Mod";)" "\n"
+                                      R"(        origin="GAME DIR";)" "\n"
+                                      R"(        fullPath="C:\{0}\!workshop\@bigmod";)" "\n"
+                                      "    }};" "\n"
+                                      "    class Mod2" "\n"
+                                      "    {{" "\n"
+                                      R"(        dir="@Remove stamina";)" "\n"
+                                      R"(        name="Remove stamina";)" "\n"
+                                      R"(        origin="GAME DIR";)" "\n"
+                                      R"(        fullPath="C:\{0}\!workshop\@Remove stamina";)" "\n"
+                                      "    }};" "\n"
+                                      "}};" "\n";
+
     GIVEN("ARMA3::Client with valid home directory structure and valid mod list")
     {
         std::filesystem::path config_path = client_tests_dir / "arma3.cfg";
         ARMA3::Client a3c(absolute_arma3_path, absolute_arma3_path / workshop_dir, true);
         std::vector<Mod> mods_workshop{{{absolute_arma3_path / workshop_dir / remove_stamina_dir, Tests::Utils::remove_stamina_map},
                 {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}}};
-        WHEN("Creating Arma Config based on empty config file")
-        {
-            REQUIRE(StdUtils::CreateFile(client_tests_dir / "arma3.cfg"));
-            REQUIRE(a3c.CreateArmaCfg(mods_workshop, config_path));
-            THEN("Arma3 Config is created, containing only given mods")
-            {
 
+        WHEN("Arma config file does not exist")
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(a3c.CreateArmaCfg(mods_workshop, config_path), filesystem_error);
             }
         }
 
-        WHEN("Creating Arma Config based on valid config file")
+        std::string windows_style_arma3_path = StringUtils::Replace(absolute_arma3_path, "/", "\\");
+        std::string mod_part = fmt::format(config_file_mod_part, windows_style_arma3_path);
+
+        std::array<std::string, 5> config_files =
         {
-            std::string valid_config_file = R"(steamLanguage=";
-                    language="English";
-                    forcedAdapterId=-1;
-                    detectedAdapterId=2;
-                    detectedAdapterVendorId=1;
-                    detectedAdapterDeviceId=1;
-                    detectedAdapterSubSysId=1;
-                    detectedAdapterRevision=1;
-                    detectedAdapterBenchmark=32;
-                    detectedCPUBenchmark=81;
-                    detectedCPUFrequency=4200;
-                    detectedCPUCores=8;
-                    detectedCPUDescription="Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz";
-                    winX=16;
-                    winY=32;
-                    winWidth=1280;
-                    winHeight=960;
-                    winDefWidth=1024;
-                    winDefHeight=768;
-                    fullScreenWidth=1680;
-                    fullScreenHeight=1050;
-                    renderWidth=1280;
-                    renderHeight=960;
-                    multiSampleCount=8;
-                    multiSampleQuality=0;
-                    particlesQuality=2;
-                    GPU_MaxFramesAhead=1000;
-                    GPU_DetectedFramesAhead=1;
-                    HDRPrecision=16;
-                    vsync=1;
-                    AToC=15;
-                    cloudsQuality=4;
-                    waterSSReflectionsQuality=0;
-                    pipQuality=3;
-                    dynamicLightsQuality=4;
-                    PPAA=7;
-                    ppSSAO=6;
-                    ppCaustics=1;
-                    tripleBuffering=0;
-                    ppBloom=1;
-                    ppRotBlur=1;
-                    ppRadialBlur=1;
-                    ppDOF=1;
-                    ppSharpen=1;
-                        ")";
+            "",
+            Tests::Utils::valid_config_file,
+            Tests::Utils::valid_config_file + Tests::Utils::mod_classes,
+            Tests::Utils::valid_config_file + Tests::Utils::unrelated_classes,
+            Tests::Utils::valid_config_file + Tests::Utils::unrelated_classes + Tests::Utils::mod_classes
+        };
+
+        std::array<std::string, 5> out_files =
+        {
+            mod_part,
+            Tests::Utils::valid_config_file + mod_part,
+            Tests::Utils::valid_config_file + mod_part,
+            Tests::Utils::valid_config_file + Tests::Utils::unrelated_classes + mod_part,
+            Tests::Utils::valid_config_file + Tests::Utils::unrelated_classes + mod_part
+        };
+
+        for (size_t i = 0; i < config_files.size(); ++i)
+        {
+            WHEN("Creating Arma Config based on item from config_files array")
+            {
+                StdUtils::FileWriteAllText(config_path, config_files[i]);
+                REQUIRE(StdUtils::CreateFile(client_tests_dir / "arma3.cfg"));
+
+                REQUIRE(a3c.CreateArmaCfg(mods_workshop, config_path));
+
+                THEN("Arma Config is created, containing valid config from out_files array")
+                {
+                    REQUIRE_EQ(out_files[i], StdUtils::FileReadAllText(config_path));
+                }
+            }
         }
     }
-
-    //a3c.CreateArmaCfg({});
 }
 
 TEST_SUITE_END();

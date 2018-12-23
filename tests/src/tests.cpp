@@ -142,102 +142,129 @@ namespace Tests::Utils
             "ppRadialBlur=1;" "\n"
             "ppDOF=1;" "\n"
             "ppSharpen=1;" "\n";
-    std::string valid_config_file_with_mod_classes = valid_config_file +
-            class ModLauncherList
-            {
-                class Mod1
-                {
-                    dir="@ALiVE";
-                    name="Arma 3: ALiVE";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@ALiVE";
-                };
-                class Mod2
-                {
-                    dir="@CUP Terrains - CWA";
-                    name="CUP Terrains - CWA 1.4.2";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - CWA";
-                };
-                class Mod3
-                {
-                    dir="@CUP Terrains - Core";
-                    name="CUP Terrains - Core 1.4.2";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - Core";
-                };
-                class Mod4
-                {
-                    dir="@CUP Terrains - Maps";
-                    name="CUP Terrains - Maps 1.4.2";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - Maps";
-                };
-                class Mod5
-                {
-                    dir="@CUP Units";
-                    name="CUP Units 1.10.1";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Units";
-                };
-                class Mod6
-                {
-                    dir="@CUP Vehicles";
-                    name="CUP Vehicles 1.10.1";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Vehicles";
-                };
-                class Mod7
-                {
-                    dir="@CUP Weapons";
-                    name="CUP Weapons 1.10.1";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Weapons";
-                };
-                class Mod8
-                {
-                    dir="@CBA_A3";
-                    name="Community Base Addons v3.9.0";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CBA_A3";
-                };
-                class Mod9
-                {
-                    dir="@Enhanced Movement";
-                    name="Enhanced Movement";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@Enhanced Movement";
-                };
-                class Mod10
-                {
-                    dir="@RHSAFRF";
-                    name="RHS: Armed Forces of the Russian Federation";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSAFRF";
-                };
-                class Mod11
-                {
-                    dir="@RHSGREF";
-                    name="RHS: GREF";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSGREF";
-                };
-                class Mod12
-                {
-                    dir="@RHSSAF";
-                    name="RHS: Serbian Armed Forces";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSSAF";
-                };
-                class Mod13
-                {
-                    dir="@RHSUSAF";
-                    name="RHS: United States Forces";
-                    origin="GAME DIR";
-                    fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSUSAF";
-                };
-            };
-                     ;
-    std::string valid_config_file_with_unrelated_classes;
-    std::string valid_config_file_with_unrelated_and_mod_classes;
+
+    std::string mod_classes =
+            "class ModLauncherList" "\n"
+            "{" "\n"
+            "    class Mod1" "\n"
+            "    {" "\n"
+            R"(            dir="@ALiVE";)" "\n"
+            R"(            name="Arma 3: ALiVE";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@ALiVE";)" "\n"
+            "    };" "\n"
+            "    class Mod2" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Terrains - CWA";)" "\n"
+            R"(            name="CUP Terrains - CWA 1.4.2";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - CWA";)" "\n"
+            "    };" "\n"
+            "    class Mod3" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Terrains - Core";)" "\n"
+            R"(            name="CUP Terrains - Core 1.4.2";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - Core";)" "\n"
+            "    };" "\n"
+            "    class Mod4" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Terrains - Maps";)" "\n"
+            R"(            name="CUP Terrains - Maps 1.4.2";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Terrains - Maps";)" "\n"
+            "    };" "\n"
+            "    class Mod5" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Units";)" "\n"
+            R"(            name="CUP Units 1.10.1";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Units";)" "\n"
+            "    };" "\n"
+            "    class Mod6" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Vehicles";)" "\n"
+            R"(            name="CUP Vehicles 1.10.1";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Vehicles";)" "\n"
+            "    };" "\n"
+            "    class Mod7" "\n"
+            "    {" "\n"
+            R"(            dir="@CUP Weapons";)" "\n"
+            R"(            name="CUP Weapons 1.10.1";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CUP Weapons";)" "\n"
+            "    };" "\n"
+            "    class Mod8" "\n"
+            "    {" "\n"
+            R"(            dir="@CBA_A3";)" "\n"
+            R"(            name="Community Base Addons v3.9.0";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@CBA_A3";)" "\n"
+            "    };" "\n"
+            "    class Mod9" "\n"
+            "    {" "\n"
+            R"(            dir="@Enhanced Movement";)" "\n"
+            R"(            name="Enhanced Movement";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@Enhanced Movement";)" "\n"
+            "    };" "\n"
+            "    class Mod10" "\n"
+            "    {" "\n"
+            R"(            dir="@RHSAFRF";)" "\n"
+            R"(            name="RHS: Armed Forces of the Russian Federation";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSAFRF";)" "\n"
+            "    };" "\n"
+            "    class Mod11" "\n"
+            "    {" "\n"
+            R"(            dir="@RHSGREF";)" "\n"
+            R"(            name="RHS: GREF";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSGREF";)" "\n"
+            "    };" "\n"
+            "    class Mod12" "\n"
+            "    {" "\n"
+            R"(            dir="@RHSSAF";)" "\n"
+            R"(            name="RHS: Serbian Armed Forces";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSSAF";)" "\n"
+            "    };" "\n"
+            "    class Mod13" "\n"
+            "    {" "\n"
+            R"(            dir="@RHSUSAF";)" "\n"
+            R"(            name="RHS: United States Forces";)" "\n"
+            R"(            origin="GAME DIR";)" "\n"
+            R"(            fullPath="C:\home\muttley\.steam\steam\steamapps\common\Arma 3\!workshop\@RHSUSAF";)" "\n"
+            "    };" "\n"
+            "};" "\n";
+
+    std::string unrelated_classes =
+            "class UnrelatedClass" "\n"
+            "{" "\n"
+            "    class SubClass" "\n"
+            "    {" "\n"
+            "        class SubSubClass" "\n"
+            "        {" "\n"
+            R"(            text="YAY!";)" "\n"
+            "        };" "\n"
+            "        class SubSubClass2" "\n"
+            "        {" "\n"
+            R"(            RandomField="OK";)" "\n"
+            "        };" "\n"
+            "    };" "\n"
+            "};" "\n"
+            ;
+
+    std::string error_prone_classes =
+            R"(teststring="\"\nsometext";)" "\n"
+            "class BadClass" "\n"
+            "{" "\n"
+            "    class InheritingClass" "\n"
+            "    {" "\n"
+            R"(        text="\n\"\"Some text2\"";)" "\n"
+            R"(        text2="SomeRa ndomText";)" "\n"
+            "    };" "\n"
+            "};" "\n"
+            ;
 }

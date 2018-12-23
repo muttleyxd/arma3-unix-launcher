@@ -17,9 +17,9 @@ namespace Tests::Utils
     extern std::map<std::string, std::string> big_mod_map;
     extern std::map<std::string, std::string> random_mod_map;
     extern std::string valid_config_file;
-    extern std::string valid_config_file_with_mod_classes;
-    extern std::string valid_config_file_with_unrelated_classes;
-    extern std::string valid_config_file_with_unrelated_and_mod_classes;
+    extern std::string mod_classes;
+    extern std::string unrelated_classes;
+    extern std::string error_prone_classes;
 }
 
 namespace Tests

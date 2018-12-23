@@ -21,26 +21,27 @@
 namespace StdUtils
 {
     template<typename T, typename container = std::vector<T>>
-    bool Contains(const container &cnt, const T &t)
+    bool Contains(container const &cnt, T const &t)
     {
         return std::find(cnt.begin(), cnt.end(), t) != cnt.end();
     }
 
     template<typename T, typename X>
-    bool ContainsKey(const std::map<T, X> &map, const T &key)
+    bool ContainsKey(std::map<T, X> const &map, T const &key)
     {
         return map.find(key) != map.end();
     }
 
     template<typename T>
-    bool ContainsKey(const std::map<std::string, T> &map, const char *key)
+    bool ContainsKey(std::map<std::string, T> const &map, char const * const key)
     {
         return map.find(std::string(key)) != map.end();
     }
 
-    bool CreateFile(const std::filesystem::path &path);
-    std::vector<std::string> Ls(const std::filesystem::path &path, bool set_lowercase = false);
-    std::string FileReadAllText(const std::filesystem::path &path);
+    bool CreateFile(std::filesystem::path const &path);
+    std::vector<std::string> Ls(std::filesystem::path const &path, bool set_lowercase = false);
+    std::string FileReadAllText(std::filesystem::path const &path);
+    void FileWriteAllText(std::filesystem::path const &path, std::string const &text);
 }
 
 #endif
