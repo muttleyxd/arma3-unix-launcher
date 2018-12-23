@@ -24,24 +24,24 @@ namespace Tests::Utils
 
 namespace Tests
 {
-class Fixture
-{
-    public:
-        Fixture() = default;
-        ~Fixture() = default;
+    class Fixture
+    {
+        public:
+            Fixture() = default;
+            ~Fixture() = default;
 
-        std::filesystem::path work_dir = Tests::Utils::GetWorkDir();
-        std::filesystem::path test_files_dir = "test-files";
-        std::filesystem::path arma3_dir = "arma3";
-        std::filesystem::path custom_dir = "!custom";
-        std::filesystem::path workshop_dir = "!workshop";
-        std::filesystem::path remove_stamina_dir = "@Remove stamina";
-        std::filesystem::path big_mod_dir = "@bigmod";
-        std::filesystem::path random_mod_dir = "@Random_Mod";
-        std::filesystem::path rand_mod_v2_dir = "@rand_mod_v2";
+            std::filesystem::path work_dir = Tests::Utils::GetWorkDir();
+            std::filesystem::path test_files_dir = "test-files";
+            std::filesystem::path arma3_dir = "arma3";
+            std::filesystem::path custom_dir = "!custom";
+            std::filesystem::path workshop_dir = "!workshop";
+            std::filesystem::path remove_stamina_dir = "@Remove stamina";
+            std::filesystem::path big_mod_dir = "@bigmod";
+            std::filesystem::path random_mod_dir = "@Random_Mod";
+            std::filesystem::path rand_mod_v2_dir = "@rand_mod_v2";
 
-        std::filesystem::path test_files_path = work_dir / test_files_dir;
-};
+            std::filesystem::path test_files_path = work_dir / test_files_dir;
+    };
 
 }
 

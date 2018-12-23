@@ -18,6 +18,18 @@ using namespace std::filesystem;
 using namespace StdUtils;
 using namespace StringUtils;
 
+/*
+ * fmt weirdly handles std::filesystem::path
+ * it wraps whole path in " ", also it displays
+ * backslash: R"(\)"
+ * as two backslashes: R"(\\)"
+ */
+namespace fmt
+{
+    template <>
+    struct formatter<std::filesystem::path> : formatter<std::string> {};
+}
+
 namespace ARMA3
 {
     Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization)
@@ -36,16 +48,44 @@ namespace ARMA3
         RefreshMods();
     }
 
-    bool Client::CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path = "")
+    void Client::CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path = "")
     {
         if (cfg_path.empty())
             cfg_path = GetCfgPath();
         std::string existing_config = FileReadAllText(cfg_path);
         if (!exists(cfg_path.parent_path()))
             throw PathNoAccessException(cfg_path);
-        CppFilter cpp_filter;
-        cpp_filter.RemoveClass("class ModLauncherList");
-        return false;
+
+        CppFilter cpp_filter{existing_config};
+        auto stripped_config = cpp_filter.RemoveClass("class ModLauncherList");
+        stripped_config +=
+            "class ModLauncherList" "\n"
+            "{" "\n";
+
+        constexpr char const *mod_template =
+            "    class Mod{}" "\n"
+            "    {{" "\n"
+            R"(        dir="{}";)" "\n"
+            R"(        name="{}";)" "\n"
+            R"(        origin="GAME DIR";)" "\n"
+            R"(        fullPath="{}";)" "\n"
+            "    }};" "\n";
+
+        int mod_number = 1;
+        for (auto &mod : mod_list)
+        {
+            path mod_path_absolute = Trim<std::string, std::string>(mod.path_, "\"");
+            path final_path = StringUtils::ToWindowsPath(mod_path_absolute);
+            path dir = Trim<std::string, std::string>(mod_path_absolute.filename(), "\"");
+            auto name = mod.GetValueOrReturnDefault(dir, "name", "dir", "tooltip");
+
+            stripped_config += fmt::format(mod_template, mod_number, dir, name, final_path);
+            ++mod_number;
+        }
+
+        stripped_config += "};" "\n";
+
+        FileWriteAllText(cfg_path, stripped_config);
     }
 
     bool Client::Start(std::string const &arguments)
@@ -142,9 +182,9 @@ namespace ARMA3
     std::filesystem::path Client::GetCfgPath()
     {
         fmt::print("outpath: {}", (std::filesystem::path(Definitions::home_directory)
-                   / Definitions::local_share_prefix
-                   / Definitions::bohemia_interactive_prefix
-                   / Definitions::game_config_path).c_str());
+                                   / Definitions::local_share_prefix
+                                   / Definitions::bohemia_interactive_prefix
+                                   / Definitions::game_config_path).c_str());
         return std::filesystem::path(Definitions::home_directory)
                / Definitions::local_share_prefix
                / Definitions::bohemia_interactive_prefix
@@ -157,48 +197,35 @@ namespace ARMA3
 #include "doctest.h"
 #include "tests.hpp"
 
-#include <fmt/printf.h>
-
-void print(std::vector<std::string> const& v1, std::vector<std::string> const& v2)
-{
-    fmt::print("v1: ");
-    for (auto const &s1 : v1)
-        fmt::print("{} ", s1);
-    fmt::print("\nv2: ");
-    for (auto const &s2 : v2)
-        fmt::print("{} ", s2);
-    fmt::print("\n");
-}
-
 class ARMA3ClientFixture : public Tests::Fixture
 {
-public:
-    ARMA3ClientFixture()
-    {
-        std::filesystem::create_directory(client_tests_dir);
-    }
+    public:
+        ARMA3ClientFixture()
+        {
+            std::filesystem::create_directory(client_tests_dir);
+        }
 
-    ~ARMA3ClientFixture()
-    {
-        std::filesystem::remove_all(client_tests_dir);
-    }
+        ~ARMA3ClientFixture()
+        {
+            std::filesystem::remove_all(client_tests_dir);
+        }
 
-    ARMA3ClientFixture(ARMA3ClientFixture const&) = delete;
-    ARMA3ClientFixture(ARMA3ClientFixture &&) = delete;
-    ARMA3ClientFixture& operator= (ARMA3ClientFixture const&) = delete;
-    ARMA3ClientFixture& operator= (ARMA3ClientFixture &&) = delete;
+        ARMA3ClientFixture(ARMA3ClientFixture const &) = delete;
+        ARMA3ClientFixture(ARMA3ClientFixture &&) = delete;
+        ARMA3ClientFixture &operator= (ARMA3ClientFixture const &) = delete;
+        ARMA3ClientFixture &operator= (ARMA3ClientFixture &&) = delete;
 
-    std::filesystem::path client_tests_dir = work_dir / "arma3-client-tests";
-    std::filesystem::path steam_workshop_dir = "steam/steamapps/workshop/content/107410";
+        std::filesystem::path client_tests_dir = work_dir / "arma3-client-tests";
+        std::filesystem::path steam_workshop_dir = "steam/steamapps/workshop/content/107410";
 
-    std::filesystem::path absolute_arma3_path = test_files_path / arma3_dir;
-    std::filesystem::path testing_dir = client_tests_dir / arma3_dir;
+        std::filesystem::path absolute_arma3_path = test_files_path / arma3_dir;
+        std::filesystem::path testing_dir = client_tests_dir / arma3_dir;
 };
 
-std::ostream& operator<< (std::ostream& os, const std::vector<Mod> value)
+std::ostream &operator<< (std::ostream &os, const std::vector<Mod> value)
 {
     os << "\nMod vector begin:\n";
-    for (const auto& mod: value)
+    for (const auto &mod : value)
         os << mod << "-----\n";
     os << "Mod vector end:\n\n";
     return os;
@@ -236,7 +263,8 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RefreshMods")
             THEN("Mod vectors are set according to installed mods")
             {
                 std::vector<Mod> mods_workshop{{{absolute_arma3_path / workshop_dir / remove_stamina_dir, Tests::Utils::remove_stamina_map},
-                        {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}}};
+                        {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}
+                    }};
                 CHECK_EQ(mods_workshop, a3c.mods_workshop_);
 
                 std::vector<Mod> mods_custom{{{absolute_arma3_path / custom_dir / rand_mod_v2_dir, Tests::Utils::random_mod_map}}};
@@ -267,29 +295,30 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
 {
     std::string config_file_mod_part = "class ModLauncherList" "\n"
-                                      "{{" "\n"
-                                      "    class Mod1" "\n"
-                                      "    {{" "\n"
-                                      R"(        dir="@bigmod";)" "\n"
-                                      R"(        name="Big Mod";)" "\n"
-                                      R"(        origin="GAME DIR";)" "\n"
-                                      R"(        fullPath="C:\{0}\!workshop\@bigmod";)" "\n"
-                                      "    }};" "\n"
-                                      "    class Mod2" "\n"
-                                      "    {{" "\n"
-                                      R"(        dir="@Remove stamina";)" "\n"
-                                      R"(        name="Remove stamina";)" "\n"
-                                      R"(        origin="GAME DIR";)" "\n"
-                                      R"(        fullPath="C:\{0}\!workshop\@Remove stamina";)" "\n"
-                                      "    }};" "\n"
-                                      "}};" "\n";
+                                       "{{" "\n"
+                                       "    class Mod1" "\n"
+                                       "    {{" "\n"
+                                       R"(        dir="@Remove stamina";)" "\n"
+                                       R"(        name="Remove Stamina";)" "\n"
+                                       R"(        origin="GAME DIR";)" "\n"
+                                       R"(        fullPath="{0}\!workshop\@Remove stamina";)" "\n"
+                                       "    }};" "\n"
+                                       "    class Mod2" "\n"
+                                       "    {{" "\n"
+                                       R"(        dir="@bigmod";)" "\n"
+                                       R"(        name="Big Mod";)" "\n"
+                                       R"(        origin="GAME DIR";)" "\n"
+                                       R"(        fullPath="{0}\!workshop\@bigmod";)" "\n"
+                                       "    }};" "\n"
+                                       "}};" "\n";
 
     GIVEN("ARMA3::Client with valid home directory structure and valid mod list")
     {
         std::filesystem::path config_path = client_tests_dir / "arma3.cfg";
         ARMA3::Client a3c(absolute_arma3_path, absolute_arma3_path / workshop_dir, true);
         std::vector<Mod> mods_workshop{{{absolute_arma3_path / workshop_dir / remove_stamina_dir, Tests::Utils::remove_stamina_map},
-                {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}}};
+                {absolute_arma3_path / workshop_dir / big_mod_dir, Tests::Utils::big_mod_map}
+            }};
 
         WHEN("Arma config file does not exist")
         {
@@ -299,7 +328,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
             }
         }
 
-        std::string windows_style_arma3_path = StringUtils::Replace(absolute_arma3_path, "/", "\\");
+        std::string windows_style_arma3_path = StringUtils::ToWindowsPath(absolute_arma3_path);
         std::string mod_part = fmt::format(config_file_mod_part, windows_style_arma3_path);
 
         std::array<std::string, 5> config_files =
@@ -327,7 +356,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
                 StdUtils::FileWriteAllText(config_path, config_files[i]);
                 REQUIRE(StdUtils::CreateFile(client_tests_dir / "arma3.cfg"));
 
-                REQUIRE(a3c.CreateArmaCfg(mods_workshop, config_path));
+                CHECK_NOTHROW(a3c.CreateArmaCfg(mods_workshop, config_path));
 
                 THEN("Arma Config is created, containing valid config from out_files array")
                 {

@@ -102,6 +102,16 @@ namespace StringUtils
         std::transform(text.begin(), text.end(), text.begin(), ::tolower);
         return text;
     }
+
+    std::filesystem::path ToWindowsPath(std::filesystem::path const &path)
+    {
+        if (path.empty())
+            return path;
+        std::string path_str = Replace(path.c_str(), "/", "\\");
+        if (path.is_absolute())
+            return "C:" + path_str;
+        return path_str;
+    }
 }
 
 #ifndef DOCTEST_CONFIG_DISABLE
@@ -137,6 +147,8 @@ TEST_CASE("Replace")
     CHECK_EQ(Replace("aaba", "aa", "a"), "aba");
     CHECK_EQ(Replace("aaaaa", "aa", "a"), "aaa");
     CHECK_EQ(Replace("this is a text", " a", ""), "this is text");
+
+    CHECK_EQ(Replace("/dir1/dir2/", "/", "\\"), "\\dir1\\dir2\\");
 
     // Shouldn't be able to find empty string
     CHECK_EQ(Replace("testing", "", "test"), "testing");
@@ -232,6 +244,26 @@ TEST_CASE("Split")
         std::string_view(remove_stamina_text.c_str() + 5, 16)
     };
     CHECK_EQ(remove_stamina, Split(remove_stamina_text, "="));
+}
+
+TEST_CASE("ToWindowsPath")
+{
+    using namespace std::filesystem;
+    using namespace StringUtils;
+
+    SUBCASE("Relative path")
+    {
+        path linux_path{"dir1/dir2/file.cpp"};
+        path windows_path{R"(dir1\dir2\file.cpp)"};
+        CHECK_EQ(windows_path, ToWindowsPath(linux_path));
+    }
+
+    SUBCASE("Absolute path")
+    {
+        path linux_path{"/dir1/dir2/file.cpp"};
+        path windows_path{R"(C:\dir1\dir2\file.cpp)"};
+        CHECK_EQ(windows_path, ToWindowsPath(linux_path));
+    }
 }
 
 TEST_SUITE_END();

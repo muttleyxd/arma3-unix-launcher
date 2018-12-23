@@ -1,3 +1,8 @@
+/*
+ * Every project has this dark place, where code gets dirty
+ * this is the place, tread carefeully
+ */
+
 #include "cppfilter.hpp"
 
 #include <fmt/format.h>
@@ -16,7 +21,6 @@ std::string CppFilter::RemoveClass(const std::string &class_name)
     for (int i = static_cast<int>(occurences.size()) - 1; i >= 0; --i)
     {
         auto boundaries = GetClassBoundaries(class_name, occurences[i]);
-        fmt::print("b s: {} e: {}\n", boundaries.first, boundaries.second);
         ret = ret.substr(0, boundaries.first) + ret.substr(boundaries.second);
     }
 
@@ -38,7 +42,6 @@ std::vector<size_t> CppFilter::FindAllClassOccurences(const std::string &class_n
 std::pair<size_t, size_t> CppFilter::GetClassBoundaries(std::string const &class_name, size_t start)
 {
     std::string_view view(class_text_.c_str() + start, class_name.size());
-    fmt::print("class_name: {}\nview: {}\n", class_name, view);
     if (view != class_name)
         throw SyntaxErrorException("Cannot find class name");
 
@@ -74,7 +77,34 @@ std::pair<size_t, size_t> CppFilter::GetClassBoundaries(std::string const &class
     if (bracket_depth != 0)
         throw SyntaxErrorException("Unclosed bracket");
 
-    return std::make_pair(start, pos + 2);
+    return std::make_pair(start, GetColonNewlineOrChar(pos));
+}
+
+size_t CppFilter::GetColonNewlineOrChar(size_t pos)
+{
+    bool colon_found = false;
+    bool newline_found = false;
+    bool char_found = false;
+
+    while (pos < class_text_.size())
+    {
+        char c = class_text_[pos];
+        if (c == ';')
+            colon_found = true;
+        else if (c == '\n')
+            newline_found = true;
+        else if (isalnum(c))
+            char_found = true;
+
+        if (colon_found && newline_found)
+            return pos + 1;
+        else if (colon_found && char_found)
+            return pos;
+
+        ++pos;
+    }
+
+    return std::string::npos;
 }
 
 #ifndef DOCTEST_CONFIG_DISABLE

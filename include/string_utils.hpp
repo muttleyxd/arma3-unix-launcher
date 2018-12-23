@@ -1,6 +1,7 @@
 #ifndef STRING_UTILS_HPP_
 #define STRING_UTILS_HPP_
 
+#include <filesystem>
 #include <type_traits>
 #include <string>
 #include <string_view>
@@ -18,10 +19,12 @@ namespace StringUtils
 
     std::string Lowercase(std::string text);
 
+    std::filesystem::path ToWindowsPath(std::filesystem::path const &path);
+
     template<typename ret_type = std::string_view, typename argument = std::string>
-    ret_type TrimLeft(const argument &text)
+    ret_type TrimLeft(const argument &text, std::string const &to_trim = " \n\r\t")
     {
-        size_t startpos = text.find_first_not_of(" \n\r\t");
+        size_t startpos = text.find_first_not_of(to_trim);
         if constexpr(std::is_same_v<ret_type, std::string_view> &&std::is_same_v<argument, std::string>)
             return (startpos == std::string::npos) ? std::string_view() : std::string_view(text.c_str() + startpos, text.size() - startpos);
         else //std::string ret_type
@@ -29,9 +32,9 @@ namespace StringUtils
     }
 
     template<typename ret_type = std::string_view, typename argument = std::string>
-    ret_type TrimRight(const argument &text)
+    ret_type TrimRight(const argument &text, std::string const &to_trim = " \n\r\t")
     {
-        size_t endpos = text.find_last_not_of(" \n\r\t");
+        size_t endpos = text.find_last_not_of(to_trim);
         if constexpr(std::is_same_v<ret_type, std::string_view> &&std::is_same_v<argument, std::string>)
             return (endpos == std::string::npos) ? std::string_view() : std::string_view(text.c_str(), endpos + 1);
         else //std::string ret_type
@@ -39,9 +42,9 @@ namespace StringUtils
     }
 
     template<typename ret_type = std::string_view, typename argument = std::string>
-    ret_type Trim(const argument &text)
+    ret_type Trim(const argument &text, std::string const &to_trim = " \n\r\t")
     {
-        return TrimLeft<ret_type, ret_type>(TrimRight<ret_type, argument>(text));
+        return TrimLeft<ret_type, ret_type>(TrimRight<ret_type, argument>(text, to_trim));
     }
 }
 

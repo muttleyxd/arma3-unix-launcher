@@ -38,7 +38,7 @@ namespace StdUtils
     void FileWriteAllText(std::filesystem::path const &path, const std::string &text)
     {
         if (!exists(path.parent_path()))
-                throw std::filesystem::filesystem_error("Parent dir does not exist", {});
+            throw std::filesystem::filesystem_error("Parent dir does not exist", {});
         std::ofstream(path, std::ios_base::trunc) << text;
     }
 }

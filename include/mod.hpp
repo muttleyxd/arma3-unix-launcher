@@ -15,6 +15,20 @@ class Mod
         void LoadFromFile(const std::filesystem::path &path, bool append = false);
         void LoadFromText(const std::string &text, bool append = false);
 
+        std::string GetValueOrReturnDefault(std::string default_value) const
+        {
+            return default_value;
+        }
+
+        template<typename ... Args>
+        std::string GetValueOrReturnDefault(std::string key, Args... keys) const
+        {
+            auto iterator = KeyValue.find(key);
+            if (iterator != KeyValue.end())
+                return iterator->second;
+            return GetValueOrReturnDefault(keys...);
+        }
+
         bool operator==(const Mod &other) const
         {
             return other.path_ == path_ && other.KeyValue == KeyValue;

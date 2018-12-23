@@ -33,7 +33,7 @@ namespace StdUtils
     }
 
     template<typename T>
-    bool ContainsKey(std::map<std::string, T> const &map, char const * const key)
+    bool ContainsKey(std::map<std::string, T> const &map, char const *const key)
     {
         return map.find(std::string(key)) != map.end();
     }

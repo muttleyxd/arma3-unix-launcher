@@ -62,7 +62,7 @@ void Mod::ParseCPP(const std::string &text)
 #include <doctest.h>
 #include "tests.hpp"
 
-std::ostream& operator<< (std::ostream& os, const std::map<std::string, std::string> key_value)
+std::ostream &operator<< (std::ostream &os, const std::map<std::string, std::string> key_value)
 {
     os << "\nMap begin:\n";
     for (auto const& [key, value] : key_value)
@@ -76,8 +76,8 @@ TEST_SUITE_BEGIN("Mod");
 TEST_CASE_FIXTURE(Tests::Fixture, "BasicParser")
 {
     std::filesystem::path workshop_path = test_files_path
-            / arma3_dir
-            / workshop_dir;
+                                          / arma3_dir
+                                          / workshop_dir;
 
     std::filesystem::path remove_stamina_path = workshop_path / remove_stamina_dir;
     Mod remove_stamina{remove_stamina_path, {}};

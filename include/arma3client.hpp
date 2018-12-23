@@ -39,7 +39,7 @@ namespace ARMA3
             Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization = false);
 
             bool CreateSymlinkToWorkshop();
-            bool CreateArmaCfg( std::vector<Mod> const &mod_list, std::filesystem::path cfg_path);
+            void CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path);
             bool RefreshMods();
             bool Start(std::string const &arguments);
 
