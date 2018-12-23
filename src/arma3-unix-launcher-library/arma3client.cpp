@@ -88,9 +88,9 @@ namespace ARMA3
         FileWriteAllText(cfg_path, stripped_config);
     }
 
-    bool Client::Start(std::string const &arguments)
+    void Client::Start(std::string const &arguments)
     {
-        return false;
+        system(("steam --applaunch 107410 " + arguments).c_str());
     }
 
     bool Client::RefreshMods()
@@ -366,6 +366,38 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateArmaCfg")
         }
     }
 }
+
+TEST_CASE_FIXTURE(ARMA3ClientFixture, "Start")
+{
+    ARMA3::Client a3c(absolute_arma3_path, test_files_path / steam_workshop_dir, true);
+    std::string path_env_var = std::string(test_files_path / "steam") + ":" + getenv("PATH");
+    chdir(client_tests_dir.c_str());
+    setenv("PATH", path_env_var.c_str(), 1);
+
+    path arguments_passed_path = client_tests_dir / "argumentspassed";
+
+    std::array<std::string, 3> arguments_array
+    {
+        "",
+        "-cpuCount=4",
+        "-exThreads=7 -cpuCount=4 -world=empty -skipIntro"
+    };
+
+    std::array<std::string, 3> call_arguments_array
+    {
+        "--applaunch 107410",
+        "--applaunch 107410 -cpuCount=4",
+        "--applaunch 107410 -exThreads=7 -cpuCount=4 -world=empty -skipIntro"
+    };
+
+    for (size_t i = 0; i < arguments_array.size(); ++i)
+    {
+        a3c.Start(arguments_array[i]);
+        CHECK_EQ(call_arguments_array[i], FileReadAllText(arguments_passed_path));
+        std::filesystem::remove(arguments_passed_path);
+    }
+}
+
 
 TEST_SUITE_END();
 
