@@ -28,7 +28,6 @@ namespace ARMA3::Definitions
     static constexpr const char *executable_name "ArmA3.app"
     static constexpr const char *local_share_prefix = "Library/Application Support";
 #endif
-
 }
 
 namespace ARMA3
@@ -42,6 +41,7 @@ namespace ARMA3
             void CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path);
             bool RefreshMods();
             void Start(std::string const &arguments);
+            void AddCustomMod(std::filesystem::path const &path);
 
             std::vector<Mod> mods_custom_;
             std::vector<Mod> mods_home_;
@@ -53,6 +53,7 @@ namespace ARMA3
             std::filesystem::path GetCfgPath();
 
             std::filesystem::path path_;
+            std::filesystem::path path_custom_;
             std::filesystem::path path_executable_;
             std::filesystem::path path_workshop_local_;
             std::filesystem::path path_workshop_target_;

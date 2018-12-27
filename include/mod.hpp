@@ -34,12 +34,17 @@ class Mod
             return other.path_ == path_ && other.KeyValue == KeyValue;
         }
 
+        operator std::string() const
+        {
+            std::string out_string = "Path: " + path_ + "\n";
+            for (const auto &[key, value] : KeyValue)
+                out_string += "Key: " + key + " Value: " + value + "\n";
+            return out_string;
+        }
+
         friend ::std::ostream &operator<<(::std::ostream &os, const Mod &mod)
         {
-            std::string out_string = "Path: " + mod.path_ + "\n";
-            for (const auto &[key, value] : mod.KeyValue)
-                out_string += "Key: " + key + " Value: " + value + "\n";
-            return os << out_string;
+            return os << std::string(mod);
         }
 
     private:

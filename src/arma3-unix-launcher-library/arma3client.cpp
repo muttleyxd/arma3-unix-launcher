@@ -4,11 +4,13 @@
 #include <filesystem>
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include "cppfilter.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
 
+#include "exceptions/directory_not_found.hpp"
 #include "exceptions/file_not_found.hpp"
 #include "exceptions/syntax_error.hpp"
 
@@ -35,6 +37,7 @@ namespace ARMA3
     Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization)
     {
         path_ = arma_path;
+        path_custom_ = path_ / Definitions::symlink_custom_name;
         path_executable_ = path_ / Definitions::executable_name;
         path_workshop_local_ = path_ / Definitions::symlink_workshop_name;
         path_workshop_target_ = target_workshop_path;
@@ -46,6 +49,8 @@ namespace ARMA3
 
         CreateSymlinkToWorkshop();
         RefreshMods();
+
+        create_directory(path_custom_);
     }
 
     void Client::CreateArmaCfg(std::vector<Mod> const &mod_list, std::filesystem::path cfg_path = "")
@@ -91,6 +96,35 @@ namespace ARMA3
     void Client::Start(std::string const &arguments)
     {
         system(("steam --applaunch 107410 " + arguments).c_str());
+    }
+
+    void Client::AddCustomMod(const path &path)
+    {
+        std::vector<std::string> entities = StdUtils::Ls(path, true);
+        if (!Contains(entities, "addons"))
+            throw DirectoryNotFoundException(path / "addons");
+
+        Mod mod{path, {}};
+        mod.LoadAllCPP();
+
+        std::string link_name = PickModName(mod, std::vector<std::string> {"dir", "name", "tooltip"});
+        if (link_name.empty())
+            link_name = path.filename();
+
+        if (link_name[0] != '@')
+            link_name.insert(link_name.begin(), '@');
+
+        std::filesystem::path source_path = path_custom_ / link_name;
+        while (exists(source_path))
+        {
+            directory_entry entry(source_path);
+            if (entry.exists() && entry.is_symlink() && read_symlink(source_path) == mod.path_)
+                return;
+            source_path += '_';
+        }
+
+        std::error_code ec;
+        create_directory_symlink(mod.path_, source_path, ec);
     }
 
     bool Client::RefreshMods()
@@ -143,7 +177,7 @@ namespace ARMA3
             if (link_name[0] != '@')
                 link_name.insert(link_name.begin(), '@');
 
-            std::string source_path = path_workshop_local_ / link_name;
+            path source_path = path_workshop_local_ / link_name;
             directory_entry entry(source_path);
             if (entry.exists() && entry.is_symlink() && read_symlink(source_path) == mod_dir)
                 continue;
@@ -194,6 +228,8 @@ namespace ARMA3
 
 #ifndef DOCTEST_CONFIG_DISABLE
 //GCOV_EXCL_START
+#include <iostream>
+
 #include "doctest.h"
 #include "tests.hpp"
 
@@ -222,13 +258,27 @@ class ARMA3ClientFixture : public Tests::Fixture
         std::filesystem::path testing_dir = client_tests_dir / arma3_dir;
 };
 
-std::ostream &operator<< (std::ostream &os, const std::vector<Mod> value)
-{
-    os << "\nMod vector begin:\n";
-    for (const auto &mod : value)
-        os << mod << "-----\n";
-    os << "Mod vector end:\n\n";
-    return os;
+
+namespace doctest {
+    template<> struct StringMaker<std::vector<std::string>> {
+        static String convert(std::vector<std::string> const &value) {
+            std::string text = "\"";
+            for (auto const &str: value)
+                text += str + ",";
+            text += "\"";
+            return text.c_str();
+        }
+    };
+
+    template<> struct StringMaker<std::vector<Mod>> {
+        static String convert(std::vector<Mod> const &value) {
+            std::string text = "\"";
+            for (auto const &mod: value)
+                text += std::string(mod) + ",";
+            text += "\"";
+            return text.c_str();
+        }
+    };
 }
 
 TEST_SUITE_BEGIN("ARMA3::Client");
@@ -398,6 +448,66 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "Start")
     }
 }
 
+TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
+{
+    auto check_dir_structure_ok = [&](auto const &ls_result_expected) {
+        REQUIRE(std::filesystem::exists((testing_dir / custom_dir)));
+        std::vector<std::string> ls_result_actual = StdUtils::Ls(testing_dir / custom_dir);
+        std::sort(ls_result_actual.begin(), ls_result_actual.end());
+        CHECK_EQ(ls_result_expected, ls_result_actual);
+    };
+
+    GIVEN("List of mods, ARMA3::Client")
+    {
+        std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
+
+        REQUIRE(std::filesystem::create_directory(testing_dir));
+        REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
+
+        ARMA3::Client a3c(testing_dir, test_files_path / steam_workshop_dir);
+
+        WHEN("Adding two custom valid mods")
+        {
+            a3c.AddCustomMod(test_files_path / steam_workshop_dir / "1");
+            a3c.AddCustomMod(test_files_path / steam_workshop_dir / "3");
+
+            THEN("!custom folder is created, symlinks are created")
+            {
+                check_dir_structure_ok(ls_result_expected);
+            }
+        }
+
+        WHEN("Adding invalid mod (without 'addons' directory inside)")
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(a3c.AddCustomMod(test_files_path / steam_workshop_dir / "2"), DirectoryNotFoundException);
+            }
+        }
+    }
+
+    GIVEN("List of mods, ARMA3::Client, two valid mods aded")
+    {
+        std::vector<std::string> ls_result_expected{"@Remove Stamina"};
+
+        REQUIRE(std::filesystem::create_directory(testing_dir));
+        REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
+
+        ARMA3::Client a3c(testing_dir, test_files_path / steam_workshop_dir);
+        a3c.AddCustomMod(test_files_path / steam_workshop_dir / "1");
+
+        check_dir_structure_ok(ls_result_expected);
+
+        WHEN("Adding valid mod again")
+        {
+            a3c.AddCustomMod(test_files_path / steam_workshop_dir / "1");
+            THEN("Nothing will happen")
+            {
+                check_dir_structure_ok(ls_result_expected);
+            }
+        }
+    }
+}
 
 TEST_SUITE_END();
 
