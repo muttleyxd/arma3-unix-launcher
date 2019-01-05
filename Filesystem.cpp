@@ -44,7 +44,7 @@ namespace Filesystem
 #endif
     std::string HomeDirectory = getenv("HOME");
 
-    std::string SteamConfigFile = LocalSharePrefix + "/Steam/config/config.vdf";
+    std::string SteamConfigFile = HomeDirectory + LocalSharePrefix + "/Steam/config/config.vdf";
     std::string SteamConfigFileNeon = HomeDirectory + "/.steam/steam/config/config.vdf";
     std::string SteamAppsArmaPath = "/steamapps/common/Arma 3";
     std::string SteamAppsModWorkshopPath = "/steamapps/workshop/content/107410";
@@ -64,14 +64,14 @@ namespace Filesystem
         string steamConfigFile;
         ifstream configFile;
 
-        if (!FileExists(HomeDirectory + SteamConfigFile))
-            configFile.open(HomeDirectory + SteamConfigFileNeon);
-        else
-            configFile.open(HomeDirectory + SteamConfigFile, ios::in);
+        std::string config_file_path = SteamConfigFile;
+        if (!FileExists(config_file_path))
+            config_file_path = SteamConfigFileNeon;
 
+        configFile.open(config_file_path, ios::in);
         if (configFile.is_open())
         {
-            LOG(0, "File " + HomeDirectory + SteamConfigFile + " successfully opened...\nReading libraries list...\n");
+            LOG(0, "File " + SteamConfigFile + " successfully opened...\nReading libraries list...\n");
             getline(configFile, steamConfigFile, '\0');
             VDF vdfReader(steamConfigFile);
             string currentLibraryPath = "";
@@ -86,7 +86,7 @@ namespace Filesystem
             }
         }
         else
-            LOG(1, "Can't open " + HomeDirectory + SteamConfigFile + "\nCritical error\n");
+            LOG(1, "Can't open " + SteamConfigFile + "\nCritical error\n");
 
         string home_steam_dir = HomeDirectory + LocalSharePrefix + "/Steam/steamapps/common";
         if (DirectoryExists(home_steam_dir))
@@ -238,7 +238,6 @@ namespace Filesystem
         }
 
         vector<string> ModDirs = GetSubDirectories(armaDirWorkshopPath);
-
         CheckSymlinks(armaDirWorkshopPath, armaDir, workshopDir, &ModDirs, &modList);
 
         ModDirs = GetSubDirectories(armaDirCustomPath);

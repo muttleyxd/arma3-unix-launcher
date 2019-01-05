@@ -31,6 +31,7 @@ namespace Filesystem
     extern std::string LauncherSettingsDirectory;
 
     extern std::string SteamConfigFile;
+    extern std::string SteamConfigFileNeon;
     extern std::string SteamAppsArmaPath;
     extern std::string SteamAppsModWorkshopPath;
     extern std::string SteamPath;
