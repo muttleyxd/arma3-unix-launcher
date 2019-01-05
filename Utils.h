@@ -28,6 +28,7 @@ namespace Utils
     pid_t FindProcess(std::string name);
     std::string BashAdaptPath(std::string path);
     bool ContainsAddons(const std::string &path);
+    bool ContainsCppFile(const std::string &path);
 };
 
 #endif /* UTILS_H_ */

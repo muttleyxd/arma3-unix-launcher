@@ -192,4 +192,9 @@ namespace Utils
         }
         return false;
     }
+
+    bool ContainsCppFile(const std::string &path)
+    {
+        return Filesystem::FileExists(path + "/meta.cpp") || Filesystem::FileExists(path + "/mod.cpp");
+    }
 }

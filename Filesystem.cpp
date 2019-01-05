@@ -194,7 +194,7 @@ namespace Filesystem
                     || s == "Jets" || s == "Kart" || s == "Mark" || s == "Argo"
                     || s == "Orange" || s == "Tacops" || s == "Tank") //skip DLCs
                 continue;
-            if (Utils::ContainsAddons(path + "/" + s))
+            if (Utils::ContainsAddons(path + "/" + s) && Utils::ContainsCppFile(path + "/" + s))
             {
                 if (isdigit(s.at(0)))
                     response.push_back(Mod(path + "/" + s, s));
