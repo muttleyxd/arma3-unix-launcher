@@ -316,13 +316,6 @@ void MainWindow::ArmaStatusThread()
         armaPid = Utils::FindProcess("./arma3.x86_64");
         #endif
         this->notify();
-        /*if (armaPid != -1)
-            this->notify();
-            //lblStatus->set_text("Status: ArmA 3 running, PID: " + std::to_string(armaPid));
-        else
-            this->notify();
-            //lblStatus->set_text("Status: ArmA 3 not running");
-        */
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
