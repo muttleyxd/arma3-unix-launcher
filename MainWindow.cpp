@@ -801,18 +801,6 @@ void MainWindow::btnPlay_Clicked()
     std::vector<Mod *> modList;
 
     LOG(1, "FullModList size:" + std::to_string(FullModList.size()));
-    for (std::string s : Settings::CustomModsEnabled)
-    {
-        for (int i = 0; i < FullModList.size(); i++)
-        {
-            if (FullModList[i].Path == s)
-            {
-                LOG(0, "Mod: " + FullModList[i].Path);
-                modList.push_back(&FullModList[i]);
-                break;
-            }
-        }
-    }
 
     for (std::string s : Settings::WorkshopModsEnabled)
     {
@@ -821,6 +809,19 @@ void MainWindow::btnPlay_Clicked()
             if (FullModList[i].WorkshopId == s)
             {
                 LOG(0, "Mod: " + FullModList[i].WorkshopId);
+                modList.push_back(&FullModList[i]);
+                break;
+            }
+        }
+    }
+
+    for (std::string s : Settings::CustomModsEnabled)
+    {
+        for (int i = 0; i < FullModList.size(); i++)
+        {
+            if (FullModList[i].Path == s)
+            {
+                LOG(0, "Mod: " + FullModList[i].Path);
                 modList.push_back(&FullModList[i]);
                 break;
             }
