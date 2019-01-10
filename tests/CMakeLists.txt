@@ -1,5 +1,5 @@
 add_executable(tests src/tests.cpp)
-target_link_libraries(tests arma3-unix-launcher-library)
+target_link_libraries(tests arma3-unix-launcher-library-testing)
 
 add_custom_target(link_target ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/tests/test-files ${CMAKE_BINARY_DIR}/tests/test-files)
