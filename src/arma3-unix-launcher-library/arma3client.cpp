@@ -215,10 +215,6 @@ namespace ARMA3
 
     std::filesystem::path Client::GetCfgPath()
     {
-        fmt::print("outpath: {}", (std::filesystem::path(Definitions::home_directory)
-                                   / Definitions::local_share_prefix
-                                   / Definitions::bohemia_interactive_prefix
-                                   / Definitions::game_config_path).c_str());
         return std::filesystem::path(Definitions::home_directory)
                / Definitions::local_share_prefix
                / Definitions::bohemia_interactive_prefix
@@ -259,21 +255,26 @@ class ARMA3ClientFixture : public Tests::Fixture
 };
 
 
-namespace doctest {
-    template<> struct StringMaker<std::vector<std::string>> {
-        static String convert(std::vector<std::string> const &value) {
+namespace doctest
+{
+    template<> struct StringMaker<std::vector<std::string>>
+    {
+        static String convert(std::vector<std::string> const &value)
+        {
             std::string text = "\"";
-            for (auto const &str: value)
+            for (auto const &str : value)
                 text += str + ",";
             text += "\"";
             return text.c_str();
         }
     };
 
-    template<> struct StringMaker<std::vector<Mod>> {
-        static String convert(std::vector<Mod> const &value) {
+    template<> struct StringMaker<std::vector<Mod>>
+    {
+        static String convert(std::vector<Mod> const &value)
+        {
             std::string text = "\"";
-            for (auto const &mod: value)
+            for (auto const &mod : value)
                 text += std::string(mod) + ",";
             text += "\"";
             return text.c_str();
@@ -329,7 +330,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RefreshMods")
 
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
 {
-    std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
+    std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
 
     REQUIRE(std::filesystem::create_directory(testing_dir));
     REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -450,7 +451,8 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "Start")
 
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
 {
-    auto check_dir_structure_ok = [&](auto const &ls_result_expected) {
+    auto check_dir_structure_ok = [&](auto const & ls_result_expected)
+    {
         REQUIRE(std::filesystem::exists((testing_dir / custom_dir)));
         std::vector<std::string> ls_result_actual = StdUtils::Ls(testing_dir / custom_dir);
         std::sort(ls_result_actual.begin(), ls_result_actual.end());
@@ -459,7 +461,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
 
     GIVEN("List of mods, ARMA3::Client")
     {
-        std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
+        std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
 
         REQUIRE(std::filesystem::create_directory(testing_dir));
         REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -488,7 +490,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
 
     GIVEN("List of mods, ARMA3::Client, two valid mods aded")
     {
-        std::vector<std::string> ls_result_expected{"@Remove Stamina"};
+        std::vector<std::string> ls_result_expected{"@Remove stamina"};
 
         REQUIRE(std::filesystem::create_directory(testing_dir));
         REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));

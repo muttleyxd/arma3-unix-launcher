@@ -5,6 +5,9 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5Widgets CONFIG REQUIRED)
 
 file(GLOB SOURCES *.cpp *.hpp *.ui)
+if (RUN_TESTS)
+    list(APPEND SOURCES ${CMAKE_SOURCE_DIR}/tests/src/tests.cpp)
+endif ()
 
 add_executable(arma3-unix-launcher ${SOURCES})
 target_link_libraries(arma3-unix-launcher

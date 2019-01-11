@@ -1,3 +1,8 @@
+#ifndef DOCTEST_CONFIG_DISABLE
+#define DOCTEST_CONFIG_IMPLEMENT
+#include "doctest.h"
+#endif
+
 #include "mainwindow.hpp"
 #include <QApplication>
 
