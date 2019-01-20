@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_STEAM_WORKSHOP_DIRECTORY_NOT_FOUND_HPP
-#define __EXCEPTIONS_STEAM_WORKSHOP_DIRECTORY_NOT_FOUND_HPP
+#ifndef EXCEPTIONS_STEAM_WORKSHOP_DIRECTORY_NOT_FOUND_HPP_
+#define EXCEPTIONS_STEAM_WORKSHOP_DIRECTORY_NOT_FOUND_HPP_
 
 #include <exception>
+#include <string>
 
 class SteamWorkshopDirectoryNotFoundException : public std::exception
 {
     public:
-        SteamWorkshopDirectoryNotFoundException(std::string appid)
-        {
-            msg_ = "Steam Workshop directory not found for appid: " + appid;
-        }
+        SteamWorkshopDirectoryNotFoundException(std::string const &appid);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

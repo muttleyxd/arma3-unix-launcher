@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_FILE_NO_ACCESS_HPP
-#define __EXCEPTIONS_FILE_NO_ACCESS_HPP
+#ifndef EXCEPTIONS_FILE_NO_ACCESS_HPP_
+#define EXCEPTIONS_FILE_NO_ACCESS_HPP_
 
 #include <exception>
+#include <string>
 
 class FileNoAccessException : public std::exception
 {
     public:
-        FileNoAccessException(const std::string &path)
-        {
-            msg_ = "Cannot access file: " + path;
-        }
+        FileNoAccessException(const std::string &path);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

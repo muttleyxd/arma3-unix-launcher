@@ -6,12 +6,16 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include <static_todo.hpp>
+
 #include "cppfilter.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
 
 #include "exceptions/directory_not_found.hpp"
+#include "exceptions/file_no_access.hpp"
 #include "exceptions/file_not_found.hpp"
+#include "exceptions/not_a_symlink.hpp"
 #include "exceptions/syntax_error.hpp"
 
 using namespace std;
@@ -34,7 +38,8 @@ namespace fmt
 
 namespace ARMA3
 {
-    Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path, bool skip_initialization)
+    Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path,
+                   bool skip_initialization)
     {
         path_ = arma_path;
         path_custom_ = path_ / Definitions::symlink_custom_name;
@@ -98,23 +103,23 @@ namespace ARMA3
         system(("steam --applaunch 107410 " + arguments).c_str());
     }
 
-    void Client::AddCustomMod(const path &path)
+    void Client::AddCustomMod(path const &mod_path)
     {
-        std::vector<std::string> entities = StdUtils::Ls(path, true);
+        std::vector<std::string> entities = StdUtils::Ls(mod_path, true);
         if (!Contains(entities, "addons"))
-            throw DirectoryNotFoundException(path / "addons");
+            throw DirectoryNotFoundException(mod_path / "addons");
 
-        Mod mod{path, {}};
+        Mod mod{mod_path, {}};
         mod.LoadAllCPP();
 
         std::string link_name = PickModName(mod, std::vector<std::string> {"dir", "name", "tooltip"});
         if (link_name.empty())
-            link_name = path.filename();
+            link_name = mod_path.filename();
 
         if (link_name[0] != '@')
             link_name.insert(link_name.begin(), '@');
 
-        std::filesystem::path source_path = path_custom_ / link_name;
+        path source_path = path_custom_ / link_name;
         while (exists(source_path))
         {
             directory_entry entry(source_path);
@@ -125,6 +130,22 @@ namespace ARMA3
 
         std::error_code ec;
         create_directory_symlink(mod.path_, source_path, ec);
+    }
+
+    void Client::RemoveCustomMod(path const &mod_path)
+    {
+        if (!exists(mod_path))
+            return;
+
+        path custom_mods_path = path_ / Definitions::symlink_custom_name;
+
+        if (!StartsWith(mod_path, custom_mods_path))
+            throw PathNoAccessException(mod_path);
+
+        if (!is_symlink(mod_path) && !is_regular_file(mod_path))
+            throw NotASymlinkException(mod_path);
+
+        remove(mod_path);
     }
 
     bool Client::RefreshMods()
@@ -142,6 +163,7 @@ namespace ARMA3
 
     std::string Client::PickModName(Mod const &mod, std::vector<std::string> const &names)
     {
+        TODO_BEFORE(03, 2019, "Pick mod name from workshop");
         for (auto const &name : names)
         {
             if (ContainsKey(mod.KeyValue, name))
@@ -152,6 +174,9 @@ namespace ARMA3
 
     bool Client::CreateSymlinkToWorkshop()
     {
+        if (path_workshop_target_.empty())
+            return false;
+
         bool status = true;
 
         create_directory(path_workshop_local_);
@@ -298,7 +323,8 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "Constructor")
     {
         THEN("ARMA3::Client constructor throws exception")
         {
-            CHECK_THROWS_AS(ARMA3::Client(test_files_dir / "farma3", test_files_dir / "farma3" / "!workshop", true), FileNotFoundException);
+            CHECK_THROWS_AS(ARMA3::Client(test_files_dir / "farma3", test_files_dir / "farma3" / "!workshop", true),
+                            FileNotFoundException);
         }
     }
 }
@@ -506,6 +532,71 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
             THEN("Nothing will happen")
             {
                 check_dir_structure_ok(ls_result_expected);
+            }
+        }
+    }
+}
+
+TEST_CASE_FIXTURE(ARMA3ClientFixture, "RemoveCustomMod")
+{
+    GIVEN("ARMA3::Client")
+    {
+        REQUIRE(std::filesystem::create_directory(testing_dir));
+        REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
+
+        ARMA3::Client a3c(testing_dir, test_files_path / steam_workshop_dir);
+
+        path custom_dir = testing_dir / "!custom";
+        path custom_mod = custom_dir / "@Remove stamina";
+
+        WHEN("Trying to remove mod inside !custom folder")
+        {
+            REQUIRE_FALSE(exists(custom_mod));
+            a3c.AddCustomMod(test_files_path / steam_workshop_dir / "1");
+            REQUIRE(exists(custom_mod));
+            CHECK_EQ(test_files_path / steam_workshop_dir / "1", read_symlink(custom_mod));
+
+            CHECK_NOTHROW(a3c.RemoveCustomMod(custom_mod));
+            THEN("Symlink gets deleted")
+            {
+                CHECK_FALSE(exists(custom_mod));
+            }
+        }
+
+        WHEN("Trying to remove file !custom folder")
+        {
+            REQUIRE(CreateFile(custom_mod));
+            CHECK_NOTHROW(a3c.RemoveCustomMod(custom_mod));
+            THEN("File gets deleted")
+            {
+                CHECK_FALSE(exists(custom_mod));
+            }
+        }
+
+        WHEN("Trying to remove directory from !custom folder")
+        {
+            REQUIRE(create_directory(custom_mod));
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(a3c.RemoveCustomMod(custom_mod), NotASymlinkException);
+            }
+        }
+
+        WHEN("Trying to remove not-existing mod")
+        {
+            path not_existing = custom_dir / "@not-existing-mod";
+            CHECK_FALSE(exists(not_existing));
+            THEN("Nothing happens")
+            {
+                CHECK_NOTHROW(a3c.RemoveCustomMod(not_existing));
+            }
+        }
+
+        WHEN("Trying to remove mod outside !custom folder")
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(a3c.RemoveCustomMod(testing_dir / "!workshop/@Remove stamina"), PathNoAccessException);
             }
         }
     }

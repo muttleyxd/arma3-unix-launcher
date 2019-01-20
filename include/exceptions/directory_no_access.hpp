@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_DIRECTORY_NO_ACCESS_HPP
-#define __EXCEPTIONS_DIRECTORY_NO_ACCESS_HPP
+#ifndef EXCEPTIONS_DIRECTORY_NO_ACCESS_HPP_
+#define EXCEPTIONS_DIRECTORY_NO_ACCESS_HPP_
 
 #include <exception>
+#include <string>
 
 class DirectoryNoAccessException : public std::exception
 {
     public:
-        DirectoryNoAccessException(const std::string &path)
-        {
-            msg_ = "Cannot access directory" + path;
-        }
+        DirectoryNoAccessException(std::string const &path);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

@@ -5,7 +5,7 @@
 
 namespace StringUtils
 {
-    size_t find_last_nth(const std::string &text, const char c, int count = 1)
+    size_t find_last_nth(std::string const &text, char const c, int count = 1)
     {
         ssize_t found_chars = 0;
         ssize_t found_i = 0;
@@ -24,7 +24,7 @@ namespace StringUtils
         return std::string::npos;
     }
 
-    std::string_view RemoveElementsFromPath(const std::string &text, bool remove_slash, int count)
+    std::string_view RemoveElementsFromPath(std::string const &text, bool remove_slash, int count)
     {
         if (text.length() == 0)
             return std::string_view(text.c_str(), text.size());
@@ -37,7 +37,7 @@ namespace StringUtils
         return std::string_view(text.c_str(), pos);
     }
 
-    std::string Replace(std::string text, const std::string &from, const std::string &to)
+    std::string Replace(std::string text, std::string const &from, std::string const &to)
     {
         if (from.empty())
             return text;
@@ -55,21 +55,21 @@ namespace StringUtils
         return text;
     }
 
-    bool EndsWith(const std::string &text, const std::string &find)
+    bool EndsWith(std::string const &text, std::string const &find)
     {
         if (find.size() > text.size())
             return false;
         return find == std::string_view(text.c_str() + text.size() - find.size(), find.size());
     }
 
-    bool StartsWith(const std::string &text, const std::string &find)
+    bool StartsWith(std::string const &text, std::string const &find)
     {
         if (find.size() > text.size())
             return false;
         return find == std::string_view(text.c_str(), find.size());
     }
 
-    std::vector<std::string_view> Split(const std::string &text_to_split, const std::string &delimiters)
+    std::vector<std::string_view> Split(std::string const &text_to_split, std::string const &delimiters)
     {
         std::vector<std::string_view> ret;
 
@@ -110,7 +110,7 @@ namespace StringUtils
         std::string path_str = Replace(path.c_str(), "/", "\\");
         if (path.is_absolute())
             return "C:" + path_str;
-        return path_str;
+        return std::move(path_str);
     }
 }
 

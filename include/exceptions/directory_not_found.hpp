@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_DIRECTORY_NOT_FOUND_HPP
-#define __EXCEPTIONS_DIRECTORY_NOT_FOUND_HPP
+#ifndef EXCEPTIONS_DIRECTORY_NOT_FOUND_HPP_
+#define EXCEPTIONS_DIRECTORY_NOT_FOUND_HPP_
 
 #include <exception>
+#include <string>
 
 class DirectoryNotFoundException : public std::exception
 {
     public:
-        DirectoryNotFoundException(std::string path)
-        {
-            msg_ = "Directory not found: " + path;
-        }
+        DirectoryNotFoundException(std::string const &path);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

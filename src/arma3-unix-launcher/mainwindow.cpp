@@ -3,6 +3,9 @@
 
 #include <QMessageBox>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)

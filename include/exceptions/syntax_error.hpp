@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_SYNTAX_ERROR_HPP
-#define __EXCEPTIONS_SYNTAX_ERROR_HPP
+#ifndef EXCEPTIONS_SYNTAX_ERROR_HPP_
+#define EXCEPTIONS_SYNTAX_ERROR_HPP_
 
 #include <exception>
+#include <string>
 
 class SyntaxErrorException : public std::exception
 {
     public:
-        SyntaxErrorException(const std::string &error)
-        {
-            msg_ = "Syntax error: " + error;
-        }
+        SyntaxErrorException(std::string const &error);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

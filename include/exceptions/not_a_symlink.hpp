@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_NOT_A_SYMLINK_HPP
-#define __EXCEPTIONS_NOT_A_SYMLINK_HPP
+#ifndef EXCEPTIONS_NOT_A_SYMLINK_HPP_
+#define EXCEPTIONS_NOT_A_SYMLINK_HPP_
 
 #include <exception>
+#include <string>
 
 class NotASymlinkException : public std::exception
 {
     public:
-        NotASymlinkException(std::string path)
-        {
-            msg_ = "Not a symlink: " + path;
-        }
+        NotASymlinkException(std::string const &path);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

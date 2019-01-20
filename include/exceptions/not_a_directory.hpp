@@ -1,20 +1,15 @@
-#ifndef __EXCEPTIONS_NOT_A_DIRECTORY_HPP
-#define __EXCEPTIONS_NOT_A_DIRECTORY_HPP
+#ifndef EXCEPTIONS_NOT_A_DIRECTORY_HPP_
+#define EXCEPTIONS_NOT_A_DIRECTORY_HPP_
 
 #include <exception>
+#include <string>
 
 class NotADirectoryException : public std::exception
 {
     public:
-        NotADirectoryException(std::string path)
-        {
-            msg_ = "Not a directory: " + path;
-        }
+        NotADirectoryException(std::string const &path);
 
-        const char *what() const noexcept override
-        {
-            return msg_.c_str();
-        }
+        const char *what() const noexcept override;
 
     private:
         std::string msg_;

@@ -1,7 +1,7 @@
 #!/bin/bash
 pushd `dirname "$(readlink -f "$0")"`
 
-dirs=( "include" "include/exceptions" "src/arma3-unix-launcher-library" "tests/include" "tests/src" )
+dirs=( "include" "include/exceptions" "src/arma3-unix-launcher" "src/arma3-unix-launcher-library" "src/arma3-unix-launcher-library/exceptions" "tests/include" "tests/src" )
 astylerc=`realpath astylerc`
 for directory in "${dirs[@]}"
 do
