@@ -356,7 +356,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RefreshMods")
 
 TEST_CASE_FIXTURE(ARMA3ClientFixture, "CreateWorkshopSymlink")
 {
-    std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
+    std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
 
     REQUIRE(std::filesystem::create_directory(testing_dir));
     REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -487,7 +487,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
 
     GIVEN("List of mods, ARMA3::Client")
     {
-        std::vector<std::string> ls_result_expected{"@Remove stamina", "@bigmod"};
+        std::vector<std::string> ls_result_expected{"@Remove Stamina", "@bigmod"};
 
         REQUIRE(std::filesystem::create_directory(testing_dir));
         REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -516,7 +516,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "AddCustomMod")
 
     GIVEN("List of mods, ARMA3::Client, two valid mods aded")
     {
-        std::vector<std::string> ls_result_expected{"@Remove stamina"};
+        std::vector<std::string> ls_result_expected{"@Remove Stamina"};
 
         REQUIRE(std::filesystem::create_directory(testing_dir));
         REQUIRE(StdUtils::CreateFile(std::filesystem::path(testing_dir) / ARMA3::Definitions::executable_name));
@@ -547,7 +547,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RemoveCustomMod")
         ARMA3::Client a3c(testing_dir, test_files_path / steam_workshop_dir);
 
         path custom_dir = testing_dir / "!custom";
-        path custom_mod = custom_dir / "@Remove stamina";
+        path custom_mod = custom_dir / "@Remove Stamina";
 
         WHEN("Trying to remove mod inside !custom folder")
         {
@@ -596,7 +596,7 @@ TEST_CASE_FIXTURE(ARMA3ClientFixture, "RemoveCustomMod")
         {
             THEN("Exception is thrown")
             {
-                CHECK_THROWS_AS(a3c.RemoveCustomMod(testing_dir / "!workshop/@Remove stamina"), PathNoAccessException);
+                CHECK_THROWS_AS(a3c.RemoveCustomMod(testing_dir / "!workshop/@Remove Stamina"), PathNoAccessException);
             }
         }
     }

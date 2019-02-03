@@ -15,6 +15,9 @@ public:
     explicit ArmaPathChooserDialog(QWidget *parent = nullptr);
     ~ArmaPathChooserDialog();
 
+private slots:
+    void on_text_arma_path_textChanged(const QString &arg1);
+
 private:
     Ui::ArmaPathChooserDialog *ui;
 };

@@ -41,8 +41,6 @@ int main(int argc, char *argv[])
         ArmaPathChooserDialog apcd;
         apcd.exec();
 
-
-
         fmt::print("{}\n", apcd.result());
     }
 

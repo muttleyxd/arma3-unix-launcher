@@ -42,7 +42,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="text_arma_path"/>
      </item>
      <item>
       <widget class="QPushButton" name="button_browse_arma_path">
@@ -72,7 +72,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_2"/>
+      <widget class="QLineEdit" name="text_workshop_path"/>
      </item>
      <item>
       <widget class="QPushButton" name="button_browse_workshop_path">
