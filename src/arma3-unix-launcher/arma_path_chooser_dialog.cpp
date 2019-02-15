@@ -2,6 +2,9 @@
 #include "ui_arma_path_chooser_dialog.h"
 
 #include <fmt/format.h>
+#include <filesystem>
+
+#include <QFile>
 
 #include "exceptions/file_not_found.hpp"
 
@@ -19,9 +22,14 @@ ArmaPathChooserDialog::ArmaPathChooserDialog(QWidget *parent) :
     this->setMaximumSize(1024000, 1);
     this->setMinimumSize(450, 106);
 
-    QIcon icon = QIcon::fromTheme("checkmark");
-    QPixmap qpixmap = icon.pixmap(icon.actualSize(QSize(32, 32)));
-    ui->label_arma_path->setPixmap(qpixmap);
+    QIcon icon_ok = QIcon(":/icons/open-iconic/check.svg");
+    pixmap_ok = icon_ok.pixmap(QSize(16, 16));
+
+    QIcon icon_error = QIcon(":/icons/open-iconic/x.svg");
+    pixmap_error = icon_error.pixmap(QSize(16, 16));
+
+    on_text_arma_path_textChanged("/invalid-path");
+
 }
 
 ArmaPathChooserDialog::~ArmaPathChooserDialog()
@@ -29,15 +37,47 @@ ArmaPathChooserDialog::~ArmaPathChooserDialog()
     delete ui;
 }
 
-void ArmaPathChooserDialog::on_text_arma_path_textChanged(const QString &arg1)
+void ArmaPathChooserDialog::on_text_arma_path_textChanged(QString const &arg1)
 {
-    try {
-        fmt::print("Trying client at {}\n", arg1.toStdString());
-        ARMA3::Client client(arg1.toStdString(), "", true);
-        fmt::print("Works\n");
-        ui->button_browse_arma_path->setIcon(QIcon::fromTheme("checkmark"));
-    } catch (...) {
-        fmt::print("Failed\n");
-        ui->button_browse_arma_path->setIcon(QIcon::fromTheme("error"));
+    if (!is_arma_path_valid(arg1))
+    {
+        ui->icon_arma_path->setPixmap(pixmap_error);
+        return;
     }
+
+    ui->icon_arma_path->setPixmap(pixmap_ok);
+    QString workshop_path = ui->text_arma_path->text() + "/../../workshop/content/107410";
+    std::filesystem::path canonical_path = std::filesystem::canonical(workshop_path.toStdString());
+    ui->text_workshop_path->setText(QString::fromStdString(canonical_path.string()));
+}
+
+void ArmaPathChooserDialog::on_text_workshop_path_textChanged(QString const &arg1)
+{
+    if (!is_workshop_path_valid(arg1))
+    {
+        ui->icon_arma_path->setPixmap(pixmap_error);
+        return;
+    }
+
+    ui->icon_workshop_path->setPixmap(pixmap_ok);
+}
+
+bool ArmaPathChooserDialog::is_arma_path_valid(QString const &arg1)
+{
+    try
+    {
+        ARMA3::Client client(arg1.toStdString(), "", true);
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+bool ArmaPathChooserDialog::is_workshop_path_valid(QString const &arg1)
+{
+    using namespace std::filesystem;
+    std::error_code ec;
+    return is_directory(arg1.toStdString(), ec);
 }

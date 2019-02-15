@@ -245,6 +245,21 @@ namespace ARMA3
                / Definitions::bohemia_interactive_prefix
                / Definitions::game_config_path;
     }
+
+    std::filesystem::path const &Client::GetPath()
+    {
+        return path_;
+    }
+
+    std::filesystem::path const &Client::GetPathExecutable()
+    {
+        return path_executable_;
+    }
+
+    std::filesystem::path const &Client::GetPathWorkshop()
+    {
+        return path_workshop_target_;
+    }
 }
 
 #ifndef DOCTEST_CONFIG_DISABLE

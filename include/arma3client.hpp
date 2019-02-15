@@ -45,6 +45,10 @@ namespace ARMA3
             void AddCustomMod(std::filesystem::path const &path);
             void RemoveCustomMod(std::filesystem::path const &path);
 
+            std::filesystem::path const &GetPath();
+            std::filesystem::path const &GetPathExecutable();
+            std::filesystem::path const &GetPathWorkshop();
+
             std::vector<Mod> mods_custom_;
             std::vector<Mod> mods_home_;
             std::vector<Mod> mods_workshop_;
