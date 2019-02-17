@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include <filesystem>
+
 namespace Ui
 {
     class ArmaPathChooserDialog;
@@ -16,11 +18,18 @@ class ArmaPathChooserDialog : public QDialog
         explicit ArmaPathChooserDialog(QWidget *parent = nullptr);
         ~ArmaPathChooserDialog();
 
+        std::filesystem::path arma_path;
+        std::filesystem::path workshop_path;
+
     private slots:
         void on_text_arma_path_textChanged(QString const &arg1);
         void on_text_workshop_path_textChanged(QString const &arg1);
 
-    private:
+        void on_button_browse_arma_path_clicked();
+
+        void on_button_browse_workshop_path_clicked();
+
+private:
         Ui::ArmaPathChooserDialog *ui;
         QPixmap pixmap_error;
         QPixmap pixmap_ok;

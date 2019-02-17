@@ -41,11 +41,9 @@ int main(int argc, char *argv[])
         ArmaPathChooserDialog apcd;
         apcd.exec();
 
-        fmt::print("{}\n", apcd.result());
+        if (apcd.result() != QDialog::Accepted)
+            exit(0);
     }
-
-    return 0;
-
 
     MainWindow w;
     w.show();
