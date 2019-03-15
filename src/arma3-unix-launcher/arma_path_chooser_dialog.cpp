@@ -4,6 +4,7 @@
 #include <fmt/ostream.h>
 #include <fmt/format.h>
 #include <filesystem>
+#include <utility>
 
 #include <QFile>
 #include <QFileDialog>
@@ -24,11 +25,13 @@ ArmaPathChooserDialog::ArmaPathChooserDialog(QWidget *parent) :
     this->setMaximumSize(1024000, 1);
     this->setMinimumSize(450, 106);
 
+    button_ok_ = ui->buttonBox->button(ui->buttonBox->Ok);
+
     QIcon icon_ok = QIcon(":/icons/open-iconic/check.svg");
-    pixmap_ok = icon_ok.pixmap(QSize(16, 16));
+    pixmap_ok_ = icon_ok.pixmap(QSize(16, 16));
 
     QIcon icon_error = QIcon(":/icons/open-iconic/x.svg");
-    pixmap_error = icon_error.pixmap(QSize(16, 16));
+    pixmap_error_ = icon_error.pixmap(QSize(16, 16));
 
     on_text_arma_path_textChanged("/invalid-path");
     on_text_workshop_path_textChanged("/invalid-path");
@@ -43,13 +46,13 @@ void ArmaPathChooserDialog::on_text_arma_path_textChanged(QString const &arg1)
 {
     if (!is_arma_path_valid(arg1))
     {
-        ui->buttonBox->button(ui->buttonBox->Ok)->setEnabled(false);
-        ui->icon_arma_path->setPixmap(pixmap_error);
+        button_ok_->setEnabled(false);
+        ui->icon_arma_path->setPixmap(pixmap_error_);
         return;
     }
 
-    ui->buttonBox->button(ui->buttonBox->Ok)->setEnabled(true);
-    ui->icon_arma_path->setPixmap(pixmap_ok);
+    button_ok_->setEnabled(true);
+    ui->icon_arma_path->setPixmap(pixmap_ok_);
     QString workshop_path = ui->text_arma_path->text() + "/../../workshop/content/107410";
     try
     {
@@ -65,9 +68,49 @@ void ArmaPathChooserDialog::on_text_arma_path_textChanged(QString const &arg1)
 void ArmaPathChooserDialog::on_text_workshop_path_textChanged(QString const &arg1)
 {
     if (!is_workshop_path_valid(arg1))
-        ui->icon_workshop_path->setPixmap(pixmap_error);
+        ui->icon_workshop_path->setPixmap(pixmap_error_);
     else
-        ui->icon_workshop_path->setPixmap(pixmap_ok);
+        ui->icon_workshop_path->setPixmap(pixmap_ok_);
+}
+
+void ArmaPathChooserDialog::on_button_browse_arma_path_clicked()
+{
+    using namespace std::filesystem;
+
+    std::string format_str = fmt::format("Arma 3 Executable ({})", ARMA3::Definitions::executable_name);
+
+    auto open_executable_dialog = get_open_dialog("Select ArmA 3 executable", QFileDialog::ExistingFile);
+    open_executable_dialog->setNameFilter(format_str.c_str());
+    int result = open_executable_dialog->exec();
+    if (!result)
+        return;
+
+    auto executable_path = open_executable_dialog->selectedFiles()[0];
+    path parent_path = path(executable_path.toStdString()).parent_path();
+    ui->text_arma_path->setText(parent_path.c_str());
+}
+
+void ArmaPathChooserDialog::on_button_browse_workshop_path_clicked()
+{
+    auto open_dir_dialog = get_open_dialog("Select ArmA 3 workshop path", QFileDialog::DirectoryOnly);
+    int result = open_dir_dialog->exec();
+    if (!result)
+        return;
+
+    auto workshop_dir = open_dir_dialog->selectedFiles()[0];
+    ui->text_workshop_path->setText(workshop_dir);
+}
+
+std::unique_ptr<QFileDialog> ArmaPathChooserDialog::get_open_dialog(QString const &title, QFileDialog::FileMode mode)
+{
+    auto dialog = std::make_unique<QFileDialog>();
+    dialog->setFilter(QDir::AllDirs | QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
+    dialog->setWindowTitle(title);
+    dialog->setFileMode(mode);
+    dialog->setViewMode(QFileDialog::Detail);
+    dialog->setResolveSymlinks(true);
+    dialog->setDirectory(QDir::homePath());
+    return dialog;
 }
 
 bool ArmaPathChooserDialog::is_arma_path_valid(QString const &arg1)
@@ -88,30 +131,4 @@ bool ArmaPathChooserDialog::is_workshop_path_valid(QString const &arg1)
     using namespace std::filesystem;
     std::error_code ec;
     return is_directory(arg1.toStdString(), ec);
-}
-
-void ArmaPathChooserDialog::on_button_browse_arma_path_clicked()
-{
-    using namespace std::filesystem;
-
-    std::string format_str = fmt::format("Arma 3 Executable ({})", ARMA3::Definitions::executable_name);
-
-    QFileDialog open_executable_dialog;
-    open_executable_dialog.setFilter(QDir::AllDirs | QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
-    open_executable_dialog.setWindowTitle("Select ArmA 3 executable");
-    open_executable_dialog.setFileMode(QFileDialog::ExistingFile);
-    open_executable_dialog.setViewMode(QFileDialog::Detail);
-    open_executable_dialog.setNameFilter(format_str.c_str());
-    open_executable_dialog.setDirectory("/home/mszychow");
-    int result = open_executable_dialog.exec();
-
-    if (!result)
-        return;
-    auto executable_path = open_executable_dialog.selectedFiles()[0];
-    ui->text_arma_path->setText(path(executable_path.toStdString()).parent_path().c_str());
-}
-
-void ArmaPathChooserDialog::on_button_browse_workshop_path_clicked()
-{
-
 }

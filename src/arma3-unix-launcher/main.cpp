@@ -13,14 +13,28 @@
 #include "arma3client.hpp"
 #include "steam.hpp"
 
+#include "json.hpp"
+
+#include <static_todo.hpp>
+
 int main(int argc, char *argv[])
 {
+    using json = nlohmann::json;
+    json js;
+    js["sometext"] = 5;
+    js["mod"] = {"xd", "one", "two"};
+    fmt::print("{}\n", js.dump(4));
+
+    for (const auto &mod : js["mod"])
+        fmt::print("Mod: {}\n", mod);
+    return 1;
+
     QApplication a(argc, argv);
 
     Steam steam;
     std::unique_ptr<ARMA3::Client> client;
 
-    /*for (auto const &path : steam.GetInstallPaths())
+    for (auto const &path : steam.GetInstallPaths())
     {
         try
         {
@@ -34,7 +48,7 @@ int main(int argc, char *argv[])
         }
         if (client != nullptr)
             break;
-    }*/
+    }
 
     if (client == nullptr)
     {
@@ -43,6 +57,7 @@ int main(int argc, char *argv[])
 
         if (apcd.result() != QDialog::Accepted)
             exit(0);
+
     }
 
     MainWindow w;
