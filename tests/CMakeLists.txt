@@ -3,6 +3,7 @@ target_link_libraries(tests arma3-unix-launcher-library)
 
 add_custom_target(link_target ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/tests/test-files ${CMAKE_BINARY_DIR}/tests/test-files)
+add_dependencies(tests link_target)
 
 if (RUN_COVERAGE)
     find_program(GCOVR_EXECUTABLE gcovr)
