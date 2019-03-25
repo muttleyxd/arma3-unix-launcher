@@ -56,7 +56,8 @@ namespace Filesystem
     std::string ArmaDirDoNotChange = "/!DO_NOT_CHANGE_FILES_IN_THESE_FOLDERS";
     std::string ArmaDirMark = "~arma";
 
-    std::string ArmaConfigFile = LocalSharePrefix + BohemiaInteractivePrefix + "/GameDocuments/Arma 3/Arma3.cfg";
+    std::string ArmaConfigFile = HomeDirectory + LocalSharePrefix + BohemiaInteractivePrefix +
+                                 "/GameDocuments/Arma 3/Arma3.cfg";
 
     std::vector<std::string> GetSteamLibraries()
     {
@@ -79,7 +80,8 @@ namespace Filesystem
 
             while (true)
             {
-                currentLibraryPath = vdfReader.GetValue("InstallConfigStore/Software/Valve/Steam/BaseInstallFolder_" + to_string(libraryNumber++));
+                currentLibraryPath = vdfReader.GetValue("InstallConfigStore/Software/Valve/Steam/BaseInstallFolder_" + to_string(
+                        libraryNumber++));
                 if (currentLibraryPath == KEY_NOT_FOUND)
                     break;
                 response.push_back(currentLibraryPath);
@@ -337,7 +339,8 @@ namespace Filesystem
         return NOT_A_SYMLINK;
     }
 
-    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string> *ModDirs, vector<Mod> *modList)
+    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, vector<string> *ModDirs,
+                       vector<Mod> *modList)
     {
         for (int i = 0; i < ModDirs->size(); i++)
         {
@@ -406,7 +409,10 @@ namespace Filesystem
 
             string dirName = symlinkAt + modList[i]->DirName;
 
-            string windowsPath = "C:" + Utils::Replace(fullPath, "/", "\\");
+            string disk = "C:";
+            if (IsProton(GetDirectory(DirectoryToFind::ArmaInstall)))
+                disk = "Z:";
+            string windowsPath = disk + Utils::Replace(fullPath, "/", "\\");
             modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
                                + "\n\t\tdir=\"" + dirName + "\";"
                                + "\n\t\tname=\"" + modList[i]->Name + "\";"
@@ -414,10 +420,6 @@ namespace Filesystem
                                + "\n\t\tfullPath=\"" + windowsPath + "\";"
                                + "\n\t};\n";
         }
-
-        /*modLauncherList += "\tclass Mod" + to_string(i + 1)
-                + "\n\t{\n\t\tdir=\"Arma\";\n\t\tname=\"Arma\";"
-                + "\n\t\torigin=\"NOT FOUND\";\n\t};\n};";*/
 
         modLauncherList += "};";
 
@@ -453,5 +455,10 @@ namespace Filesystem
         }
         response += modLauncherList + "\n";
         return response;
+    }
+
+    bool IsProton(std::string path)
+    {
+        return Filesystem::FileExists(path + "/arma3_x64.exe");
     }
 }

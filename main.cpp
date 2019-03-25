@@ -143,11 +143,13 @@ int main(int argc, char *argv[])
         {
             string currentFolder = fcDialog.get_current_folder();
             if (Filesystem::FileExists(currentFolder + "/arma3.x86_64")
+                    || Filesystem::FileExists(currentFolder + "/arma3_x64.exe")
                     || Filesystem::FileExists(currentFolder + "/ArmA3.app")
                     || Filesystem::DirectoryExists(currentFolder + "/ArmA3.app"))
                 Settings::ArmaPath = currentFolder;
             currentFolder = fcDialog.get_filename();
             if (Filesystem::FileExists(currentFolder + "/arma3.x86_64")
+                    || Filesystem::FileExists(currentFolder + "/arma3_x64.exe")
                     || Filesystem::FileExists(currentFolder + "/ArmA3.app")
                     || Filesystem::DirectoryExists(currentFolder + "/ArmA3.app"))
                 Settings::ArmaPath = currentFolder;
@@ -155,6 +157,7 @@ int main(int argc, char *argv[])
             if (Settings::ArmaPath == Filesystem::DIR_NOT_FOUND)
             {
                 string Message2 = string("Selected directory seems incorrect") +
+                                  "\n" + currentFolder + "/arma3_x64.exe"
                                   "\n" + currentFolder + "/arma3.x86_64 doesn't exist"
                                   "\n" + currentFolder + "/ArmA3.app doesn't exist";
 
@@ -163,7 +166,8 @@ int main(int argc, char *argv[])
             }
             else
             {
-                char *resolved_path = realpath((Utils::RemoveLastElement(Settings::ArmaPath, false, 2) + "workshop/content/107410").c_str(), NULL);
+                char *resolved_path = realpath((Utils::RemoveLastElement(Settings::ArmaPath, false,
+                                                2) + "workshop/content/107410").c_str(), nullptr);
                 Settings::WorkshopPath = resolved_path;
                 free(resolved_path);
                 LOG(1, "Workaround workshop path: " + Settings::WorkshopPath);
@@ -171,7 +175,58 @@ int main(int argc, char *argv[])
         }
     }
 
-    MainWindow *mainWindow = NULL;
+    if (Filesystem::IsProton(Settings::ArmaPath))
+    {
+        string arma3_launcher_path = Settings::ArmaPath + "/arma3launcher.exe";
+        struct stat st;
+
+        auto do_link = [&]()
+        {
+            int result = symlink((Settings::ArmaPath + "/arma3_x64.exe").c_str(), arma3_launcher_path.c_str());
+            if (result == 0)
+                LOG(0, "Successfully created symlink");
+            return result;
+        };
+
+        int return_code = stat(arma3_launcher_path.c_str(), &st);
+        if (return_code != 0)
+        {
+            LOG(0, arma3_launcher_path + " does not exist, linking to arma3_x64.exe");
+            do_link();
+        }
+        else if (return_code == 0)
+        {
+            int minimal_binary_size = 10 * 1024 * 1024;
+            if (st.st_size < minimal_binary_size)
+            {
+                LOG(0, "Original launcher detected, moving to /arma3launcher.exe.backup");
+                rename(arma3_launcher_path.c_str(), (arma3_launcher_path + ".backup").c_str());
+                do_link();
+            }
+            else
+                LOG(0, "/arma3launcher.exe looks ok");
+        }
+
+        Filesystem::ArmaConfigFile
+            = Filesystem::HomeDirectory + Filesystem::SteamPath +
+              "/steamapps/compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
+        LOG(0, "Proton detected");
+
+        LOG(1, "Config path: " + Filesystem::ArmaConfigFile);
+        if (!Filesystem::FileExists(Filesystem::ArmaConfigFile))
+        {
+            LOG(1, "Arma3.cfg does not exist\nPlease run Arma at least once before using launcher. You can start it from Steam (original launcher has been replaced)");
+            exit(1);
+        }
+
+        LOG(1, "Config file exists");
+    }
+    else
+    {
+        LOG(0, "IS NOT PROTON");
+    }
+
+    MainWindow *mainWindow = nullptr;
 
     builder->get_widget_derived("MainForm", mainWindow);
 

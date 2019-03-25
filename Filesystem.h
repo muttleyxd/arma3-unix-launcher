@@ -68,8 +68,11 @@ namespace Filesystem
     bool CreateDirectory(std::string path);
 
     std::string GetSymlinkTarget(std::string path);
-    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string> *ModDirs, std::vector<Mod> *modList);
+    void CheckSymlinks(std::string path, std::string armaDir, std::string workshopDir, std::vector<std::string> *ModDirs,
+                       std::vector<Mod> *modList);
 
     std::string GenerateArmaCfg(std::string armaPath, std::string source, std::vector<Mod *> modList);
+
+    bool IsProton(std::string path);
 }
 #endif /* FILESYSTEM_H_ */
