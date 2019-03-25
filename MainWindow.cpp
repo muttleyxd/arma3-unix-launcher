@@ -159,9 +159,12 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     numCpuCount->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::numCpuCount_Changed));
 
     cbExThreads->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbExThreads_Toggled));
-    cbExThreadsFileOperations->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbExThreadsFileOperations_Toggled));
-    cbExThreadsTextureLoading->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbExThreadsTextureLoading_Toggled));
-    cbExThreadsGeometryLoading->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbExThreadsGeometryLoading_Toggled));
+    cbExThreadsFileOperations->signal_toggled().connect(sigc::mem_fun(*this,
+            &MainWindow::cbExThreadsFileOperations_Toggled));
+    cbExThreadsTextureLoading->signal_toggled().connect(sigc::mem_fun(*this,
+            &MainWindow::cbExThreadsTextureLoading_Toggled));
+    cbExThreadsGeometryLoading->signal_toggled().connect(sigc::mem_fun(*this,
+            &MainWindow::cbExThreadsGeometryLoading_Toggled));
 
     cbEnableHT->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbEnableHT_Toggled));
     cbDisableMulticore->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbDisableMulticore_Toggled));
@@ -348,7 +351,8 @@ void MainWindow::btnAdd_Clicked()
 
         if (!Utils::ContainsAddons(selectedPath))
         {
-            Gtk::MessageDialog msgDialog("Couldn't find Addons folder in selected directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+            Gtk::MessageDialog msgDialog("Couldn't find Addons folder in selected directory", false, Gtk::MESSAGE_ERROR,
+                                         Gtk::BUTTONS_OK, true);
             msgDialog.run();
             LOG(1, "Selected directory doesn't contain Addons folder");
             return;
@@ -397,7 +401,8 @@ void MainWindow::btnRemove_Clicked()
     Glib::ustring path = row[customColumns.path];
     if (path.raw().find(Filesystem::ArmaDirMark) != std::string::npos)
     {
-        Gtk::MessageDialog msgDialog("You can't remove mods from ArmA's directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msgDialog("You can't remove mods from ArmA's directory", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK,
+                                     true);
         msgDialog.run();
         LOG(1, "Can't delete mods from ArmA's directory");
         return;
@@ -515,7 +520,7 @@ void MainWindow::btnPresetSave_Clicked()
 bool MainWindow::onExit(GdkEventAny *event)
 {
     LOG(1, "onExit() -> restoring Arma3.cfg");
-    std::string configFile = Utils::BashAdaptPath(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile);
+    std::string configFile = Utils::BashAdaptPath(Filesystem::ArmaConfigFile);
     std::string backupFile = configFile + ".a3lbak";
     system(("rm " + configFile).c_str());
     system(("mv " + backupFile + " " + configFile).c_str());
@@ -789,7 +794,8 @@ void MainWindow::btnPlay_Clicked()
 
     if (armaPid != -1)
     {
-        Gtk::MessageDialog msg("ArmA 3 is already running! PID: " + std::to_string(armaPid), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK, true);
+        Gtk::MessageDialog msg("ArmA 3 is already running! PID: " + std::to_string(armaPid), false, Gtk::MESSAGE_INFO,
+                               Gtk::BUTTONS_OK, true);
         msg.run();
         return;
     }
@@ -828,9 +834,9 @@ void MainWindow::btnPlay_Clicked()
         }
     }
 
-    LOG(1, Filesystem::HomeDirectory + Filesystem::ArmaConfigFile);
-    std::string newArmaCfg = Filesystem::GenerateArmaCfg(Settings::ArmaPath, Filesystem::HomeDirectory + Filesystem::ArmaConfigFile, modList);
-    Filesystem::WriteAllText(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile, newArmaCfg);
+    LOG(1, Filesystem::ArmaConfigFile);
+    std::string newArmaCfg = Filesystem::GenerateArmaCfg(Settings::ArmaPath, Filesystem::ArmaConfigFile, modList);
+    Filesystem::WriteAllText(Filesystem::ArmaConfigFile, newArmaCfg);
     LOG(0, "Arma3.cfg:\n--------------------\n" + newArmaCfg + "\n--------------------");
 
     parameters += Settings::SkipIntro           ? "-skipIntro " : "";
@@ -906,11 +912,11 @@ void MainWindow::Init()
     LOG(1, "ArmA 3 Path: " + Settings::ArmaPath + "\nWorkshop mods path: " + Settings::WorkshopPath);
 
     LOG(1, "Creating Arma3.cfg backup...");
-    if (Filesystem::FileExists(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile))
+    if (Filesystem::FileExists(Filesystem::ArmaConfigFile))
     {
-        std::string configFile = Utils::BashAdaptPath(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile);
+        std::string configFile = Utils::BashAdaptPath(Filesystem::ArmaConfigFile);
         std::string backupFile = configFile + ".a3lbak";
-        if (Filesystem::FileExists(Filesystem::HomeDirectory + Filesystem::ArmaConfigFile + ".a3lbak"))
+        if (Filesystem::FileExists(Filesystem::ArmaConfigFile + ".a3lbak"))
         {
             LOG(1, "Backup file already exists... restoring it");
 
@@ -987,7 +993,8 @@ void MainWindow::PutModsToSettings()
     for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
     {
         Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
-        LOG(0, "[W" + Utils::ToString(row[workshopColumns.enabled]) + "] Name: " + row[workshopColumns.name] + " WorkshopId: " + row[workshopColumns.workshopid]);
+        LOG(0, "[W" + Utils::ToString(row[workshopColumns.enabled]) + "] Name: " + row[workshopColumns.name] + " WorkshopId: " +
+            row[workshopColumns.workshopid]);
 
         Glib::ustring workshopId = row[workshopColumns.workshopid];
         Settings::WorkshopModsOrder.push_back(workshopId);
