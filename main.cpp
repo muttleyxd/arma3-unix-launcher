@@ -207,9 +207,7 @@ int main(int argc, char *argv[])
                 LOG(0, "/arma3launcher.exe looks ok");
         }
 
-        Filesystem::ArmaConfigFile
-            = Filesystem::HomeDirectory + Filesystem::SteamPath +
-              "/steamapps/compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
+        Filesystem::ArmaConfigFile = Settings::ArmaPath + "/../../compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
         LOG(0, "Proton detected");
 
         LOG(1, "Config path: " + Filesystem::ArmaConfigFile);
