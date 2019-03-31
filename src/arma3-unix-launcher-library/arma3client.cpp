@@ -112,7 +112,7 @@ namespace ARMA3
         Mod mod{mod_path, {}};
         mod.LoadAllCPP();
 
-        std::string link_name = PickModName(mod, std::vector<std::string> {"dir", "name", "tooltip"});
+        std::string link_name = mod.GetValueOrReturnDefault("dir", "name", "tooltip", mod_path.filename());
         if (link_name.empty())
             link_name = mod_path.filename();
 
@@ -195,7 +195,7 @@ namespace ARMA3
             Mod m{mod_dir, {}};
             m.LoadAllCPP();
 
-            std::string link_name = PickModName(m, std::vector<std::string> {"dir", "name", "tooltip"});
+            std::string link_name = m.GetValueOrReturnDefault(mod_dir, "dir", "name", "tooltip");
             if (link_name.empty())
                 link_name = dir;
 

@@ -19,7 +19,7 @@
 
 int main(int argc, char *argv[])
 {
-    using json = nlohmann::json;
+    /*using json = nlohmann::json;
     json js;
     js["sometext"] = 5;
     js["mod"] = {"xd", "one", "two"};
@@ -27,14 +27,14 @@ int main(int argc, char *argv[])
 
     for (const auto &mod : js["mod"])
         fmt::print("Mod: {}\n", mod);
-    return 1;
+    return 1;*/
 
     QApplication a(argc, argv);
 
     Steam steam;
     std::unique_ptr<ARMA3::Client> client;
 
-    for (auto const &path : steam.GetInstallPaths())
+    /*for (auto const &path : steam.GetInstallPaths())
     {
         try
         {
@@ -58,9 +58,15 @@ int main(int argc, char *argv[])
         if (apcd.result() != QDialog::Accepted)
             exit(0);
 
-    }
+        fmt::print("Arma3: {}\nWorkshop: {}\n", apcd.arma_path_, apcd.workshop_path_);
+
+        client = std::make_unique<ARMA3::Client>(apcd.arma_path_, apcd.workshop_path_);
+    }*/
+
+    client = std::make_unique<ARMA3::Client>("/home/mszychow/git/fake/arma", "/home/mszychow/git/fake/workshop");
 
     MainWindow w;
+    w.set_client(std::move(client));
     w.show();
 
     return a.exec();

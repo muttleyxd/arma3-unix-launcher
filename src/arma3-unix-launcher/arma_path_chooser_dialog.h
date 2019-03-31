@@ -29,7 +29,9 @@ class ArmaPathChooserDialog : public QDialog
         void on_button_browse_arma_path_clicked();
         void on_button_browse_workshop_path_clicked();
 
-    private:
+        void on_buttonBox_accepted();
+
+private:
         Ui::ArmaPathChooserDialog *ui;
         QPixmap pixmap_error_;
         QPixmap pixmap_ok_;

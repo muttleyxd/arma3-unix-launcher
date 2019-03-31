@@ -1,4 +1,5 @@
 name = "Remove Stamina";
+dir = "@Remove stamina";
 picture = "logo.paa";
 hidePicture = "false";
 hideName = "false";

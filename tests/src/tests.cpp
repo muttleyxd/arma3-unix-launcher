@@ -58,6 +58,7 @@ namespace Tests::Utils
     std::map<std::string, std::string> remove_stamina_map
     {
         {"name", "Remove Stamina"},
+        {"dir", "@Remove stamina"},
         {"picture", "logo.paa"},
         {"hidePicture", "false"},
         {"hideName", "false"},

@@ -132,3 +132,9 @@ bool ArmaPathChooserDialog::is_workshop_path_valid(QString const &arg1)
     std::error_code ec;
     return is_directory(arg1.toStdString(), ec);
 }
+
+void ArmaPathChooserDialog::on_buttonBox_accepted()
+{
+    arma_path_ = ui->text_arma_path->text().toStdString();
+    workshop_path_ = ui->text_workshop_path->text().toStdString();
+}

@@ -6,14 +6,89 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>533</width>
+    <height>577</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ArmA 3 Unix Launcher</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>500</width>
+          <height>500</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Mods</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Workshop mods</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignHCenter|Qt::AlignTop</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="tableWidget">
+              <property name="gridStyle">
+               <enum>Qt::DotLine</enum>
+              </property>
+              <property name="columnCount">
+               <number>3</number>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <column/>
+              <column/>
+              <column/>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Parameters</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

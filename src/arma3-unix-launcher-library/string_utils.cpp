@@ -186,7 +186,7 @@ TEST_CASE("Trim")
 TEST_CASE("StartsWith")
 {
     using namespace StringUtils;
-    const std::string text = "This is some text";
+    std::string const text = "This is some text";
 
     CHECK(StartsWith(text, "This"));
     CHECK(StartsWith(text, "This "));
@@ -202,7 +202,7 @@ TEST_CASE("StartsWith")
 TEST_CASE("EndsWith")
 {
     using namespace StringUtils;
-    const std::string text = "This is some text";
+    std::string const text = "This is some text";
 
     CHECK(EndsWith(text, "text"));
     CHECK(EndsWith(text, " text"));
@@ -215,7 +215,7 @@ TEST_CASE("EndsWith")
 TEST_CASE("Split")
 {
     using namespace StringUtils;
-    const std::string text = "This is some text";
+    std::string const text = "This is some text";
 
     std::vector<std::string_view> text_split_by_space
     {
@@ -237,7 +237,7 @@ TEST_CASE("Split")
 
     CHECK_EQ(std::vector<std::string_view>(), Split("  ", " "));
 
-    const std::string remove_stamina_text = "name=\"Remove Stamina\"";
+    std::string const remove_stamina_text = "name=\"Remove Stamina\"";
     std::vector<std::string_view> remove_stamina
     {
         std::string_view(remove_stamina_text.c_str(), 4),

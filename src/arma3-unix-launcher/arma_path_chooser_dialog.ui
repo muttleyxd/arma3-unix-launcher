@@ -139,6 +139,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>text_arma_path</tabstop>
+  <tabstop>button_browse_arma_path</tabstop>
+  <tabstop>text_workshop_path</tabstop>
+  <tabstop>button_browse_workshop_path</tabstop>
+ </tabstops>
  <resources>
   <include location="icons.qrc"/>
  </resources>

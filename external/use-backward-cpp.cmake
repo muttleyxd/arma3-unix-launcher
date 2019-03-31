@@ -20,5 +20,5 @@ endfunction()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
 if ("${cmake_build_type_tolower}" STREQUAL "debug")
-    enable_backward_cpp()
+    #enable_backward_cpp()
 endif ()
