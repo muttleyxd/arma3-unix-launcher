@@ -57,7 +57,7 @@ namespace Filesystem
     bool DirectoryExists(std::string path);
 
     bool WriteAllText(std::string path, std::string value);
-    std::string ReadAllText(std::string path);
+    std::string ReadAllText(std::string path, bool suppress_log = false);
 
     std::vector<Mod> FindMods(std::string path);
 

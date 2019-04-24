@@ -169,9 +169,10 @@ namespace Filesystem
         return false;
     }
 
-    string ReadAllText(string path)
+    string ReadAllText(string path, bool suppress_log)
     {
-        LOG(0, "Reading file " + path + "... ");
+        if (!suppress_log)
+            LOG(0, "Reading file " + path + "... ");
         string response;
         ifstream inFile;
         inFile.open(path, ios::in);
@@ -179,10 +180,12 @@ namespace Filesystem
         {
             getline(inFile, response, '\0');
             inFile.close();
-            LOG(0, "File read successfully");
+            if (!suppress_log)
+                LOG(0, "File read successfully");
             return response;
         }
-        LOG(1, "Can't open file " + path + " for read");
+        if (!suppress_log)
+            LOG(1, "Can't open file " + path + " for read");
         return FILE_NOT_OPEN;
     }
 
@@ -280,7 +283,6 @@ namespace Filesystem
             LOG(1, "Opening directory " + path + " failed");
             return response;
         }
-        LOG(0, "Opening directory " + path + " succeeded");
 
         while ((directoryEntry = readdir(pathDir)) != NULL)
         {

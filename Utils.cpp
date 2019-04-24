@@ -137,42 +137,14 @@ namespace Utils
             return strtol(splits[0].c_str(), NULL, 10);
         return -1;
         #else
-        DIR *dir;
-        struct dirent *ent;
-        char *endptr;
-        char buf[512];
 
-        if (!(dir = opendir("/proc")))
-            return -1;
-
-        while ((ent = readdir(dir)) != NULL)
+        for (auto const &process : Filesystem::GetSubDirectories("/proc"))
         {
-            long lpid = strtol(ent->d_name, &endptr, 10);
-            if (*endptr != '\0')
-                continue;
-
-            snprintf(buf, sizeof(buf), "/proc/%ld/cmdline", lpid);
-            FILE *fp = fopen(buf, "r");
-
-            if (fp)
-            {
-                if (fgets(buf, sizeof(buf), fp) != NULL)
-                {
-                    char *first = strtok(buf, " ");
-                    //LOG(1, first);
-                    if (!strcmp(first, name.c_str()))
-                    {
-                        fclose(fp);
-                        closedir(dir);
-                        return (pid_t)lpid;
-                    }
-                }
-                fclose(fp);
-            }
-
+            auto process_name = Utils::Trim(Filesystem::ReadAllText("/proc/" + process + "/comm", true));
+            if (process_name == name)
+                return std::stoi(process);
         }
 
-        closedir(dir);
         return -1;
         #endif
     }

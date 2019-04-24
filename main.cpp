@@ -166,11 +166,17 @@ int main(int argc, char *argv[])
             }
             else
             {
-                char *resolved_path = realpath((Utils::RemoveLastElement(Settings::ArmaPath, false,
-                                                2) + "workshop/content/107410").c_str(), nullptr);
-                Settings::WorkshopPath = resolved_path;
-                free(resolved_path);
-                LOG(1, "Workaround workshop path: " + Settings::WorkshopPath);
+                std::string estimated_workshop_path = Utils::RemoveLastElement(Settings::ArmaPath, false, 2) + "workshop/content/107410";
+                LOG(1, "Estimated workshop path: " + estimated_workshop_path);
+                if (Filesystem::DirectoryExists((estimated_workshop_path)))
+                {
+                    char *resolved_path = realpath(estimated_workshop_path.c_str(), nullptr);
+                    Settings::WorkshopPath = resolved_path;
+                    free(resolved_path);
+                    LOG(1, "Workaround workshop path: " + Settings::WorkshopPath);
+                }
+                else
+                    LOG(0, "Estimated workshop path does not exist!");
             }
         }
     }
