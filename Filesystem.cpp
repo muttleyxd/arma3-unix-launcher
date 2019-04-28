@@ -461,6 +461,6 @@ namespace Filesystem
 
     bool IsProton(std::string path)
     {
-        return Filesystem::FileExists(path + "/arma3_x64.exe");
+        return Filesystem::FileExists(path + "/arma3launcher.exe");
     }
 }
