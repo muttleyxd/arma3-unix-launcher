@@ -47,15 +47,22 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::init_table()
 {
+    /*if (ui->tableWidget->supportedDropActions() == Qt::LinkAction)
+    {
+        fmt::print("Hi\n");
+    }*/
+    ui->tableWidget->setRowCount(5);
+    return;
+
     auto table = ui->tableWidget;
 
-    table->setHorizontalHeaderLabels({"Enabled", "Name", "Workshop ID"});
+    //table->setHorizontalHeaderLabels({"Enabled", "Name", "Workshop ID"});
     table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     table->setColumnWidth(0, 64);
     table->setColumnWidth(2, 128);
 
     //table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    /*table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setDragEnabled(true);
     table->setDragDropMode(QAbstractItemView::InternalMove);
     table->setDragDropOverwriteMode(true);
@@ -63,9 +70,9 @@ void MainWindow::init_table()
     table->setDropIndicatorShown(true);
     table->setAcceptDrops(true);
     table->horizontalHeader()->setSectionsMovable(true);
-    table->viewport()->setAcceptDrops(true);
+    table->viewport()->setAcceptDrops(true);*/
 
-    auto add_entry = [&](bool enabled, QString const &name, QString const &workshop_id)
+    auto add_entry = [&](bool enabled, QString const & name, QString const & workshop_id)
     {
         QCheckBox *checkbox = new QCheckBox();
         checkbox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
@@ -89,4 +96,4 @@ void MainWindow::init_table()
     add_entry(true, "Some mod", "463969091");
     add_entry(false, "Some mod two", "463969095");
     add_entry(false, "Some mod three", "463969099");
- }
+}

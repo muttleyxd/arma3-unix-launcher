@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         client = std::make_unique<ARMA3::Client>(apcd.arma_path_, apcd.workshop_path_);
     }*/
 
-    client = std::make_unique<ARMA3::Client>("/home/mszychow/git/fake/arma", "/home/mszychow/git/fake/workshop");
+    client = std::make_unique<ARMA3::Client>("/home/muttley/git/fake/arma", "/home/muttley/git/fake/workshop");
 
     MainWindow w;
     w.set_client(std::move(client));

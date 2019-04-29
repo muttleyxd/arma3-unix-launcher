@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOW_HPP_
+#define MAINWINDOW_HPP_
 
 #include <QMainWindow>
 
@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 
         void set_client(std::unique_ptr<ARMA3::Client> client);
 
-        void resizeEvent(QResizeEvent* event) override;
+        void resizeEvent(QResizeEvent *event) override;
 
     private slots:
 
@@ -32,4 +32,4 @@ class MainWindow : public QMainWindow
         void init_table();
 };
 
-#endif // MAINWINDOW_H
+#endif // MAINWINDOW_HPP_
