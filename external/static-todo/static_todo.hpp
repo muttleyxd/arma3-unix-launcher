@@ -33,40 +33,26 @@ SOFTWARE.
 
 #else
 
-// Returns the year from the current build date
 constexpr int current_build_year() {
-    // exemple: "Nov 27 2018"
+    // example: "Nov 27 2018"
     const char *year = __DATE__;
 
-    // skip the 2 first spaces
-    int nbSpaces = 0;
-    while (nbSpaces < 2) {
-        if (*year == ' ') {
-            nbSpaces++;
-        }
-        year++;
-    }
-
-    return (year[0] - '0') * 1000 + (year[1] - '0') * 100 + (year[2] - '0') * 10 + (year[3] - '0');
+    return (year[7] - '0') * 1000 + (year[8] - '0') * 100 + (year[9] - '0') * 10 + (year[10] - '0');
 }
 
-// Returns the month number (1..12) from the current build date
 constexpr int current_build_month() {
     constexpr const char months[12][4]{
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-    // exemple: "Nov 27 2018"
     constexpr const char date[] = __DATE__;
 
-    // find matching month
     for (int i = 0; i < 12; i++) {
         const char *m = months[i];
-        if (m[0] == date[0] && m[1] == date[1] && m[2] == date[2]) {
+        if (m[0] == date[0] && m[1] == date[1] && m[2] == date[2])
             return i + 1;
-        }
     }
 
-    return 0; // will be caught by the static_assert() check on month value
+    return 0xFFFFFFFF;
 }
 
 /// TODO_BEFORE() inserts a compilation "time bomb" that will trigger a "TODO" build error a soon as
@@ -78,14 +64,14 @@ constexpr int current_build_month() {
 /// Example:
 ///     TODO_BEFORE(01, 2019, "refactor to use std::optional<> once we compile in C++17 mode");
 #define TODO_BEFORE(month, year, msg)                                                              \
-    static_assert((year >= 2018 && month > 0 && month <= 12) &&                                    \
+    static_assert((month > 0 && month <= 12) &&                                    \
                       (current_build_year() < year ||                                              \
                           (current_build_year() == year && current_build_month() < month)),        \
         "TODO: " msg)
 
 /// FIXME_BEFORE() works the same way than TODO_BEFORE() but triggers a "FIXME" error instead
 #define FIXME_BEFORE(month, year, msg)                                                             \
-    static_assert((year >= 2018 && month > 0 && month <= 12) &&                                    \
+    static_assert((month > 0 && month <= 12) &&                                    \
                       (current_build_year() < year ||                                              \
                           (current_build_year() == year && current_build_month() < month)),        \
         "FIXME: " msg)

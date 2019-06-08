@@ -163,7 +163,7 @@ namespace ARMA3
 
     std::string Client::PickModName(Mod const &mod, std::vector<std::string> const &names)
     {
-        TODO_BEFORE(04, 2019, "Pick mod name from workshop");
+        TODO_BEFORE(07, 2019, "Pick mod name from workshop");
         for (auto const &name : names)
         {
             if (ContainsKey(mod.KeyValue, name))
@@ -236,6 +236,11 @@ namespace ARMA3
                     m.LoadFromFile(mod_dir / cppfile, true);
             target.emplace_back(std::move(m));
         }
+
+        std::sort(target.begin(), target.end(), [](Mod const &m1, Mod const &m2)
+        {
+            return m1.GetValueOrReturnDefault("name", "dir", m1.path_) > m2.GetValueOrReturnDefault("name", "dir", m2.path_);
+        });
     }
 
     std::filesystem::path Client::GetCfgPath()
