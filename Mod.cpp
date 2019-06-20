@@ -82,7 +82,6 @@ void Mod::ParseCPP(string meta, string mod)
             {
                 //name="hello" -> hello
                 this->Name = s.substr(6, s.size() - 7);
-                this->DirName = s.substr(6, s.size() - 7);
             }
             else if (Utils::StartsWith(s, "publishedid"))
                 this->PublishedId = s.substr(12);
@@ -178,6 +177,11 @@ void Mod::ParseCPP(string meta, string mod)
             }
         }
     }
+    if (this->DirName.empty())
+    {
+        this->DirName = this->Name;
+    }
+    this->DirName = Utils::Replace(this->DirName, "/", "_");
 }
 
 string Mod::ToString()
