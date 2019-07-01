@@ -293,7 +293,10 @@ namespace Filesystem
 
             if (fstatat(dirfd(pathDir), directoryEntry->d_name, &st, 0) < 0)
             {
+                int error = errno;
                 string DirName = directoryEntry->d_name;
+                DirName += " strerror: ";
+                DirName += strerror(errno);
                 LOG(1, "Directory error " + DirName);
                 continue;
             }
