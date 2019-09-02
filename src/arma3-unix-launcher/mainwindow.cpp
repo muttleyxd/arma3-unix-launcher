@@ -18,9 +18,22 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    init_table();
+    /*auto tabView = ui->tableView;
+    tabView->verticalHeader()->hide();
+    tabView->horizontalHeader()->hide();
+    tabView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    tabView->setSelectionBehavior(QTableView::SelectRows);
+    tabView->setSelectionMode(QTableView::SingleSelection);
+    tabView->setShowGrid(false);
+    tabView->setDragDropMode(QTableView::InternalMove);
+    tabView->setDragDropOverwriteMode(false);
+    tabView->viewport()->setAcceptDrops(true);*/
 
-    //table->item(0, 0)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    /**/
+
+    ui->tableView->setup();
+
+    //tabView->setModel(model);
 }
 
 MainWindow::~MainWindow()
@@ -51,15 +64,15 @@ void MainWindow::init_table()
     {
         fmt::print("Hi\n");
     }*/
-    ui->tableWidget->setRowCount(5);
+    //ui->tableWidget->setRowCount(5);
     return;
 
-    auto table = ui->tableWidget;
+    //auto table = ui->tableWidget;
 
     //table->setHorizontalHeaderLabels({"Enabled", "Name", "Workshop ID"});
-    table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    /*table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     table->setColumnWidth(0, 64);
-    table->setColumnWidth(2, 128);
+    table->setColumnWidth(2, 128);*/
 
     //table->setSelectionMode(QAbstractItemView::SingleSelection);
     /*table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -72,7 +85,7 @@ void MainWindow::init_table()
     table->horizontalHeader()->setSectionsMovable(true);
     table->viewport()->setAcceptDrops(true);*/
 
-    auto add_entry = [&](bool enabled, QString const & name, QString const & workshop_id)
+    /*auto add_entry = [&](bool enabled, QString const & name, QString const & workshop_id)
     {
         QCheckBox *checkbox = new QCheckBox();
         checkbox->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
@@ -95,5 +108,5 @@ void MainWindow::init_table()
 
     add_entry(true, "Some mod", "463969091");
     add_entry(false, "Some mod two", "463969095");
-    add_entry(false, "Some mod three", "463969099");
+    add_entry(false, "Some mod three", "463969099");*/
 }

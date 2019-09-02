@@ -59,50 +59,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QModList" name="tableWidget">
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::InternalMove</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::MoveAction</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="gridStyle">
-               <enum>Qt::DotLine</enum>
-              </property>
-              <property name="columnCount">
-               <number>3</number>
-              </property>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>Enabled</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Path</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Workshop ID</string>
-               </property>
-              </column>
-             </widget>
+             <widget class="QModView" name="tableView"/>
             </item>
            </layout>
           </item>
@@ -123,9 +80,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QModList</class>
-   <extends>QTableWidget</extends>
-   <header location="global">qmodlist.hpp</header>
+   <class>QModView</class>
+   <extends>QTableView</extends>
+   <header location="global">qmodview.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

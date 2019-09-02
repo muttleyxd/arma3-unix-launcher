@@ -14,7 +14,13 @@ class QModList : public QTableWidget
         {
             std::cout.setf(std::ios::unitbuf);
             std::cout << "constructor\n";
+            this->setDragDropMode(QAbstractItemView::DragDrop);
             //fmt::print("HEY I'M CONSTRUCTED");
+
+            this->setSelectionMode(QAbstractItemView::SingleSelection);
+            this->setDragEnabled(true);
+            this->viewport()->setAcceptDrops(true);
+            this->setDropIndicatorShown(true);
         }
         ~QModList() override = default;
 

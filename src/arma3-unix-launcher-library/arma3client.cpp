@@ -237,7 +237,7 @@ namespace ARMA3
             target.emplace_back(std::move(m));
         }
 
-        std::sort(target.begin(), target.end(), [](Mod const &m1, Mod const &m2)
+        std::sort(target.begin(), target.end(), [](Mod const & m1, Mod const & m2)
         {
             return m1.GetValueOrReturnDefault("name", "dir", m1.path_) > m2.GetValueOrReturnDefault("name", "dir", m2.path_);
         });

@@ -12,7 +12,7 @@ if (RUN_TESTS)
 endif ()
 
 add_executable(arma3-unix-launcher ${SOURCES})
-target_link_libraries(arma3-unix-launcher
+target_link_libraries(arma3-unix-launcher PRIVATE
     arma3-unix-launcher-library
     Qt5::Widgets
     Qt5::Svg)
