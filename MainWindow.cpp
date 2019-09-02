@@ -317,6 +317,8 @@ void MainWindow::ArmaStatusThread()
         armaPid = Utils::FindProcess("ArmA3");
         #else
         armaPid = Utils::FindProcess("./arma3.x86_64");
+        if (armaPid == -1)
+            armaPid = Utils::FindProcess("Arma3_x64.exe");
         #endif
         this->notify();
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -879,7 +881,10 @@ void MainWindow::btnPlay_Clicked()
     #ifdef __APPLE__
     Glib::spawn_command_line_async("open steam://run/107410//" + Utils::Replace(parameters, " ", "%20"));
     #else
-    Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
+    if (Filesystem::IsProton(Settings::ArmaPath))
+        Glib::spawn_command_line_async("steam -applaunch 107410 -nolauncher " + parameters);
+    else
+        Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
     #endif
 }
 
