@@ -411,7 +411,10 @@ namespace Filesystem
             else
                 fullPath += Filesystem::ArmaDirWorkshop;
             fullPath += "/" + symlinkAt + modList[i]->DirName;
-
+            string testPath = GetSymlinkTarget(fullPath);
+            if (testPath != NOT_A_SYMLINK) {
+                fullPath = testPath;
+            };
             string dirName = symlinkAt + modList[i]->DirName;
 
             string disk = "C:";
