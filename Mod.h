@@ -33,7 +33,7 @@ class Mod
         bool Enabled;
 
     private:
-        void ParseCPP(std::string meta, std::string mod);
+        void ParseCPP(std::string meta, std::string mod, std::string path, std::string workshopId);
         std::string ParseString(std::string input);
 };
 

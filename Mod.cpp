@@ -13,6 +13,7 @@
 
 #include "Utils.h"
 #include "Filesystem.h"
+#include "Settings.h"
 #include "Logger.h"
 
 using namespace std;
@@ -37,7 +38,7 @@ Mod::Mod(string path, string workshopId)
         metaPath = "";
     if (!Filesystem::FileExists(modPath))
         modPath = "";
-    ParseCPP(metaPath, modPath);
+    ParseCPP(metaPath, modPath,path,workshopId);
 
     //Mod is added manually by user and din't contain any data in meta.cpp or mod.cpp
     //quick & dirty -> Name = DirectoryName
@@ -69,7 +70,7 @@ string Mod::ParseString(string input)
 }
 
 //As anyone would expect - documentation on this is trash
-void Mod::ParseCPP(string meta, string mod)
+void Mod::ParseCPP(string meta, string mod, string path,string workshopId)
 {
     if (meta != "")
     {
@@ -177,6 +178,9 @@ void Mod::ParseCPP(string meta, string mod)
             }
         }
     }
+    if (workshopId == "-1") {
+        this->DirName = Utils::Replace(path, Settings::ArmaPath+"/", "");
+    };
     if (this->DirName.empty())
     {
         this->DirName = this->Name;
