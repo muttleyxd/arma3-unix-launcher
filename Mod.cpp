@@ -95,56 +95,41 @@ void Mod::ParseCPP(string meta, string mod, string path,string workshopId)
         vector<string> instructions = Utils::Split(file, ";");
         for (string s : instructions)
         {
-            if (Utils::StartsWith(s, "name"))
-                this->Name = s.substr(6, s.size() - 7);
-            else if (Utils::StartsWith(s, "picture"))
-                this->Picture = s.substr(9, s.size() - 10);
-            else if (Utils::StartsWith(s, "logoSmall"))
-                this->LogoSmall = s.substr(11, s.size() - 12);
-            else if (Utils::StartsWith(s, "logo"))
-                this->Logo = s.substr(6, s.size() - 7);
-            else if (Utils::StartsWith(s, "logoOver"))
-                this->LogoOver = s.substr(10, s.size() - 11);
-            else if (Utils::StartsWith(s, "action"))
-                this->Action = s.substr(8, s.size() - 9);
-            else if (Utils::StartsWith(s, "actionName"))
-                this->ActionName = s.substr(12, s.size() - 13);
-            else if (Utils::StartsWith(s, "tooltipOwned"))
-                this->TooltipOwned = s.substr(14, s.size() - 15);
-            else if (Utils::StartsWith(s, "overview"))
-                this->Overview = s.substr(10, s.size() - 11);
-            else if (Utils::StartsWith(s, "description"))
-                this->Description = s.substr(13, s.size() - 14);
-            else if (Utils::StartsWith(s, "overviewPicture"))
-                this->OverviewPicture = s.substr(17, s.size() - 18);
-            else if (Utils::StartsWith(s, "overviewText"))
-                this->OverviewText = s.substr(14, s.size() - 15);
-            else if (Utils::StartsWith(s, "author"))
-                this->Author = s.substr(8, s.size() - 9);
-            else if (Utils::StartsWith(s, "dlcColor"))
-            {
-                //dlcColor[]={1.2,5.8,3.23,6.44}
-                string dlcColor = s.substr(12, s.size() - 13);
-                //1.2,5.8,3.23,6.44
-                vector<string> splits = Utils::Split(dlcColor, ",");
-                if (splits.size() != 4)
-                    LOG(1, "Could not read dlcColor from mod.cpp");
-                else
-                {
-                    DlcColor.r = atof(splits[0].c_str());
-                    DlcColor.g = atof(splits[1].c_str());
-                    DlcColor.b = atof(splits[2].c_str());
-                    DlcColor.a = atof(splits[3].c_str());
-                }
-
-            }
+            auto keyValue = Utils::SplitFirst(s, "=");
+            auto const key = Utils::Replace(Utils::Trim(keyValue.first), "\"", "");
+            auto const value = Utils::Replace(Utils::Trim(keyValue.second), "\"", "");
+            if (key == "name")
+                this->Name = value;
+            else if (key ==  "picture")
+                this->Picture = value;
+            else if (key ==  "logoSmall")
+                this->LogoSmall = value;
+            else if (key ==  "logo")
+                this->Logo = value;
+            else if (key ==  "logoOver")
+                this->LogoOver = value;
+            else if (key ==  "action")
+                this->Action = value;
+            else if (key ==  "actionName")
+                this->ActionName = value;
+            else if (key ==  "tooltipOwned")
+                this->TooltipOwned = value;
+            else if (key ==  "overview")
+                this->Overview = value;
+            else if (key ==  "description")
+                this->Description = value;
+            else if (key ==  "overviewPicture")
+                this->OverviewPicture = value;
+            else if (key ==  "overviewText")
+                this->OverviewText = value;
+            else if (key ==  "author")
+                this->Author = value;
             /* there is no stabilized syntax upon this
              * some write hideName=0 or hideName=1
              * but also I've seen hideName="false"
              * */
-            else if (Utils::StartsWith(s, "hideName"))
+            else if (key == "hideName")
             {
-                string value = s.substr(9);
                 for (char c : value)
                 {
                     if (c == '0' || c == 'f')
@@ -159,9 +144,8 @@ void Mod::ParseCPP(string meta, string mod, string path,string workshopId)
                     }
                 }
             }
-            else if (Utils::StartsWith(s, "hidePicture"))
+            else if (key == "hidePicture")
             {
-                string value = s.substr(12);
                 for (char c : value)
                 {
                     if (c == '0' || c == 'f')
@@ -180,7 +164,7 @@ void Mod::ParseCPP(string meta, string mod, string path,string workshopId)
     }
     if (workshopId == "-1") {
         this->DirName = Utils::Replace(path, Settings::ArmaPath+"/", "");
-    };
+    }
     if (this->DirName.empty())
     {
         this->DirName = this->Name;

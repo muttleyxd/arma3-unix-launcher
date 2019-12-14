@@ -39,6 +39,12 @@ namespace Utils
         return response;
     }
 
+    pair<string, string> SplitFirst(string textToSplit, string delimiters)
+    {
+        auto position = textToSplit.find_first_of(delimiters);
+        return pair<string, string>{textToSplit.substr(0, position), textToSplit.substr(position + 1)};
+    }
+
     bool EndsWith(string textToCheck, string textToFind)
     {
         if (textToFind.size() > textToCheck.size())
