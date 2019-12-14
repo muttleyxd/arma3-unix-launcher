@@ -87,6 +87,9 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     builder->get_widget("cbHost", cbHost);
 
+    //Other
+    builder->get_widget("btnQuit", btnQuit);
+
     //Visible everywhere
     builder->get_widget("btnPlay", btnPlay);
 
@@ -189,6 +192,8 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
     tbPassword->signal_changed().connect(sigc::mem_fun(*this, &MainWindow::tbPassword_Changed));
 
     cbHost->signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::cbHost_Toggled));
+
+    btnQuit->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnQuit_Clicked));
 
     btnPlay->signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::btnPlay_Clicked));
 
@@ -788,6 +793,11 @@ void MainWindow::cbHost_Toggled()
 {
     LOG(0, "cbHost_Toggled: " + Utils::ToString(cbHost->get_active()));
     if (!ignore) Settings::Host = cbHost->get_active();
+}
+
+void MainWindow::btnQuit_Clicked()
+{
+    this->close();
 }
 
 void MainWindow::btnPlay_Clicked()

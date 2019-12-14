@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.1 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.14"/>
   <object class="GtkAdjustment" id="adjCpuCount">
@@ -36,6 +36,9 @@
   </object>
   <object class="GtkWindow" id="MainForm">
     <property name="can_focus">False</property>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkBox" id="mainGtkBox">
         <property name="visible">True</property>
@@ -233,18 +236,18 @@
                     <property name="can_focus">False</property>
                     <property name="homogeneous">True</property>
                     <child>
-                    <object class="GtkLabel"> 
-                        <property name="visible">True</property> 
-                        <property name="can_focus">False</property> 
-                        <property name="label" translatable="yes">Custom Mods:</property> 
-                      </object> 
-                      <packing> 
-                        <property name="expand">False</property> 
-                        <property name="fill">True</property> 
-                        <property name="position">0</property> 
-                      </packing> 
-                    </child> 
-                    <child> 
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Custom Mods:</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkButton" id="btnAdd">
                         <property name="label">gtk-add</property>
                         <property name="visible">True</property>
@@ -1207,6 +1210,46 @@
                 <property name="tab_fill">False</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkButton" id="btnQuit">
+                    <property name="label" translatable="yes">Quit</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Other</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -1215,69 +1258,69 @@
           </packing>
         </child>
         <child>
-        <object class="GtkBox" id="presetsBox"> 
-            <property name="visible">True</property> 
-            <property name="can_focus">False</property> 
-            <property name="homogeneous">True</property> 
-            <child> 
-              <object class="GtkLabel"> 
-                <property name="visible">True</property> 
-                <property name="can_focus">False</property> 
-                <property name="label" translatable="yes">Mod Preset:</property> 
-              </object> 
-              <packing> 
-                <property name="expand">False</property> 
-                <property name="fill">True</property> 
-                <property name="position">0</property> 
-              </packing> 
-            </child> 
-            <child> 
-              <object class="GtkButton" id="btnPresetLoad"> 
-                <property name="label">gtk-open</property> 
-                <property name="visible">True</property> 
-                <property name="can_focus">True</property> 
-                <property name="receives_default">True</property> 
-                <property name="use_stock">True</property> 
-              </object> 
-              <packing> 
-                <property name="expand">False</property> 
-                <property name="fill">True</property> 
-                <property name="position">1</property> 
-              </packing> 
-            </child> 
-            <child> 
-              <object class="GtkButton" id="btnPresetSave"> 
-                <property name="label">gtk-save</property> 
-                <property name="visible">True</property> 
-                <property name="can_focus">True</property> 
-                <property name="receives_default">True</property> 
-                <property name="use_stock">True</property> 
-              </object> 
-              <packing> 
-                <property name="expand">False</property> 
-                <property name="fill">True</property> 
-                <property name="position">2</property> 
-              </packing> 
-            </child> 
-          </object> 
-          <packing> 
-            <property name="expand">False</property> 
-            <property name="fill">True</property> 
-            <property name="position">1</property> 
-          </packing> 
-        </child> 
-        <child> 
-          <object class="GtkSeparator"> 
-            <property name="visible">True</property> 
-            <property name="can_focus">False</property> 
-          </object> 
-          <packing> 
-            <property name="expand">False</property> 
-            <property name="fill">True</property> 
-            <property name="position">2</property> 
-          </packing> 
-        </child> 
-        <child> 
+          <object class="GtkBox" id="presetsBox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Mod Preset:</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnPresetLoad">
+                <property name="label">gtk-open</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnPresetSave">
+                <property name="label">gtk-save</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkLabel" id="lblSelectedMods">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -1334,9 +1377,6 @@
           </packing>
         </child>
       </object>
-    </child>
-    <child type="titlebar">
-      <placeholder/>
     </child>
   </object>
 </interface>

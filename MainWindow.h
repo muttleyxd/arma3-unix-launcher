@@ -84,6 +84,9 @@ class MainWindow : public Gtk::Window
 
         Gtk::CheckButton *cbHost;
 
+        //Other
+        Gtk::Button *btnQuit;
+
         //Visible everywhere
         Gtk::Button *btnPlay;
 
@@ -197,6 +200,8 @@ class MainWindow : public Gtk::Window
         void tbPassword_Changed();
 
         void cbHost_Toggled();
+
+        void btnQuit_Clicked();
 
         void btnPlay_Clicked();
 
