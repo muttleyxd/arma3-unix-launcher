@@ -50,11 +50,10 @@ Binary package is currently unavailable. Please build from source or use [instal
 Gtkmm3 is required
 
 #### Debian package
-    apt-get install libgtkmm-3.0-1v5
-    apt-get install libgtkmm-3.0-dev
+    apt-get install cmake libgtkmm-3.0-1v5 libgtkmm-3.0-dev
 
 #### Arch Linux
-    pacman -S gtkmm3
+    pacman -S cmake gtkmm3
 
 #### Mac OS X
     brew install gtkmm3
@@ -97,10 +96,9 @@ This deletes all files created by the launcher (symlinks and config files)
 ### Screenshots
 
 Mods tab:
+
 ![mods tab](http://i.imgur.com/OmN0IDe.png)
 
 Parameters tab:
+
 ![parameters tab](http://i.imgur.com/IseHvUc.png)
-
-
-
