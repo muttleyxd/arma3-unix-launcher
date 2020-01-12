@@ -373,7 +373,7 @@ namespace Filesystem
                     string newWorkshopId = target;
                     for (int i = 0; i < modList->size(); i++)
                     {
-                        if (modList->operator[](i).WorkshopId == newWorkshopId)
+                        if (modList->operator[](i).WorkshopId == newWorkshopId && s == modList->operator[](i).Name)
                         {
                             modList->operator[](i).IsRepresentedBySymlink = true;
                             break;
