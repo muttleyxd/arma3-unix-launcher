@@ -526,11 +526,7 @@ void MainWindow::btnPresetSave_Clicked()
 
 bool MainWindow::onExit(GdkEventAny *event)
 {
-    LOG(1, "onExit() -> restoring Arma3.cfg");
-    std::string configFile = Utils::BashAdaptPath(Filesystem::ArmaConfigFile);
-    std::string backupFile = configFile + ".a3lbak";
-    system(("rm " + configFile).c_str());
-    system(("mv " + backupFile + " " + configFile).c_str());
+    LOG(1, "onExit()");
 
     this->get_position(Settings::WindowPosX, Settings::WindowPosY);
     this->get_size(Settings::WindowSizeX, Settings::WindowSizeY);
@@ -891,6 +887,7 @@ void MainWindow::btnPlay_Clicked()
     #ifdef __APPLE__
     Glib::spawn_command_line_async("open steam://run/107410//" + Utils::Replace(parameters, " ", "%20"));
     #else
+    return;
     if (Filesystem::IsProton(Settings::ArmaPath))
         Glib::spawn_command_line_async("steam -applaunch 107410 -nolauncher " + parameters);
     else
@@ -925,28 +922,6 @@ void MainWindow::RefreshStatusLabel()
 void MainWindow::Init()
 {
     LOG(1, "ArmA 3 Path: " + Settings::ArmaPath + "\nWorkshop mods path: " + Settings::WorkshopPath);
-
-    LOG(1, "Creating Arma3.cfg backup...");
-    if (Filesystem::FileExists(Filesystem::ArmaConfigFile))
-    {
-        std::string configFile = Utils::BashAdaptPath(Filesystem::ArmaConfigFile);
-        std::string backupFile = configFile + ".a3lbak";
-        if (Filesystem::FileExists(Filesystem::ArmaConfigFile + ".a3lbak"))
-        {
-            LOG(1, "Backup file already exists... restoring it");
-
-            std::string command = "rm " + configFile;
-            system(command.c_str());
-            command = "mv " + backupFile + " " + configFile;
-            system(command.c_str());
-        }
-        system(("cp " + configFile + " " + backupFile).c_str());
-    }
-    else
-    {
-        LOG(1, "Arma3.cfg does not exist\nPlease run Arma at least once before using launcher");
-        exit(1);
-    }
 
     WorkshopMods = Filesystem::FindMods(Settings::WorkshopPath);
 

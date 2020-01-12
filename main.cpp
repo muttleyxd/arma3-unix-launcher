@@ -187,16 +187,6 @@ int main(int argc, char *argv[])
         LOG(0, "Proton detected");
 
         LOG(1, "Config path: " + Filesystem::ArmaConfigFile);
-        if (!Filesystem::FileExists(Filesystem::ArmaConfigFile))
-        {
-            std::string no_cfg_msg = "Arma3.cfg does not exist\nPlease run Arma at least once before using launcher. You can start it from Steam (add -nolauncher parameter)";
-            Gtk::MessageDialog no_cfg_dialog(no_cfg_msg);
-            no_cfg_dialog.run();
-            LOG(1, no_cfg_msg);
-            exit(1);
-        }
-
-        LOG(1, "Config file exists");
     }
     else
     {

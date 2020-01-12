@@ -391,8 +391,12 @@ namespace Filesystem
         LOG(1, "Generating Arma3.cfg");
         string response;
         string inputFile = ReadAllText(source);
-        if (inputFile == FILE_NOT_OPEN)
-            return FILE_NOT_OPEN;
+        if (inputFile == FILE_NOT_OPEN) {
+            inputFile = "";
+            std::string command = "mkdir -p $(realpath -m $(dirname \"" + source + "\"))";
+            LOG(1, "Cannot read Arma3.cfg, creating directory " + command);
+            system(command.c_str());
+        }
 
         string modLauncherList = "class ModLauncherList\n{\n";
         int i;
