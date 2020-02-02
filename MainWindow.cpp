@@ -882,17 +882,17 @@ void MainWindow::btnPlay_Clicked()
 
     parameters += Settings::Host                ? "-host" : "";
 
-    LOG(0, "Arma 3 launch command:\n" + Settings::ArmaPath + "/arma " + parameters);
-
+    std::string launch_command;
     #ifdef __APPLE__
-    Glib::spawn_command_line_async("open steam://run/107410//" + Utils::Replace(parameters, " ", "%20"));
+    launch_command = "open steam://run/107410//" + Utils::Replace(parameters, " ", "%20");
     #else
-    return;
     if (Filesystem::IsProton(Settings::ArmaPath))
-        Glib::spawn_command_line_async("steam -applaunch 107410 -nolauncher " + parameters);
+        launch_command = "steam -applaunch 107410 -nolauncher " + parameters;
     else
-        Glib::spawn_command_line_async("steam -applaunch 107410 " + parameters);
+        launch_command = "steam -applaunch 107410 " + parameters;
     #endif
+    LOG(0, "Arma 3 launch command:\n steam -applaunch 107410 " + parameters);
+    Glib::spawn_command_line_async(launch_command);
 }
 
 void MainWindow::RefreshStatusLabel()
