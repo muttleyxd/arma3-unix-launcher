@@ -81,6 +81,8 @@ namespace Settings
 
     std::vector<std::string> CustomMods;
 
+    std::string PresetToRun = "";
+
     bool Load(string path)
     {
         string loadedFile = Filesystem::ReadAllText(path);

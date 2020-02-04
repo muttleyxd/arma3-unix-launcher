@@ -35,11 +35,16 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    //Checking parameters for --verbose or -v
+    //Checking parameters
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0)
             LogLevel = 0;
+        if (strcmp(argv[i], "--preset-to-run") == 0)
+        {
+            if (i + 1 < argc)
+                Settings::PresetToRun = argv[i + 1];
+        }
     }
 
     LOG(1, "ArmA 3 Unix Launcher started");

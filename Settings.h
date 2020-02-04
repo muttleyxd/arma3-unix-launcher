@@ -78,6 +78,8 @@ namespace Settings
     bool Save(std::string path);
 
     bool ModEnabled(std::string workshopId);
+
+    extern std::string PresetToRun;
 };
 
 #endif /* SETTINGS_H_ */

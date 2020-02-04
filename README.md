@@ -92,6 +92,10 @@ This enables verbose logging - useful if something works in a wrong way
 
 This deletes all files created by the launcher (symlinks and config files)
 
+    --preset-to-run <preset_name_or_preset_file>
+
+This allows you to use saved mod preset and run Arma instantly, useful for desktop shortcuts
+
 
 ### Screenshots
 

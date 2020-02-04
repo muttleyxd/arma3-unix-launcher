@@ -297,6 +297,28 @@ MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder>
 
     stop_arma_thread.store(false);
     armaStatusThread = new std::thread(&MainWindow::ArmaStatusThread, this);
+    sleep(1); // sleep - wait for armaStatusThread to update
+
+    if (!Settings::PresetToRun.empty())
+    {
+        if (!Filesystem::FileExists(Settings::PresetToRun))
+        {
+            std::string path = Filesystem::HomeDirectory + Filesystem::LauncherSettingsDirectory;
+            std::string newPresetPath = path + "/" + Settings::PresetToRun;
+            if (Filesystem::FileExists(newPresetPath))
+                Settings::PresetToRun = newPresetPath;
+            else
+                Settings::PresetToRun = newPresetPath + ".a3ulm";
+        }
+        if (!Filesystem::FileExists(Settings::PresetToRun))
+        {
+            LOG(1, "Preset file does not exist, exiting...");
+            exit(1);
+        }
+        load_preset(Settings::PresetToRun);
+        btnPlay_Clicked();
+        exit(0);
+    }
 }
 
 void MainWindow::notify()
@@ -419,6 +441,53 @@ void MainWindow::btnRemove_Clicked()
     RefreshStatusLabel();
 }
 
+void MainWindow::load_preset(std::string filename)
+{
+    Settings::ModPreset = filename.substr(filename.find_last_of('/') + 1);
+    std::string contents = Filesystem::ReadAllText(filename);
+    Settings::WorkshopModsEnabled.clear();
+    Settings::CustomModsEnabled.clear();
+
+    //load mods into settings
+    for (std::string line : Utils::Split(contents, "\n"))
+    {
+        if (Utils::StartsWith(line, "WorkshopModsEnabled="))
+        {
+            std::string sub = line.substr(20);
+            for (std::string s : Utils::Split(sub, ","))
+                Settings::WorkshopModsEnabled.push_back(s);
+        }
+        else if (Utils::StartsWith(line, "CustomModsEnabled="))
+        {
+            std::string sub = line.substr(18);
+            for (std::string s : Utils::Split(sub, ","))
+                Settings::CustomModsEnabled.push_back(s);
+        }
+    }
+
+    //update UI to reflect changes
+    for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
+    {
+        Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+        Glib::ustring workshopid = row[workshopColumns.workshopid];
+
+        row[workshopColumns.enabled] = Settings::ModEnabled(workshopid.raw());
+    }
+
+    for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
+    {
+        Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
+
+        Glib::ustring path = row[customColumns.path];
+        std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
+
+        row[customColumns.enabled] = Settings::ModEnabled(pathStr);
+    }
+
+    RefreshStatusLabel();
+}
+
 void MainWindow::btnPresetLoad_Clicked()
 {
     Gtk::FileChooserDialog fcDialog(*this, "Select a Preset", Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -439,52 +508,7 @@ void MainWindow::btnPresetLoad_Clicked()
     int result = fcDialog.run();
 
     if (result)
-    {
-        std::string fname = fcDialog.get_filename();
-        Settings::ModPreset = fname.substr(fname.find_last_of('/') + 1);
-        std::string contents = Filesystem::ReadAllText(fcDialog.get_filename());
-        Settings::WorkshopModsEnabled.clear();
-        Settings::CustomModsEnabled.clear();
-
-        //load mods into settings
-        for (std::string line : Utils::Split(contents, "\n"))
-        {
-            if (Utils::StartsWith(line, "WorkshopModsEnabled="))
-            {
-                std::string sub = line.substr(20);
-                for (std::string s : Utils::Split(sub, ","))
-                    Settings::WorkshopModsEnabled.push_back(s);
-            }
-            else if (Utils::StartsWith(line, "CustomModsEnabled="))
-            {
-                std::string sub = line.substr(18);
-                for (std::string s : Utils::Split(sub, ","))
-                    Settings::CustomModsEnabled.push_back(s);
-            }
-        }
-
-        //update UI to reflect changes
-        for (int i = 0; i < workshopModsStore.operator ->()->children().size(); i++)
-        {
-            Gtk::TreeModel::Row row = *(workshopModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
-
-            Glib::ustring workshopid = row[workshopColumns.workshopid];
-
-            row[workshopColumns.enabled] = Settings::ModEnabled(workshopid.raw());
-        }
-
-        for (int i = 0; i < customModsStore.operator ->()->children().size(); i++)
-        {
-            Gtk::TreeModel::Row row = *(customModsStore.operator ->()->get_iter(std::to_string(i).c_str()));
-
-            Glib::ustring path = row[customColumns.path];
-            std::string pathStr = Utils::Replace(path.raw(), Filesystem::ArmaDirMark, Settings::ArmaPath);
-
-            row[customColumns.enabled] = Settings::ModEnabled(pathStr);
-        }
-
-        RefreshStatusLabel();
-    }
+        load_preset(fcDialog.get_filename());
 }
 
 void MainWindow::btnPresetSave_Clicked()

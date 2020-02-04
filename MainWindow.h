@@ -150,6 +150,7 @@ class MainWindow : public Gtk::Window
         void btnAdd_Clicked();
         void btnRemove_Clicked();
 
+        void load_preset(std::string path);
         void btnPresetLoad_Clicked();
         void btnPresetSave_Clicked();
 

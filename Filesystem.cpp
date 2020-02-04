@@ -391,7 +391,8 @@ namespace Filesystem
         LOG(1, "Generating Arma3.cfg");
         string response;
         string inputFile = ReadAllText(source);
-        if (inputFile == FILE_NOT_OPEN) {
+        if (inputFile == FILE_NOT_OPEN)
+        {
             inputFile = "";
             std::string command = "mkdir -p $(realpath -m $(dirname \"" + source + "\"))";
             LOG(1, "Cannot read Arma3.cfg, creating directory " + command);
@@ -416,7 +417,8 @@ namespace Filesystem
                 fullPath += Filesystem::ArmaDirWorkshop;
             fullPath += "/" + symlinkAt + modList[i]->DirName;
             string testPath = GetSymlinkTarget(fullPath);
-            if (testPath != NOT_A_SYMLINK) {
+            if (testPath != NOT_A_SYMLINK)
+            {
                 fullPath = testPath;
             };
             string dirName = symlinkAt + modList[i]->DirName;
