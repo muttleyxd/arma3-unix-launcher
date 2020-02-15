@@ -1,0 +1,28 @@
+git:
+  depth: false #($COMMIT_COUNT would fail otherwise)
+os:
+- osx
+language: cpp
+script:
+- mkdir build && cd build
+- cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt'
+  -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9
+  -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+- set -e
+- make -j$(sysctl -n hw.ncpu)
+- ctest
+- make package
+- export COMMIT_COUNT=`git rev-list --count HEAD`
+- export COMMIT_HASH=`git rev-parse --verify HEAD | cut -c -7`
+- mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT-$COMMIT_HASH-mac_os_x-x86_64.dmg 
+deploy:
+  provider: releases
+  api_key:
+    secure: il+wwZH4DkB2kXPp4vgGmtWUKh4y6O+Jt415mcbHHTZLx0a6HaoJnVRLXMXEkJ9lqw9wlME2phlAcDNprSZrkTAH7lnz9ZgCklcIMIgPkvKJMleH1rUBy5YwBrYsld1XhjEbbxWzBGSJr0AXlAUKhB5ApwME0c8GW1awe4Job48cmhY/wUqm7PXv8opx4L871bhyXRzW1xxnB0HMw8Ru/VZ/c/tuo7zvy5m2ilia9+C+XW1xTI3nn6TNyEk1w3DD5dMWbu6ZBIKJZFuoZFe/Ysjps15ihJVpRjJ8ZAPJYu5FChRnBSYbdmeB5gOw1B5x+PJXCxnNbjUAfQ3NOCO+2Y+v/37QC9EYZ5FELKEuMTA2nbF1D6gC1bk9uA+V5PbEhFsMkSyrpY8xsWCKCwFJlI6AEJHKSJ+zDPanuNGSsJJbwKFI846z8bEFPY8ORj6wFzcMiiY0a1pFoOKmOLIUedvEX176MEOwyyjZbWqQF/5HA70XBuPbS0f9idVNBX5PkRUIEU02z2+K/hGZI35zHXJY1bmk5FNkrQYHmhSS/5AibIKEFBZlJ5bIHntP0V5wgE9VIO87xFFQyq4j6Xc95r3EfMilkOqOnWQrVLDYT1BB59a4rkWimc83FBNvT/RlrvBmRskg8g/ZvIlSHnBpwpBngEDBEqiztQlRWKva+n0=
+  draft: true
+  file_glob: true
+  file: "/Users/travis/build/muttleyxd/arma3-unix-launcher/build/*.dmg"
+  skip_cleanup: true
+  on:
+    repo: muttleyxd/arma3-unix-launcher
+    branch: master

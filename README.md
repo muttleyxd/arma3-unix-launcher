@@ -1,62 +1,46 @@
 # ArmA 3 Unix Launcher
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a144e12d9cc4cde90616f0e3f282322)](https://www.codacy.com/manual/muttleyxd/arma3-unix-launcher?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=muttleyxd/arma3-unix-launcher&amp;utm_campaign=Badge_Grade), <img src="https://cdn0.iconfinder.com/data/icons/tab-bar-ios-and-wp8-vector-icons/48/linux-512.png" height="32">  [![Build Status](https://cloud.drone.io/api/badges/muttleyxd/arma3-unix-launcher/status.svg)](https://cloud.drone.io/muttleyxd/arma3-unix-launcher), <img src="https://cdn3.iconfinder.com/data/icons/flat-icons-web/40/Apple-512.png" height="32"> [![Build Status](https://travis-ci.com/muttleyxd/arma3-unix-launcher.svg?branch=master)](https://travis-ci.com/muttleyxd/arma3-unix-launcher)
+
 ArmA 3 Launcher for Linux and Mac.
 Since Bohemia didn't port their launcher to Linux and Mac and existing launcher didn't satisfy my needs I decided to create my own.
 
 Launcher detects and symlinks all mods from Workshop and ArmA's main directory. It also allows to add your own mods from outside ArmA directory.
 
-### Features
+## Table of contents
 
-* Read location of ArmA 3 (config.vdf parsing)
-* Workshop mods support (symlink to ~arma/!workshop)
-* Detect @mods (ArmA main dir)
-* Add mods from outside ArmA's dir (symlink)
-* Launch ArmA with desired options
-* Cross platform - Linux and Mac
+* [Installing](#installing)
+    * [From package](#from-package)
+    * [Building from source](#building-from-source)
+* [Launch parameters](#launch-parameters)
 
-### TODO
 
-* Steam integration (info about downloading)
-* Server browser
-* .paa reading - for displaying mod images in launcher
-* Mod dependency caching from Steam Workshop
-* MacOS binary build
-* Code refactoring (logic should be outside GUI code)
-* PPA for Ubuntu
+## Installing
 
-### Installing
+### From package
 
-#### Debian based (Debian, Ubuntu)
+For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
-Please build arma3-unix-launcher from source. 
-.deb files are outdated
+For Arch based distributions there's an AUR package available - it's called `arma3-linux-launcher-git`
 
-~~There is a .deb package available in releases tab!~~
-
-[Releases tab](https://github.com/muttleyxd/arma3-unix-launcher/releases)
-
-#### Arch based (Arch, Antergos, Manjaro)
-
-For now there's AUR package available - it's called arma3-linux-launcher-git.
-
-    yaourt -S arma3-linux-launcher-git
-
-#### Mac OS X
-
-Binary package is currently unavailable. Please build from source or use [install script](https://github.com/muttleyxd/arma3-unix-launcher/tree/mac_installer).
+    yay -S arma3-linux-launcher-git
 
 ### Building from source
 
-Gtkmm3 is required
+Requirements:
+- GCC 8 or newer (Clang with C++17 support should work too)
+- CMake 3.11
+- Qt5 with SVG support
+- fmt (optional)
 
-#### Debian package
-    apt-get install cmake libgtkmm-3.0-1v5 libgtkmm-3.0-dev
+#### Debian based (Debian, Ubuntu)
+    apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev
 
-#### Arch Linux
-    pacman -S cmake gtkmm3
+#### Arch based (Arch Linux, Manjaro)
+    pacman -S cmake fmt qt5-base qt5-svg
 
 #### Mac OS X
-    brew install gtkmm3
+    brew install gcc cmake qt
 
 #### Build process
     git clone https://github.com/muttleyxd/arma3-unix-launcher.git
@@ -68,41 +52,25 @@ Gtkmm3 is required
 
 After that you can launch with
 
-    ./arma3-unix-launcher
+    ./src/arma3-unix-launcher
 
-Or install globally with
-
-    sudo make install
-
-#### Launching on Linux
-
-    arma3_unix_launcher
-
-#### Launching on Mac OS X
-
-Go to Applications and run "arma3-unix-launcher"
 
 ### Launch parameters
 
-    --verbose
+```
+Usage: arma3-unix-launcher [options] 
 
-This enables verbose logging - useful if something works in a wrong way
+Optional arguments:
+-h --help          	show this help message and exit
+-l --list-presets  	list available mod presets
+-p --preset-to-run 	preset to run, launcher will start Arma with given mods and exit
+--server-ip        	server ip to connect to, usable only with --preset-to-run
+--server-port      	server port to connect to, usable only with --preset-to-run
+--server-password  	server pasword to connect to, usable only with --preset-to-run
+-v --verbose       	verbose mode which enables more logging
+```
 
-    --purge
-
-This deletes all files created by the launcher (symlinks and config files)
-
-    --preset-to-run <preset_name_or_preset_file>
-
-This allows you to use saved mod preset and run Arma instantly, useful for desktop shortcuts
-
-
-### Screenshots
-
-Mods tab:
-
-![mods tab](http://i.imgur.com/OmN0IDe.png)
-
-Parameters tab:
-
-![parameters tab](http://i.imgur.com/IseHvUc.png)
+Example:
+```
+arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 1234 --server-password asdasd
+```

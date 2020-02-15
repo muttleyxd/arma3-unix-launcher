@@ -16,3 +16,4 @@ pad-header
 align-pointer=name
 align-reference=name
 convert-tabs
+max-code-length=120

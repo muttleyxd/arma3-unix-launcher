@@ -1,0 +1,20 @@
+FROM archlinux/base
+
+# Update image
+RUN pacman -Syu --noconfirm
+
+# Install required dependencies
+RUN pacman -S --noconfirm base-devel cmake make gcc git qt5-base qt5-svg fmt
+
+# Cleanup
+RUN rm -rf /var/cache/pacman/pkg/*
+
+# Download nlohmann-json and doctest from GitHub
+ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp
+ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h
+RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
+
+# We cannot run makepkg as root, so we need a builduser
+RUN useradd -m builduser && passwd -d builduser
+
+USER builduser
