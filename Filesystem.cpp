@@ -424,7 +424,7 @@ namespace Filesystem
             string dirName = symlinkAt + modList[i]->DirName;
 
             string disk = "C:";
-            if (IsProton(GetDirectory(DirectoryToFind::ArmaInstall)))
+            if (IsProton(armaPath))
                 disk = "Z:";
             string windowsPath = disk + Utils::Replace(fullPath, "/", "\\");
             modLauncherList += "\tclass Mod" + to_string(i + 1) + "\n\t{"
