@@ -5,8 +5,6 @@
 ArmA 3 Launcher for Linux and Mac.
 Since Bohemia didn't port their launcher to Linux and Mac and existing launcher didn't satisfy my needs I decided to create my own.
 
-Launcher detects and symlinks all mods from Workshop and ArmA's main directory. It also allows to add your own mods from outside ArmA directory.
-
 ## Table of contents
 
 * [Installing](#installing)
