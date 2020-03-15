@@ -1,48 +1,12 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+/build*
 
-# Precompiled Headers
-*.gch
-*.pch
+#Qt Creator
+CMakeLists.txt.*
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-#Executable
-arma3-unix-launcher
-
-#Eclipse project files
-.settings/*
-.cproject
-.project
-/MainForm.glade~
-/#MainForm.glade#
-
-#CLion project files
+#CLion
 .idea/*
+cmake-build*/
 
-#build dir
-build/*
-cmake-build-debug/*
-cmake-build-release/*
-CMakeLists.txt.user
+#Packages
+*.tar.xz
+*.deb

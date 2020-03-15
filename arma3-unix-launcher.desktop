@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=ArmA 3 Unix Launcher
-Comment=Advanced launcher for ArmA 3 on Linux and Mac
-Exec=arma3-unix-launcher
-Categories=Game;
-StartupNotify=true

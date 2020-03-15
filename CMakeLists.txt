@@ -1,33 +1,35 @@
-cmake_minimum_required (VERSION 2.8.12)
-project (arma3-unix-launcher)
+cmake_minimum_required(VERSION 3.11)
+project(arma3-unix-launcher)
 
-set (CMAKE_CXX_STANDARD 11)
+include(cmake/external_dependencies.cmake)
+include(cmake/functions.cmake)
 
-# GTKMM
-find_package (PkgConfig REQUIRED)
-pkg_check_modules (GTKMM REQUIRED gtkmm-3.0)
-include_directories(SYSTEM ${GTKMM_INCLUDE_DIRS})
-link_directories (${GTKMM_LIBRARY_DIRS})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+add_libraries_to_linker(COMPILER_ID GNU
+                        LIBS stdc++fs
+                        WHEN ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 9
+                        WARNING_MESSAGE "Applying workaround for GCC 8 and lower - linking stdc++fs")
 
-#build executable
-add_executable (arma3-unix-launcher main.cpp Filesystem.cpp Logger.cpp MainWindow.cpp Mod.cpp Settings.cpp Utils.cpp VDF.cpp VDFKey.cpp)
-target_link_libraries (arma3-unix-launcher ${GTKMM_LIBRARIES} pthread)
-set (CMAKE_CXX_FLAGS "-std=gnu++11 ${CMAKE_CXX_FLAGS}")
+option(DEVELOPER_MODE "Enable developer checks" OFF)
+option(RUN_TESTS "Run tests with DocTest" OFF)
 
-if(APPLE)
-    add_custom_command (TARGET arma3-unix-launcher POST_BUILD COMMAND mkdir arma3-unix-launcher.app && cd arma3-unix-launcher.app && mkdir Contents && cd Contents && mkdir MacOS)
-    add_custom_command (TARGET arma3-unix-launcher POST_BUILD COMMAND cp arma3-unix-launcher ${CMAKE_CURRENT_BINARY_DIR}/arma3-unix-launcher.app/Contents/MacOS)
-    add_custom_command (TARGET arma3-unix-launcher POST_BUILD COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist ${CMAKE_CURRENT_BINARY_DIR}/arma3-unix-launcher.app/Contents)
-    add_custom_command (TARGET arma3-unix-launcher POST_BUILD COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/MainForm.glade ${CMAKE_CURRENT_BINARY_DIR}/arma3-unix-launcher.app/Contents/MacOS)
-else(APPLE)
-    add_custom_command (TARGET arma3-unix-launcher POST_BUILD COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/MainForm.glade ${CMAKE_CURRENT_BINARY_DIR}/MainForm.glade)
-endif(APPLE)
+if (DEVELOPER_MODE)
+    add_definitions(-DSTATIC_TODO_ENABLED)
+endif ()
 
-# Installation
-if(APPLE)
-    install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/arma3-unix-launcher.app DESTINATION /Applications USE_SOURCE_PERMISSIONS)
-else(APPLE)
-    install (TARGETS arma3-unix-launcher DESTINATION /usr/bin)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.desktop DESTINATION /usr/share/applications)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/MainForm.glade DESTINATION /usr/share/arma3-unix-launcher)
-endif(APPLE)
+include_directories(external/static-todo)
+setup_argparse()
+setup_fmt()
+setup_nlohmann_json()
+
+add_subdirectory(src)
+
+if (RUN_TESTS)
+    setup_doctest()
+    setup_trompeloeil()
+    enable_testing()
+    add_subdirectory(tests)
+endif ()
+
+include(external/use-backward-cpp.cmake)

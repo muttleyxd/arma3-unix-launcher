@@ -1,0 +1,9 @@
+Package: arma3-unix-launcher
+Version: 0.1
+Architecture: amd64
+Maintainer: muttleyxd <mateusz@szychowski.it>
+Depends: libqt5widgets5, libqt5svg5
+Section: testing
+Priority: optional
+Homepage: https://github.com/muttleyxd/arma3-unix-launcher.git
+Description: Advanced launcher Linux and Mac ArmA 3
