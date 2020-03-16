@@ -43,12 +43,6 @@
            <layout class="QVBoxLayout" name="layout_vertical_mods">
             <item>
              <widget class="QLabel" name="label_workshop_mods">
-              <property name="maximumSize">
-               <size>
-                <width>1024</width>
-                <height>1024</height>
-               </size>
-              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
