@@ -32,6 +32,7 @@ namespace
                                                             "exThreads": -1,
                                                             "filePatching": false,
                                                             "host": false,
+                                                            "hugepages": false,
                                                             "name": null,
                                                             "noLogs": false,
                                                             "noPause": false,
@@ -107,6 +108,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("noLogs", ui->checkbox_no_logs);
     read_setting("world", ui->checkbox_world, ui->textbox_world);
     read_setting("noPause", ui->checkbox_no_pause);
+    read_setting("hugepages", ui->checkbox_hugepages);
     read_setting("customParameters", ui->checkbox_custom_parameters, ui->textbox_custom_parameters);
 
     auto &parameters = settings["parameters"];
@@ -177,6 +179,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("noLogs", ui->checkbox_no_logs);
     write_setting("world", ui->checkbox_world, ui->textbox_world);
     write_setting("noPause", ui->checkbox_no_pause);
+    write_setting("hugepages", ui->checkbox_hugepages);
     write_setting("customParameters", ui->checkbox_custom_parameters, ui->textbox_custom_parameters);
 
     parameters["cpuCount"] = -1;
