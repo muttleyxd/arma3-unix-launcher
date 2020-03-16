@@ -84,8 +84,8 @@ function(setup_nlohmann_json)
           json[0] = 1;
           return 0;
         }")
-	check_cxx_source_compiles("${CHECK_SOURCE}" SYSTEM_nlohmann_json_WORKS)
-	if (SYSTEM_nlohmann_json_WORKS)
+    check_cxx_source_compiles("${CHECK_SOURCE}" SYSTEM_nlohmann_json_WORKS)
+    if (SYSTEM_nlohmann_json_WORKS)
         add_library(nlohmann_json INTERFACE)
     else()
         FetchContent_Declare(nlohmann_json
