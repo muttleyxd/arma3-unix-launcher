@@ -105,10 +105,13 @@ namespace ARMA3
 
     std::filesystem::path Client::GetCfgPath()
     {
-        return std::filesystem::path(Definitions::home_directory)
-               / Definitions::local_share_prefix
-               / Definitions::bohemia_interactive_prefix
-               / Definitions::game_config_path;
+        if (IsProton())
+          return GetPath() / Definitions::proton_config_relative_path;
+        else
+          return std::filesystem::path(Definitions::home_directory)
+                 / Definitions::local_share_prefix
+                 / Definitions::bohemia_interactive_prefix
+                 / Definitions::game_config_path;
     }
 
     char Client::GetFakeDriveLetter()
