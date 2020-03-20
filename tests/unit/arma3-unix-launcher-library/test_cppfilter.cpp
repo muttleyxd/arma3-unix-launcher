@@ -179,28 +179,28 @@ class BadClass
 TEST_CASE("RemoveModLauncherList")
 {
     std::array<std::string, 8> config_files =
-    {
-        "",
-        "some trash",
-        valid_config_file,
-        valid_config_file + mod_classes,
-        valid_config_file + unrelated_classes,
-        valid_config_file + mod_classes + unrelated_classes,
-        valid_config_file + error_prone_classes,
-        valid_config_file + error_prone_classes + mod_classes
-    };
+        {
+            "",
+            "some trash",
+            valid_config_file,
+            valid_config_file + mod_classes,
+            valid_config_file + unrelated_classes,
+            valid_config_file + mod_classes + unrelated_classes,
+            valid_config_file + error_prone_classes,
+            valid_config_file + error_prone_classes + mod_classes
+        };
 
     std::array<std::string, 8> out_files =
-    {
-        "",
-        "some trash",
-        valid_config_file,
-        valid_config_file,
-        valid_config_file + unrelated_classes,
-        valid_config_file + unrelated_classes,
-        valid_config_file + error_prone_classes,
-        valid_config_file + error_prone_classes
-    };
+        {
+            "",
+            "some trash",
+            valid_config_file,
+            valid_config_file,
+            valid_config_file + unrelated_classes,
+            valid_config_file + unrelated_classes,
+            valid_config_file + error_prone_classes,
+            valid_config_file + error_prone_classes
+        };
 
     for (size_t i = 0; i < config_files.size(); ++i)
     {

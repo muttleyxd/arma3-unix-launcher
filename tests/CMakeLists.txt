@@ -1,8 +1,12 @@
 enable_testing()
 
-option(TRACE_MOCKS "Enable mock tracing (logs every call to mock object to stdout)" OFF)
-if (TRACE_MOCKS)
-    string(APPEND CMAKE_CXX_FLAGS " -include ${CMAKE_CURRENT_SOURCE_DIR}/mock/mock_tracer.hpp")
+option(RUN_TESTS_FUZZING "Run fuzzing tests with libFuzzer" OFF)
+option(RUN_TESTS_UNIT "Run unit tests with DocTest" ON)
+
+if (RUN_TESTS_FUZZING)
+    add_subdirectory(fuzzing)
 endif()
 
-add_subdirectory(arma3-unix-launcher-library)
+if (RUN_TESTS_UNIT)
+    add_subdirectory(unit)
+endif()

@@ -63,7 +63,7 @@ TEST_CASE("GetConfigFilePath")
             auto path = GetConfigFilePath(config_file);
 
             THEN("$HOME/.config is used")
-                CHECK_EQ(fmt::format("{}/.config/a3unixlauncher/{}", getenv("HOME"), config_file.string()), path);
+            CHECK_EQ(fmt::format("{}/.config/a3unixlauncher/{}", getenv("HOME"), config_file.string()), path);
         }
 
         WHEN("XDG_CONFIG_HOME is set")
@@ -74,7 +74,7 @@ TEST_CASE("GetConfigFilePath")
             auto path = GetConfigFilePath(config_file);
 
             THEN("XDG_CONFIG_HOME is used")
-                CHECK_EQ(fmt::format("{}/a3unixlauncher/{}", xdg_config_home.string(), config_file.string()), path);
+            CHECK_EQ(fmt::format("{}/a3unixlauncher/{}", xdg_config_home.string(), config_file.string()), path);
         }
     }
 }
