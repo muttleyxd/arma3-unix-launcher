@@ -34,7 +34,7 @@ steps:
     - mkdir /tmp/build && cd /tmp/build
     - cmake /drone/src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-Werror" -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DRUN_TESTS_FUZZING=ON -DRUN_TESTS_UNIT=OFF
     - make -j$(nproc)
-    - export ASAN_OPTIONS=detect_leaks=0
+    - export ASAN_OPTIONS=detect_leaks=0 # LSAN needs to be disabled, because cloud.drone.io doesn't offer ptrace capability
     - ctest --output-on-failure || ls | grep crash | xargs -n1 cat
 
 ---
