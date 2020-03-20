@@ -26,7 +26,8 @@ namespace ARMA3::Definitions
     static constexpr char const *game_config_path = "GameDocuments/Arma 3/Arma3.cfg";
     #endif
 
-    static constexpr char const *proton_config_relative_path = "../../compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
+    static constexpr char const *proton_config_relative_path =
+        "../../compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
 }
 
 namespace ARMA3
