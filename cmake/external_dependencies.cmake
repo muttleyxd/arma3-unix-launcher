@@ -101,8 +101,15 @@ function(setup_nlohmann_json)
 endfunction()
 
 function(setup_trompeloeil)
-    set(CHECK_SOURCE "#include <doctest/trompeloeil.hpp>
-                      #include <trompeloeil.hpp>")
+    set(CHECK_SOURCE "#if __has_include(<doctest/trompeloeil.hpp>)
+                      #else
+                      #error no doctest/trompeloeil.hpp
+                      #endif
+                      #if __has_include(<trompeloeil.hpp>)
+                      #else
+                      #error no trompeloeil.hpp
+                      #endif
+                      int main() { }")
     setup_library("${CHECK_SOURCE}"
                   NAME trompeloeil
                   GIT_REPOSITORY https://github.com/rollbear/trompeloeil.git
