@@ -51,6 +51,8 @@ class MainWindow : public QMainWindow
 
         void on_button_mod_preset_save_clicked();
 
+        void on_button_quit_clicked();
+
 private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;

@@ -550,3 +550,8 @@ catch (std::exception const &e)
     QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
     return;
 }
+
+void MainWindow::on_button_quit_clicked()
+{
+    this->close();
+}
