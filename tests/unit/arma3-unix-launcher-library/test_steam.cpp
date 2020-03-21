@@ -20,20 +20,25 @@
 #include "exceptions/steam_install_not_found.hpp"
 #include "exceptions/steam_workshop_directory_not_found.hpp"
 
-namespace doctest {
-    template<> struct StringMaker<std::vector<std::string>> {
-        static String convert(std::vector<std::string> const& vec) {
+namespace doctest
+{
+    template<> struct StringMaker<std::vector<std::string>>
+    {
+        static String convert(std::vector<std::string> const &vec)
+        {
             std::string output  = "vector<string>: {";
-            for (auto const& str: vec)
+            for (auto const &str : vec)
                 output += fmt::format("\"{}\", ", str);
             output += "}\n";
             return output.c_str();
         }
     };
-    template<> struct StringMaker<std::vector<std::filesystem::path>> {
-        static String convert(std::vector<std::filesystem::path> const& vec) {
+    template<> struct StringMaker<std::vector<std::filesystem::path>>
+    {
+        static String convert(std::vector<std::filesystem::path> const &vec)
+        {
             std::string output  = "vector<path>: {";
-            for (auto const& str: vec)
+            for (auto const &str : vec)
                 output += fmt::format("\"{}\", ", str.string());
             output += '\n';
             return output.c_str();
@@ -45,18 +50,18 @@ using trompeloeil::_;
 
 class SteamTests
 {
-public:
-    FilesystemUtilsMock filesystemUtilsMock;
-    StdUtilsMock stdUtilsMock;
-    VdfMock vdfMock;
+    public:
+        FilesystemUtilsMock filesystemUtilsMock;
+        StdUtilsMock stdUtilsMock;
+        VdfMock vdfMock;
 
-    std::filesystem::path const default_steam_path = "/somewhere/steam";
-    std::filesystem::path const default_config_path = default_steam_path / "config/config.vdf";
+        std::filesystem::path const default_steam_path = "/somewhere/steam";
+        std::filesystem::path const default_config_path = default_steam_path / "config/config.vdf";
 
-    std::string const empty_file_content = "";
-    std::string const arma3_workshop_id = "107410";
+        std::string const empty_file_content = "";
+        std::string const arma3_workshop_id = "107410";
 
-    std::string_view const vdf_config = R"vdf(
+        std::string_view const vdf_config = R"vdf(
 "InstallConfigStore"
 {
 	"Software"
@@ -72,7 +77,7 @@ public:
 	}
 }
 )vdf";
-    std::vector<std::string> const steam_library_dirs{"/mnt/games/SteamLibrary", "/mnt/disk2/steamgames"};
+        std::vector<std::string> const steam_library_dirs{"/mnt/games/SteamLibrary", "/mnt/disk2/steamgames"};
 };
 
 TEST_CASE_FIXTURE(SteamTests, "Constructor_Success")
@@ -82,8 +87,8 @@ TEST_CASE_FIXTURE(SteamTests, "Constructor_Success")
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
 
         WHEN("Steam is constructed")
-            THEN("Exception is not thrown")
-                CHECK_NOTHROW(Steam steam({default_steam_path}));
+        THEN("Exception is not thrown")
+        CHECK_NOTHROW(Steam steam({default_steam_path}));
     }
 }
 
@@ -97,8 +102,8 @@ TEST_CASE_FIXTURE(SteamTests, "Constructor_Failed_InvalidPaths")
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(non_existent_config)).RETURN(false);
         WHEN("Steam is constructed")
-            THEN("Exception is thrown")
-                CHECK_THROWS_AS(Steam(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
+        THEN("Exception is thrown")
+        CHECK_THROWS_AS(Steam(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
     }
 }
 
@@ -115,8 +120,8 @@ TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithoutCustomLibraries")
 
         Steam steam({default_steam_path});
         WHEN("GetInstallPaths is called")
-             THEN("Only main SteamLibrary is returned")
-                CHECK_EQ(expected_paths, steam.GetInstallPaths());
+        THEN("Only main SteamLibrary is returned")
+        CHECK_EQ(expected_paths, steam.GetInstallPaths());
     }
 }
 
@@ -133,8 +138,8 @@ TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithCustomLibraries")
 
         Steam steam({default_steam_path});
         WHEN("GetInstallPaths is called")
-            THEN("Main SteamLibrary and two custom libraries are returned")
-                CHECK_EQ(expected_paths, steam.GetInstallPaths());
+        THEN("Main SteamLibrary and two custom libraries are returned")
+        CHECK_EQ(expected_paths, steam.GetInstallPaths());
     }
 }
 
@@ -151,8 +156,8 @@ TEST_CASE_FIXTURE(SteamTests, "GetGamePathFromInstallPath_Success")
 
         Steam steam({default_steam_path});
         WHEN("Getting install path of Arma 3")
-            THEN("Arma 3 path is returned")
-                CHECK_EQ(arma3_path, steam.GetGamePathFromInstallPath(default_steam_path, arma3_workshop_id));
+        THEN("Arma 3 path is returned")
+        CHECK_EQ(arma3_path, steam.GetGamePathFromInstallPath(default_steam_path, arma3_workshop_id));
     }
 }
 
@@ -171,8 +176,8 @@ TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Success")
         Steam steam({default_steam_path});
 
         WHEN("Getting workshop path for installed game")
-            THEN("Workshop path for installed game is returned")
-                CHECK_EQ(expected_workshop_path, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
+        THEN("Workshop path for installed game is returned")
+        CHECK_EQ(expected_workshop_path, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
         CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
     }
 }
@@ -190,7 +195,7 @@ TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Failed_NotExistingApp")
         Steam steam({default_steam_path});
 
         WHEN("Getting workshop path for not installed game")
-            THEN("Exception is thrown")
-                CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+        THEN("Exception is thrown")
+        CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
     }
 }

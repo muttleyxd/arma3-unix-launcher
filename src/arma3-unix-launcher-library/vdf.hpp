@@ -24,6 +24,7 @@ class VDF
         void LookForValue(char c);
         void ReadKey(char c);
         void ReadValue(char c);
+        bool CanPop();
 
         enum class VDFState
         {

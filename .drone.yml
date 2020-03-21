@@ -25,6 +25,20 @@ steps:
 
 ---
 kind: pipeline
+name: arch-clang-fuzzing-tests
+
+steps:
+- name: build-and-test
+  image: muttleyxd/a3ul_archlinux_build:latest
+  commands:
+    - mkdir /tmp/build && cd /tmp/build
+    - cmake /drone/src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-Werror" -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DRUN_TESTS_FUZZING=ON -DRUN_TESTS_UNIT=OFF
+    - make -j$(nproc)
+    - export ASAN_OPTIONS=detect_leaks=0 # LSAN needs to be disabled, because cloud.drone.io doesn't offer ptrace capability
+    - ctest --output-on-failure || ls | grep crash | xargs -n1 cat
+
+---
+kind: pipeline
 name: arch-g++-package
 
 clone:

@@ -3,6 +3,7 @@
 #include "default_test_reporter.hpp"
 
 #include "vdf.hpp"
+#include "exceptions/syntax_error.hpp"
 
 constexpr std::string_view vdf_valid = R"vdf(
 "VDFTests"
@@ -211,6 +212,21 @@ TEST_CASE("ParserThenFilter")
             THEN("Sorted output should be equal to paths")
             {
                 CHECK_EQ(filtered, paths);
+            }
+        }
+    }
+}
+
+TEST_CASE("Exception when bracket is missing")
+{
+    GIVEN("Invalid VDF - everything is ok apart from missing bracket at the end")
+    {
+        VDF vdf;
+        WHEN("Loading VDF from text")
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(vdf.LoadFromText(vdf_invalid_missing_brackets), SyntaxErrorException);
             }
         }
     }

@@ -4,7 +4,7 @@ FROM archlinux/base
 RUN pacman -Syu --noconfirm
 
 # Install required dependencies
-RUN pacman -S --noconfirm base-devel cmake make gcc git qt5-base qt5-svg fmt
+RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg fmt
 
 # Cleanup
 RUN rm -rf /var/cache/pacman/pkg/*
