@@ -51,6 +51,8 @@ class MainWindow : public QMainWindow
 
         void on_button_mod_preset_save_clicked();
 
+        void on_button_quit_clicked();
+
 private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;
@@ -67,5 +69,5 @@ private:
         UiMod get_mod_from_nth_row(QTableWidget const &table_widget, int row);
         void put_mods_from_ui_to_manager_settings();
 
-        void checkbox_changed(int state);
+        void update_mod_selection_counters(int state = 0);
 };

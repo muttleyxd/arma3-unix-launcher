@@ -89,6 +89,7 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     }
 
     manager.load_settings_to_ui(ui);
+    update_mod_selection_counters();
 
     connect(&arma_status_checker, &QTimer::timeout, this, QOverload<>::of(&MainWindow::check_if_arma_is_running));
     arma_status_checker.start(2000);
@@ -167,7 +168,7 @@ void MainWindow::add_item(QTableWidget &table_widget, UiMod const &mod)
     table_widget.setItem(id, 1, new QTableWidgetItem(mod.name.c_str()));
     table_widget.setItem(id, 2, new QTableWidgetItem(mod.path_or_workshop_id.c_str()));
 
-    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &MainWindow::checkbox_changed);
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &MainWindow::update_mod_selection_counters);
 
     for (int i = 1; i <= 2; ++i)
     {
@@ -220,7 +221,7 @@ void MainWindow::put_mods_from_ui_to_manager_settings()
             workshop_mods.push_back({{"enabled", true}, {"id", mod.path_or_workshop_id}});
 }
 
-void MainWindow::checkbox_changed(int)
+void MainWindow::update_mod_selection_counters(int)
 {
     auto workshop_mods = get_mods(*ui->table_workshop_mods);
     auto custom_mods = get_mods(*ui->table_custom_mods);
@@ -548,4 +549,9 @@ catch (std::exception const &e)
     auto error_message = fmt::format("{}.", e.what());
     QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
     return;
+}
+
+void MainWindow::on_button_quit_clicked()
+{
+    this->close();
 }
