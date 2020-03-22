@@ -13,12 +13,16 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: echo
+      run: |
+        echo ${{github.ref}}
+        exit 1
     - name: install-dependencies
       run: |
-       brew install gcc cmake qt
-       pip3 install pygithub
-       curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
-       chmod +x github-release
+        brew install gcc cmake qt
+        pip3 install pygithub
+        curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
+        chmod +x github-release
     - name: make build directory
       run: mkdir build && cd build
     - name: cmake
