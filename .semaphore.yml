@@ -1,0 +1,40 @@
+version: v1.0
+name: arma3-unix-launcher pipeline
+agent:
+  machine:
+    type: a1-standard-4
+    os_image: macos-mojave-xcode10
+blocks:
+  - name: Build
+    task:
+      secrets:
+        - name: SEMAPHORE_DEPLOY_KEY
+      jobs:
+        - name: Run build
+          commands:
+            - checkout
+            - git fetch --unshallow
+            - 'git config remote.origin.fetch ''+refs/heads/*:refs/remotes/origin/*'''
+            - git fetch --all
+            - mkdir build && cd build
+            - cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+            - make -j$(sysctl -n hw.ncpu)
+            - ctest --output-on-failure
+            - make package
+            - export COMMIT_COUNT=`git rev-list --count HEAD`
+            - export COMMIT_HASH=`git rev-parse --verify HEAD | cut -c -7`
+            - mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT-$COMMIT_HASH-mac_os_x-x86_64.dmg
+            - ls -alh
+            - echo "semaphore doesn't want to display PR status"
+            - test -z $SEMAPHORE_DEPLOY_KEY || exit 0
+            - test `git rev-parse --abbrev-ref HEAD` == "master" && ~/github-release --token $SEMAPHORE_DEPLOY_KEY --repository muttleyxd/arma3-unix-launcher --file-glob "*.dmg"
+      prologue:
+        commands:
+          - brew install gcc cmake qt
+          - pip3 install pygithub
+          - 'curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release'
+          - chmod +x github-release
+      secrets:
+        - name: SEMAPHORE_DEPLOY_KEY
+execution_time_limit:
+  minutes: 45
