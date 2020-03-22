@@ -10,17 +10,23 @@
 
 class StdUtilsMock
 {
-public:
-  StdUtilsMock() { instance = this; }
-  ~StdUtilsMock() { instance = nullptr; }
-  static inline StdUtilsMock* instance;
+    public:
+        StdUtilsMock()
+        {
+            instance = this;
+        }
+        ~StdUtilsMock()
+        {
+            instance = nullptr;
+        }
+        static inline StdUtilsMock *instance;
 
-  MAKE_MOCK1(CreateFile, bool(std::filesystem::path const&));
-  MAKE_MOCK1(FileReadAllText, std::string(std::filesystem::path const&));
-  MAKE_MOCK2(FileWriteAllText, void(std::filesystem::path const&, std::string const&));
-  MAKE_MOCK1(IsProcessRunning, pid_t(std::string const&));
-  MAKE_MOCK1(StartBackgroundProcess, void(std::string const&));
-  MAKE_MOCK1(GetConfigFilePath, std::filesystem::path(std::filesystem::path const&));
+        MAKE_MOCK1(CreateFile, bool(std::filesystem::path const &));
+        MAKE_MOCK1(FileReadAllText, std::string(std::filesystem::path const &));
+        MAKE_MOCK2(FileWriteAllText, void(std::filesystem::path const &, std::string const &));
+        MAKE_MOCK1(IsProcessRunning, pid_t(std::string const &));
+        MAKE_MOCK1(StartBackgroundProcess, void(std::string const &));
+        MAKE_MOCK1(GetConfigFilePath, std::filesystem::path(std::filesystem::path const &));
 };
 
 namespace StdUtils

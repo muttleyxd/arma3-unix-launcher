@@ -12,13 +12,19 @@ class VDF;
 
 class VdfMock
 {
-public:
-    VdfMock() { instance = this; }
-    ~VdfMock() { instance = nullptr; }
-    static inline VdfMock* instance;
+    public:
+        VdfMock()
+        {
+            instance = this;
+        }
+        ~VdfMock()
+        {
+            instance = nullptr;
+        }
+        static inline VdfMock *instance;
 
-    MAKE_MOCK3(LoadFromText, void(std::string_view const, bool, VDF&));
-    MAKE_MOCK2(GetValuesWithFilter, std::vector<std::string>(std::string_view const, VDF&));
+        MAKE_MOCK3(LoadFromText, void(std::string_view const, bool, VDF &));
+        MAKE_MOCK2(GetValuesWithFilter, std::vector<std::string>(std::string_view const, VDF &));
 };
 
 std::vector<std::string> VDF::GetValuesWithFilter(std::string_view const filter)

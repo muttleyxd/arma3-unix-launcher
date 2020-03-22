@@ -31,7 +31,7 @@ class ArmaPathChooserDialog : public QDialog
 
         void on_buttonBox_accepted();
 
-private:
+    private:
         Ui::ArmaPathChooserDialog *ui;
         QPixmap pixmap_error_;
         QPixmap pixmap_ok_;

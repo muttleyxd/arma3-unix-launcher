@@ -12,18 +12,24 @@ class Mod;
 
 class ModMock
 {
-public:
-    ModMock() { instance = this; }
-    ~ModMock() { instance = nullptr; }
-    static inline ModMock* instance;
+    public:
+        ModMock()
+        {
+            instance = this;
+        }
+        ~ModMock()
+        {
+            instance = nullptr;
+        }
+        static inline ModMock *instance;
 
-    MAKE_MOCK2(Constructor, void(std::filesystem::path const&, Mod&));
-    MAKE_MOCK1(GetName, std::string(Mod&));
-    MAKE_MOCK1(LoadAllCPP, void(Mod&));
-    MAKE_MOCK3(LoadFromText, void(std::string const&, bool, Mod&));
+        MAKE_MOCK2(Constructor, void(std::filesystem::path const &, Mod &));
+        MAKE_MOCK1(GetName, std::string(Mod &));
+        MAKE_MOCK1(LoadAllCPP, void(Mod &));
+        MAKE_MOCK3(LoadFromText, void(std::string const &, bool, Mod &));
 };
 
-Mod::Mod(std::filesystem::path const& path) : path_(path)
+Mod::Mod(std::filesystem::path const &path) : path_(path)
 {
     ModMock::instance->Constructor(path, *this);
 }

@@ -10,15 +10,21 @@
 
 class FilesystemUtilsMock
 {
-public:
-  FilesystemUtilsMock() { instance = this; }
-  ~FilesystemUtilsMock() { instance = nullptr; }
-  static inline FilesystemUtilsMock* instance;
+    public:
+        FilesystemUtilsMock()
+        {
+            instance = this;
+        }
+        ~FilesystemUtilsMock()
+        {
+            instance = nullptr;
+        }
+        static inline FilesystemUtilsMock *instance;
 
-  MAKE_MOCK1(CreateDirectories, bool(std::filesystem::path const&));
-  MAKE_MOCK1(Exists, bool(std::filesystem::path const&));
-  MAKE_MOCK1(IsDirectory, bool(std::filesystem::path const&));
-  MAKE_MOCK2(Ls, std::vector<std::string>(std::filesystem::path const&, bool));
+        MAKE_MOCK1(CreateDirectories, bool(std::filesystem::path const &));
+        MAKE_MOCK1(Exists, bool(std::filesystem::path const &));
+        MAKE_MOCK1(IsDirectory, bool(std::filesystem::path const &));
+        MAKE_MOCK2(Ls, std::vector<std::string>(std::filesystem::path const &, bool));
 };
 
 namespace FilesystemUtils
@@ -28,12 +34,12 @@ namespace FilesystemUtils
         return FilesystemUtilsMock::instance->CreateDirectories(path);
     }
 
-    bool Exists(std::filesystem::path const& path)
+    bool Exists(std::filesystem::path const &path)
     {
         return FilesystemUtilsMock::instance->Exists(path);
     }
 
-    bool IsDirectory(std::filesystem::path const& path)
+    bool IsDirectory(std::filesystem::path const &path)
     {
         return FilesystemUtilsMock::instance->IsDirectory(path);
     }
