@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 SELF_PATH=`dirname "$(readlink -f $0)"`
-pushd $SELF_PATH
+pushd "$SELF_PATH" >/dev/null
 
 print_help()
 {
@@ -10,7 +10,7 @@ Build Arma 3 Unix Launcher for given OS
 
 Available options
   -b, --build-target        build for given target, use output from '--list-systems'
-  -l, --list-systems        List available systems to build for
+  -l, --list-targets        List available targets to build for
   -u, --use-local-image     do not use images from muttleyxd/ on DockerHub, instead use local ones (build & run)
 "
   exit 0
@@ -18,7 +18,7 @@ Available options
 
 log_and_exit()
 {
-    echo "Error: $@"
+    echo "Error: $*"
     exit 1
 }
 
@@ -28,22 +28,19 @@ list_targets()
     exit 0
 }
 
-TEMP=`getopt -o b:,h,l,u --long build-target:,help,list-systems,use-local-image -n 'test.sh' -- "$@"`
-eval set -- "$TEMP"
-
 BUILD_TARGET=""
 USE_LOCAL_IMAGE=0
 
-while true ; do
+while [[ $# -gt 0 ]] ; do
     case "$1" in
-        -b|--build-targets)
+        -b|--build-target)
             case "$2" in
                 "") print_help;;
-                *) BUILD_TARGET=$2 ; shift 2 ;;
+                *) BUILD_TARGET="$2" ; shift 2 ;;
             esac ;;
-        -h|--help) print_help $0 ; shift ;;
+        -h|--help) print_help "$0" ; shift ;;
         -l|--list-targets)
-            list_targets $0 ; shift ;;
+            list_targets ; shift ;;
         -u|--use-local-image)
             USE_LOCAL_IMAGE=1 ; shift ;;
         --) shift ; break ;;
@@ -55,7 +52,7 @@ if [ "$BUILD_TARGET" == "" ]; then
     print_help
 else
     CONTAINER_NAME=`echo "a3ul_" "$BUILD_TARGET" "_build" | awk '{print $1$2$3}'`
-    DOCKERFILE_EXISTS=`ls docker/Dockerfile.$CONTAINER_NAME 2>&1`
+    DOCKERFILE_EXISTS=`ls "docker/Dockerfile.$CONTAINER_NAME" 2>&1`
     if [ $? -ne 0 ]; then
         log_and_exit "$DOCKERFILE_EXISTS"
     fi
@@ -80,4 +77,4 @@ if [ "$?" -eq 0 ]; then
     find . -mmin -1 -type f -exec realpath {} +
 fi
 
-popd
+popd >/dev/null
