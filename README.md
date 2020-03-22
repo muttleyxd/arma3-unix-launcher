@@ -14,7 +14,6 @@ Since Bohemia didn't port their launcher to Linux and Mac and existing launcher 
 
 
 ## Installing
-
 ### From package
 
 For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
@@ -26,10 +25,10 @@ For Arch based distributions there's an AUR package available - it's called `arm
 ### Building from source
 
 Requirements:
-- GCC 8 or newer (Clang with C++17 support should work too)
-- CMake 3.11
-- Qt5 with SVG support
-- fmt (optional)
+* GCC 8 or newer (Clang with C++17 support should work too)
+* CMake 3.11
+* Qt5 with SVG support
+* fmt (optional)
 
 #### Debian based (Debian, Ubuntu)
     apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev
@@ -52,10 +51,9 @@ After that you can launch with
 
     ./src/arma3-unix-launcher
 
-
 ### Launch parameters
 
-```
+```shell
 Usage: arma3-unix-launcher [options] 
 
 Optional arguments:
@@ -69,6 +67,6 @@ Optional arguments:
 ```
 
 Example:
-```
+```shell
 arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 1234 --server-password asdasd
 ```
