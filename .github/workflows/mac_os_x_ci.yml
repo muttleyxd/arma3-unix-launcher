@@ -1,0 +1,39 @@
+name: C++ Mac OS X build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install-dependencies
+      run: |
+       brew install gcc cmake qt
+       pip3 install pygithub
+       curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
+       chmod +x github-release
+    - name: make build directory
+      run: mkdir build && cd build
+    - name: cmake
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+    - name: build
+      run: cd build && make -j$(sysctl -n hw.ncpu)
+    - name: run tests
+      run: cd build && ctest --output-on-failure
+    - name: make package
+      run: |
+        cd build
+        make package
+        export COMMIT_COUNT=`git rev-list --count HEAD`
+        export COMMIT_HASH=`git rev-parse --verify HEAD | cut -c -7`
+        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT-$COMMIT_HASH-mac_os_x-x86_64.dmg
+    - name: deploy release
+      if: github.ref == 'refs/heads/muttleyxd-patch-1'
+      run: github-release --token $DRONE_DEPLOY_KEY --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
