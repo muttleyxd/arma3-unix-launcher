@@ -13,10 +13,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-#    - name: echo
-#      run: |
-#        echo ${{github.ref}}
-#        exit 1
+    - name: echo
+      run: |
+        ./github-release --token $DRONE_DEPLOY_KEY --repository muttleyxd/arma3-unix-launcher --file-glob "CMakeLists.*"
+        exit 1
     - name: install-dependencies
       run: |
         brew install gcc cmake qt
@@ -40,4 +40,4 @@ jobs:
         mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT-$COMMIT_HASH-mac_os_x-x86_64.dmg
     - name: deploy release
       if: github.ref == 'refs/pull/70/merge'
-      run: github-release --token $DRONE_DEPLOY_KEY --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
+      run: ./github-release --token $DRONE_DEPLOY_KEY --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
