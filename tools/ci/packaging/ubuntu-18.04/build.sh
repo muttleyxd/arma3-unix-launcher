@@ -16,7 +16,7 @@ PKG_DIR="$TMP_BUILD_DIR/arma3-unix-launcher_$BRANCH-$COMMIT_COUNT-$SHORT_HASH-$I
 mkdir -p $PKG_DIR/DEBIAN
 
 pushd $PKG_DIR
-  sed 's/VERSION/$COMMIT_COUNT-$SHORT_HASH/g' /build/control >./DEBIAN/control
+  sed "s/VERSION/$COMMIT_COUNT-$SHORT_HASH/g" /build/control >./DEBIAN/control
 popd
 
 pushd $TMP_BUILD_DIR

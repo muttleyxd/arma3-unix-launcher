@@ -12,12 +12,18 @@ class CppFilter;
 
 class CppFilterMock
 {
-public:
-    CppFilterMock() { instance = this; }
-    ~CppFilterMock() { instance = nullptr; }
-    static inline CppFilterMock* instance;
+    public:
+        CppFilterMock()
+        {
+            instance = this;
+        }
+        ~CppFilterMock()
+        {
+            instance = nullptr;
+        }
+        static inline CppFilterMock *instance;
 
-    MAKE_MOCK2(RemoveClass, std::string(std::string const &, CppFilter&));
+        MAKE_MOCK2(RemoveClass, std::string(std::string const &, CppFilter &));
 };
 
 /*#define MAKE_STUBOMOCK(ret_type, class_name, method_name, args, mock_type) \
@@ -28,7 +34,7 @@ public:
 
 MAKE_STUBOMOCK(std::string, CppFilter, RemoveClass, (std::string const&), CppFilterMock);*/
 
-std::string CppFilter::RemoveClass(std::string const& class_name)
+std::string CppFilter::RemoveClass(std::string const &class_name)
 {
     return CppFilterMock::instance->RemoveClass(class_name, *this);
 }
