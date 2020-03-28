@@ -51,7 +51,6 @@ std::string Mod::RemoveWhitespacesAndComments(std::string const &text)
 
 void Mod::ParseCPP(std::string const &text)
 {
-    std::vector<std::string_view> lines = StringUtils::Split(text, ";");
     for (auto const &line : StringUtils::Split(text, ";"))
     {
         size_t split_place = line.find('=');
