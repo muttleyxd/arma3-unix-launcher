@@ -38,189 +38,200 @@
          <attribute name="title">
           <string>Mods</string>
          </attribute>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <layout class="QVBoxLayout" name="layout_vertical_mods">
-            <item>
-             <widget class="QLabel" name="label_workshop_mods">
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;Workshop mods&lt;/b&gt;&lt;br/&gt;
-&lt;small&gt;Here you can see mods you are subscribed to&lt;/small&gt;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTableWidget" name="table_workshop_mods">
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="columnCount">
-               <number>3</number>
-              </property>
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <column/>
-              <column/>
-              <column/>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_custom_mods">
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;Custom mods&lt;/b&gt;&lt;br/&gt;&lt;small&gt;Here you can add your own mods&lt;/small&gt;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTableWidget" name="table_custom_mods">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="columnCount">
-               <number>3</number>
-              </property>
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <column/>
-              <column/>
-              <column/>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="layout_horizontal_buttons_add_remove">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QSplitter" name="splitter_mods">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QWidget" name="">
+             <layout class="QVBoxLayout" name="layout_vertical_workshop_mods">
               <item>
-               <widget class="QLabel" name="label_custom_mods_buttons">
-                <property name="text">
-                 <string>Custom mods:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_add_custom_mod">
-                <property name="text">
-                 <string>Add</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="icons.qrc">
-                  <normaloff>:/icons/open-iconic/plus.svg</normaloff>:/icons/open-iconic/plus.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_remove_custom_mod">
-                <property name="text">
-                 <string>Remove</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="icons.qrc">
-                  <normaloff>:/icons/open-iconic/minus.svg</normaloff>:/icons/open-iconic/minus.svg</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="layout_horizontal_mod_preset">
-              <item>
-               <widget class="QLabel" name="label_mod_preset">
-                <property name="text">
-                 <string>Mod preset:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_mod_preset_open">
-                <property name="text">
-                 <string>Open</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="icons.qrc">
-                  <normaloff>:/icons/open-iconic/envelope-open.svg</normaloff>:/icons/open-iconic/envelope-open.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="button_mod_preset_save">
-                <property name="text">
-                 <string>Save</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="icons.qrc">
-                  <normaloff>:/icons/open-iconic/envelope-closed.svg</normaloff>:/icons/open-iconic/envelope-closed.svg</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="layout_horizontal_selected_mods">
-              <item>
-               <widget class="QLabel" name="label_selected_mods">
+               <widget class="QLabel" name="label_workshop_mods">
                 <property name="frameShape">
                  <enum>QFrame::Box</enum>
                 </property>
-                <property name="lineWidth">
-                 <number>0</number>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
                 </property>
                 <property name="text">
-                 <string>Selected 0 mods (0 from workshop, 0 custom)</string>
+                 <string>&lt;b&gt;Workshop mods&lt;/b&gt;&lt;br/&gt;
+&lt;small&gt;Here you can see mods you are subscribed to&lt;/small&gt;</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QTableWidget" name="table_workshop_mods">
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="columnCount">
+                 <number>3</number>
+                </property>
+                <attribute name="horizontalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <column/>
+                <column/>
+                <column/>
+               </widget>
+              </item>
              </layout>
+            </widget>
+            <widget class="QWidget" name="">
+             <layout class="QVBoxLayout" name="layout_vertical_custom_mods">
+              <item>
+               <widget class="QLabel" name="label_custom_mods">
+                <property name="frameShape">
+                 <enum>QFrame::Box</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="text">
+                 <string>&lt;b&gt;Custom mods&lt;/b&gt;&lt;br/&gt;&lt;small&gt;Here you can add your own mods&lt;/small&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTableWidget" name="table_custom_mods">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="selectionBehavior">
+                 <enum>QAbstractItemView::SelectRows</enum>
+                </property>
+                <property name="columnCount">
+                 <number>3</number>
+                </property>
+                <attribute name="horizontalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <column/>
+                <column/>
+                <column/>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_horizontal_buttons_add_remove">
+            <item>
+             <widget class="QLabel" name="label_custom_mods_buttons">
+              <property name="text">
+               <string>Custom mods:</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="layout_horizontal_button_start_lbl_status">
-              <item>
-               <widget class="QPushButton" name="button_start">
-                <property name="text">
-                 <string>Start</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_arma_status">
-                <property name="text">
-                 <string>Status: Arma 3 is not running</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QPushButton" name="button_add_custom_mod">
+              <property name="text">
+               <string>Add</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/open-iconic/plus.svg</normaloff>:/icons/open-iconic/plus.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_remove_custom_mod">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/open-iconic/minus.svg</normaloff>:/icons/open-iconic/minus.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_horizontal_mod_preset">
+            <item>
+             <widget class="QLabel" name="label_mod_preset">
+              <property name="text">
+               <string>Mod preset:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_mod_preset_open">
+              <property name="text">
+               <string>Open</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/open-iconic/envelope-open.svg</normaloff>:/icons/open-iconic/envelope-open.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_mod_preset_save">
+              <property name="text">
+               <string>Save</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/open-iconic/envelope-closed.svg</normaloff>:/icons/open-iconic/envelope-closed.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_horizontal_selected_mods">
+            <item>
+             <widget class="QLabel" name="label_selected_mods">
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="lineWidth">
+               <number>0</number>
+              </property>
+              <property name="text">
+               <string>Selected 0 mods (0 from workshop, 0 custom)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_horizontal_button_start_lbl_status">
+            <item>
+             <widget class="QPushButton" name="button_start">
+              <property name="text">
+               <string>Start</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_arma_status">
+              <property name="text">
+               <string>Status: Arma 3 is not running</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
