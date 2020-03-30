@@ -4,7 +4,7 @@ NotASymlinkException::NotASymlinkException(std::string const &path): message("No
 {
 }
 
-const char *NotASymlinkException::what() const noexcept
+char const *NotASymlinkException::what() const noexcept
 {
     return message.c_str();
 }

@@ -5,7 +5,7 @@ DirectoryNoAccessException::DirectoryNoAccessException(std::string const &path) 
 {
 }
 
-const char *DirectoryNoAccessException::what() const noexcept
+char const *DirectoryNoAccessException::what() const noexcept
 {
     return message.c_str();
 }

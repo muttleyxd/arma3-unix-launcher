@@ -4,7 +4,7 @@ SyntaxErrorException::SyntaxErrorException(std::string const &error): message("S
 {
 }
 
-const char *SyntaxErrorException::what() const noexcept
+char const *SyntaxErrorException::what() const noexcept
 {
     return message.c_str();
 }

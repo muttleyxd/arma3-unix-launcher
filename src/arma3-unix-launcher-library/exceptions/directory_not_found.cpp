@@ -5,7 +5,7 @@ DirectoryNotFoundException::DirectoryNotFoundException(std::string const &path) 
 {
 }
 
-const char *DirectoryNotFoundException::what() const noexcept
+char const *DirectoryNotFoundException::what() const noexcept
 {
     return message.c_str();
 }

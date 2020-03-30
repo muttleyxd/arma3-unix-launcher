@@ -4,7 +4,7 @@ FileNotFoundException::FileNotFoundException(std::string const &path) : message(
 {
 }
 
-const char *FileNotFoundException::what() const noexcept
+char const *FileNotFoundException::what() const noexcept
 {
     return message.c_str();
 }
