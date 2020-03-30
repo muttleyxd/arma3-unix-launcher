@@ -603,7 +603,7 @@
         </widget>
         <widget class="QWidget" name="tab_other">
          <attribute name="title">
-          <string>Page</string>
+          <string>Other</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
