@@ -13,14 +13,15 @@ create_fuzzing_test(TEST_GROUP library
                     SOURCES    test_mod_fuzz.cpp
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/mod.cpp
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/mod.hpp
-                               ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                               ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.cpp
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.hpp
+                               ${CMAKE_SOURCE_DIR}/src/common/string_utils.cpp
+                               ${CMAKE_SOURCE_DIR}/src/common/string_utils.hpp
 
                                ${CMAKE_SOURCE_DIR}/tests/unit/mock/filesystem_utils.hpp
                                ${CMAKE_SOURCE_DIR}/tests/unit/mock/std_utils.hpp
                     INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                               ${CMAKE_SOURCE_DIR}/src/common
                                ${CMAKE_SOURCE_DIR}/tests/unit
                     )
 
@@ -32,4 +33,5 @@ create_fuzzing_test(TEST_GROUP library
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.cpp
                                ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.hpp
                     INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                               ${CMAKE_SOURCE_DIR}/src/common
                     )

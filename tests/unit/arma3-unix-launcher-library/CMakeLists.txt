@@ -5,18 +5,20 @@ create_unit_test(TEST_GROUP library
                  SOURCES    test_arma3client.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/arma3client.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/arma3client.hpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/file_not_found.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/file_not_found.hpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/path_no_access.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/path_no_access.hpp
 
-                            default_test_reporter.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/exceptions/path_no_access.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/exceptions/path_no_access.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/filesystem_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/std_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/vdf.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                            ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt
                  )
 
@@ -28,8 +30,9 @@ create_unit_test(TEST_GROUP library
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.hpp
 
-                            default_test_reporter.hpp
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                            ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt
                  )
 
@@ -38,38 +41,18 @@ create_unit_test(TEST_GROUP library
                  SOURCES    test_mod.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/mod.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/mod.hpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.hpp
 
-                            default_test_reporter.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/filesystem_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/std_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/vdf.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
-                 LINK_LIBS  fmt::fmt
-                 )
-
-create_unit_test(TEST_GROUP library
-                 TEST_NAME  std_utils
-                 SOURCES    test_std_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/std_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/std_utils.hpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
-                            default_test_reporter.hpp
-                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
-                 LINK_LIBS  fmt::fmt
-                 )
-
-create_unit_test(TEST_GROUP library
-                 TEST_NAME  string_utils
-                 SOURCES    test_string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
-                            default_test_reporter.hpp
-                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                            ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt
                  )
 
@@ -78,18 +61,20 @@ create_unit_test(TEST_GROUP library
                  SOURCES    test_steam.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/steam.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/steam.hpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.cpp
-                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/string_utils.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_install_not_found.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_install_not_found.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_workshop_directory_not_found.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_workshop_directory_not_found.hpp
 
-                            default_test_reporter.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/string_utils.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/filesystem_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/std_utils.hpp
                             ${CMAKE_SOURCE_DIR}/tests/unit/mock/vdf.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                            ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt
                  )
 
@@ -101,7 +86,8 @@ create_unit_test(TEST_GROUP library
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/syntax_error.hpp
 
-                            default_test_reporter.hpp
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                            ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt
                  )

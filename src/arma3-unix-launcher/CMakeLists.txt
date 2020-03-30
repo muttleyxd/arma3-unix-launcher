@@ -10,12 +10,13 @@ file(GLOB SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 add_executable(arma3-unix-launcher MACOSX_BUNDLE ${SOURCES})
 target_link_libraries(arma3-unix-launcher PRIVATE
     arma3-unix-launcher-library
+    common
     argparse::argparse
     fmt::fmt
     nlohmann::json
     Qt5::Widgets
-    Qt5::Svg)
-#install(TARGETS arma3-unix-launcher DESTINATION bin)
+    Qt5::Svg
+    )
 install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime)
