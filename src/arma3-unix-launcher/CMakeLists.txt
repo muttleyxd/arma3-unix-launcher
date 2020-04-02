@@ -21,7 +21,7 @@ install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime)
 
-if (APPLE)    
+if (APPLE)
     find_package(Qt5Widgets CONFIG REQUIRED)
     get_target_property(WIDGETS_LOCATION Qt5::Widgets IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR "${WIDGETS_LOCATION}" DIRECTORY)
@@ -32,7 +32,7 @@ if (APPLE)
             "$<TARGET_FILE_DIR:arma3-unix-launcher>/../.."
             -always-overwrite
         COMMENT "Running macdeployqt...")
-    
+
     set(CPACK_GENERATOR "DragNDrop")
     include(CPack)
 endif()
