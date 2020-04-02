@@ -8,7 +8,7 @@
 
 #include "arma3client.hpp"
 #include "filesystem_utils.hpp"
-#include "steam.hpp"
+#include "steam_utils.hpp"
 #include "std_utils.hpp"
 
 #include "exceptions/file_not_found.hpp"
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
         if (arma_path.empty() || !std::filesystem::exists(arma_path))
         {
-            Steam steam;
+            SteamUtils steam;
 
             for (auto const &path : steam.GetInstallPaths())
             {

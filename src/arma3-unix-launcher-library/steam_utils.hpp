@@ -4,10 +4,10 @@
 #include <string>
 #include <vector>
 
-class Steam
+class SteamUtils
 {
     public:
-        Steam(std::vector<std::filesystem::path> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam", "$HOME/Library/Application Support/Steam"});
+        SteamUtils(std::vector<std::filesystem::path> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam", "$HOME/Library/Application Support/Steam"});
 
         std::filesystem::path const &GetSteamPath() const noexcept;
         std::vector<std::filesystem::path> GetInstallPaths() const;

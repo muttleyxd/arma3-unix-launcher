@@ -1,4 +1,4 @@
-#include "steam.hpp"
+#include "steam_utils.hpp"
 
 #include <exception>
 #include <stdexcept>
@@ -18,7 +18,7 @@ using std::filesystem::path;
 
 namespace fs = FilesystemUtils;
 
-Steam::Steam(std::vector<path> search_paths)
+SteamUtils::SteamUtils(std::vector<path> search_paths)
 {
     steam_path_ = "";
     for (auto const &search_path : search_paths)
@@ -35,12 +35,12 @@ Steam::Steam(std::vector<path> search_paths)
         throw SteamInstallNotFoundException();
 }
 
-path const &Steam::GetSteamPath() const noexcept
+path const &SteamUtils::GetSteamPath() const noexcept
 {
     return steam_path_;
 }
 
-std::vector<path> Steam::GetInstallPaths() const
+std::vector<path> SteamUtils::GetInstallPaths() const
 {
     std::vector<std::filesystem::path> ret;
     ret.emplace_back(steam_path_);
@@ -54,7 +54,7 @@ std::vector<path> Steam::GetInstallPaths() const
     return ret;
 }
 
-path Steam::GetGamePathFromInstallPath(path const &install_path, std::string const &appid) const
+path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::string const &appid) const
 {
     std::filesystem::path manifest_file = install_path / "steamapps" / ("appmanifest_" + appid + ".acf");
 
@@ -63,7 +63,7 @@ path Steam::GetGamePathFromInstallPath(path const &install_path, std::string con
     return install_path / "steamapps/common" / vdf.KeyValue["AppState/installdir"];
 }
 
-path Steam::GetWorkshopPath(path const &install_path, std::string const &appid) const
+path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &appid) const
 {
     path proposed_path = install_path / "steamapps/workshop/content" / appid;
     if (fs::Exists(proposed_path))
