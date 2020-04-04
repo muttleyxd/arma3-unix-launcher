@@ -3,7 +3,7 @@ include(FetchContent)
 
 function(setup_library SOURCE_TO_TEST)
     set(boolArgs HEADER_ONLY)
-    set(oneValueArgs NAME GIT_REPOSITORY TEST_LINK_LIBS)
+    set(oneValueArgs NAME GIT_REPOSITORY GIT_TAG TEST_LINK_LIBS)
     set(multiValueArgs WHEN)
     cmake_parse_arguments(LIB_SETUP "${boolArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -20,8 +20,13 @@ function(setup_library SOURCE_TO_TEST)
         return()
     endif()
 
+    if (NOT LIB_SETUP_GIT_TAG)
+        set(LIB_SETUP_GIT_TAG master)
+    endif()
+
     FetchContent_Declare(${LIB_SETUP_NAME}
-                         GIT_REPOSITORY ${LIB_SETUP_GIT_REPOSITORY})
+                         GIT_REPOSITORY ${LIB_SETUP_GIT_REPOSITORY}
+                         GIT_TAG ${LIB_SETUP_GIT_TAG})
     FetchContent_GetProperties(${LIB_SETUP_NAME})
     set(POPULATED "${LIB_SETUP_NAME}_POPULATED")
     if (NOT "${POPULATED}")
