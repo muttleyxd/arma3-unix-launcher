@@ -14,6 +14,8 @@ class SteamUtils
         std::filesystem::path GetGamePathFromInstallPath(std::filesystem::path const &install_path,
                 std::string const &appid) const;
         std::filesystem::path GetWorkshopPath(std::filesystem::path const &install_path, std::string const &appid) const;
+        std::uint64_t GetCompatibilityToolForAppId(std::uint64_t const app_id);
+        std::filesystem::path GetInstallPathFromGamePath(std::filesystem::path const &game_path);
 
     private:
         std::filesystem::path steam_path_;

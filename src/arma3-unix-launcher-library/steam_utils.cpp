@@ -3,6 +3,8 @@
 #include <exception>
 #include <stdexcept>
 
+#include <fmt/format.h>
+
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
@@ -70,4 +72,38 @@ path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &ap
         return proposed_path;
 
     throw SteamWorkshopDirectoryNotFoundException(appid);
+}
+
+std::uint64_t SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id)
+{
+    auto const config_vdf_path = steam_path_ / "config/config.vdf";
+    auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
+
+    VDF vdf;
+    vdf.LoadFromText(StdUtils::FileReadAllText(config_vdf_path));
+    if (!StdUtils::ContainsKey(vdf.KeyValue, key))
+        return 0;
+
+    /* we need to scan compat_log.txt for something like "proton_5" and get its appid */
+    auto const compatibility_tool_shortname = vdf.KeyValue[key]; // "proton_5"
+
+    auto const log_file_path = steam_path_ / "logs/compat_log.txt";
+    auto const log_content = StdUtils::FileReadAllText(log_file_path);
+
+    auto const text_to_look_for = fmt::format("Registering tool {}, AppID ", compatibility_tool_shortname);
+    auto const position = log_content.rfind(text_to_look_for);
+    if (position == std::string::npos)
+        return 0;
+
+    // expecting somethingth like "Registering tool proton_5, AppID 12345678\n<nextlogline>"
+    auto const app_id_start = position + text_to_look_for.length();
+    auto const app_id_end = log_content.find_first_of("\r\n[", app_id_start);
+    auto const app_id_str = log_content.substr(app_id_start, app_id_end - app_id_start);
+    return std::stoull(app_id_str);
+}
+
+std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::path const &game_path)
+{
+    //game_path == "~/.local/share/Steam/steamapps/common/Arma 3"
+    return std::filesystem::weakly_canonical(game_path / "../../../");
 }
