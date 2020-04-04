@@ -21,6 +21,7 @@ endif ()
 include_directories(external/static-todo)
 setup_argparse()
 setup_fmt()
+setup_pugixml()
 setup_nlohmann_json()
 
 add_subdirectory(src)
