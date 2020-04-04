@@ -15,14 +15,20 @@ jobs:
         fetch-depth: 0
     - name: install-dependencies
       run: |
-        brew install gcc cmake qt
+        brew install gcc cmake qt p7zip wget gpg
         pip3 install pygithub
         curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
         chmod +x github-release
+        mkdir /tmp/steamworks && cd /tmp/steamworks
+        wget https://github.com/muttleyxd/gpg_encrypted_secrets/releases/download/secrets/steamworks.7z.gpg
+        echo ${{ secrets.GPG_DECRYPTION_KEY }} | base64 -d >/tmp/key.gpg
+        gpg --import /tmp/key.gpg
+        gpg --output steamworks.7z --decrypt steamworks.7z.gpg
+        7z x steamworks.7z
     - name: make build directory
       run: mkdir build && cd build
     - name: cmake
-      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks
     - name: build
       run: cd build && make -j$(sysctl -n hw.ncpu)
     - name: run tests
@@ -37,3 +43,17 @@ jobs:
     - name: deploy release
       if: github.ref == 'refs/heads/master'
       run: ./github-release --token ${{ secrets.GITHUB_ACTION_RELEASE_KEY }} --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
+  build-and-test-no-steamworks:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install-dependencies
+      run: brew install gcc cmake qt
+    - name: make build directory
+      run: mkdir build && cd build
+    - name: cmake
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+    - name: build
+      run: cd build && make -j$(sysctl -n hw.ncpu)
+    - name: run tests
+      run: cd build && ctest --output-on-failure

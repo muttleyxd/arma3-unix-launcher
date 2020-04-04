@@ -60,11 +60,20 @@ steps:
   - name: package
     path: /tmp/build
   commands:
+    - mkdir /tmp/steamworks && cd /tmp/steamworks
+    - wget https://github.com/muttleyxd/gpg_encrypted_secrets/releases/download/secrets/steamworks.7z.gpg
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - gpg --import /tmp/key.gpg
+    - gpg --output steamworks.7z --decrypt steamworks.7z.gpg
+    - 7z x steamworks.7z
     - cp -r /drone/src /tmp/arma3-unix-launcher
     - mkdir -p /tmp/build && cd /tmp/build
     - cp /tmp/arma3-unix-launcher/tools/ci/packaging/archlinux/PKGBUILD ./
     - sed -i 's|/arma3-unix-launcher|/tmp/arma3-unix-launcher|g' PKGBUILD
     - makepkg
+  environment:
+    GPG_DECRYPTION_KEY_BASE64:
+      from_secret: gpg_decryption_key_base64
 - name: publish_release
   image: muttleyxd/github-release
   environment:
@@ -109,6 +118,12 @@ steps:
   - name: package
     path: /tmp/build
   commands:
+    - mkdir /tmp/steamworks && cd /tmp/steamworks
+    - wget https://github.com/muttleyxd/gpg_encrypted_secrets/releases/download/secrets/steamworks.7z.gpg
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - gpg --import /tmp/key.gpg
+    - gpg --output steamworks.7z --decrypt steamworks.7z.gpg
+    - 7z x steamworks.7z
     - . /etc/lsb-release
     - . /etc/os-release
     - export SHORT_HASH=`git rev-parse --verify HEAD | cut -c -7`
@@ -119,7 +134,7 @@ steps:
     - cd $PKG_DIR
     - sed 's/VERSION/$COMMIT_COUNT-$SHORT_HASH/g' /drone/src/tools/ci/packaging/ubuntu-18.04/control >./DEBIAN/control
     - mkdir $TMP_BUILD/cmake_build && cd $TMP_BUILD/cmake_build
-    - cmake /drone/src -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON
+    - cmake /drone/src -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks
     - make -j$(nproc)
     - ctest --output-on-failure
     - make install DESTDIR=$PKG_DIR
@@ -127,6 +142,9 @@ steps:
     - dpkg-deb --build $PKG_DIR
     - ls -alh
     - cp *.deb /tmp/build
+  environment:
+    GPG_DECRYPTION_KEY_BASE64:
+      from_secret: gpg_decryption_key_base64
 - name: publish_release
   image: muttleyxd/github-release
   when:
