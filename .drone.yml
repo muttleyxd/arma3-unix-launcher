@@ -124,6 +124,7 @@ steps:
     - gpg --import /tmp/key.gpg
     - gpg --output steamworks.7z --decrypt steamworks.7z.gpg
     - 7z x steamworks.7z
+    - cd /drone/src
     - . /etc/lsb-release
     - . /etc/os-release
     - export SHORT_HASH=`git rev-parse --verify HEAD | cut -c -7`
