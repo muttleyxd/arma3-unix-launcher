@@ -691,7 +691,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
 
     if (steam_integration->is_initialized())
     {
-        auto const message = fmt::format("Following mods cannot be loaded now, do you want to subscribe to them?:\n{}", mod_list);
+        auto const message = fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to them now?", mod_list);
         auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message), QMessageBox::Yes | QMessageBox::No).exec();
         if (result == QMessageBox::Yes)
         {
@@ -705,7 +705,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
     }
     else
     {
-        auto const message = fmt::format("Following mods cannot be loaded (Steam integration is disabled):\n", mod_list);
+        auto const message = fmt::format("Following mods cannot be loaded (Steam integration is disabled):\n{}", mod_list);
         QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message)).exec();
         return;
     }
