@@ -18,9 +18,9 @@ Since Bohemia didn't port their launcher to Linux and Mac and existing launcher 
 
 For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
-For Arch based distributions there's an AUR package available - it's called `arma3-linux-launcher-git`
+For Arch based distributions there's an AUR package available - it's called `arma3-unix-launcher-bin`
 
-    yay -S arma3-linux-launcher-git
+    yay -S arma3-unix-launcher-bin
 
 ### Building from source
 
@@ -34,7 +34,7 @@ Requirements:
     apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev
 
 #### Arch based (Arch Linux, Manjaro)
-    pacman -S cmake fmt qt5-base qt5-svg
+    pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg
 
 #### Mac OS X
     brew install gcc cmake qt
