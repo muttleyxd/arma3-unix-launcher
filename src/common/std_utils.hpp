@@ -11,6 +11,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "exceptions/path_no_access.hpp"
@@ -19,10 +20,21 @@
 
 namespace StdUtils
 {
-    template<typename T, typename container = std::vector<T>>
-    bool Contains(container const &cnt, T const &t)
+    template <typename T>
+    struct IsStdMap {
+        static constexpr bool value = false;
+    };
+
+    template<typename Key, typename Value>
+    struct IsStdMap<std::map<Key, Value>> {
+        static constexpr bool value = true;
+    };
+
+    template<typename T, typename container_t = std::vector<T>>
+    bool Contains(container_t const &container, T const &t)
     {
-        return std::find(cnt.begin(), cnt.end(), t) != cnt.end();
+        static_assert(!IsStdMap<container_t>::value, "Use ContainsKey for map");
+        return std::find(container.begin(), container.end(), t) != container.end();
     }
 
     template<typename T, typename X>
