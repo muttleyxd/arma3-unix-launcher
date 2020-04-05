@@ -8,7 +8,7 @@
 
 #include <fmt/format.h>
 
-#include "steam.hpp"
+#include "steam_utils.hpp"
 
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
@@ -48,7 +48,7 @@ namespace doctest
 
 using trompeloeil::_;
 
-class SteamTests
+class SteamUtilsTests
 {
     public:
         FilesystemUtilsMock filesystemUtilsMock;
@@ -80,20 +80,20 @@ class SteamTests
         std::vector<std::string> const steam_library_dirs{"/mnt/games/SteamLibrary", "/mnt/disk2/steamgames"};
 };
 
-TEST_CASE_FIXTURE(SteamTests, "Constructor_Success")
+TEST_CASE_FIXTURE(SteamUtilsTests, "Constructor_Success")
 {
     GIVEN("Steam config file that exists in correct path")
     {
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
 
-        WHEN("Steam is constructed")
+        WHEN("SteamUtils are constructed")
         THEN("Exception is not thrown")
-        CHECK_NOTHROW(Steam steam({default_steam_path}));
+        CHECK_NOTHROW(SteamUtils steam({default_steam_path}));
     }
 }
 
 
-TEST_CASE_FIXTURE(SteamTests, "Constructor_Failed_InvalidPaths")
+TEST_CASE_FIXTURE(SteamUtilsTests, "Constructor_Failed_InvalidPaths")
 {
     GIVEN("Not existing Steam config file")
     {
@@ -101,13 +101,13 @@ TEST_CASE_FIXTURE(SteamTests, "Constructor_Failed_InvalidPaths")
         std::filesystem::path const non_existent_config = non_existent_path / "config/config.vdf";
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(non_existent_config)).RETURN(false);
-        WHEN("Steam is constructed")
+        WHEN("SteamUtils are constructed")
         THEN("Exception is thrown")
-        CHECK_THROWS_AS(Steam(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
+        CHECK_THROWS_AS(SteamUtils(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
     }
 }
 
-TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithoutCustomLibraries")
+TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithoutCustomLibraries")
 {
     GIVEN("Valid Steam config file not containing any custom libraries [game install directories]")
     {
@@ -118,14 +118,14 @@ TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithoutCustomLibraries")
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
         REQUIRE_CALL(vdfMock, GetValuesWithFilter("BaseInstallFolder", _)).RETURN(std::vector<std::string>{});
 
-        Steam steam({default_steam_path});
+        SteamUtils steam({default_steam_path});
         WHEN("GetInstallPaths is called")
         THEN("Only main SteamLibrary is returned")
         CHECK_EQ(expected_paths, steam.GetInstallPaths());
     }
 }
 
-TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithCustomLibraries")
+TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithCustomLibraries")
 {
     GIVEN("Valid Steam config file with two custom libraries")
     {
@@ -136,14 +136,14 @@ TEST_CASE_FIXTURE(SteamTests, "FindInstallPaths_Success_WithCustomLibraries")
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
         REQUIRE_CALL(vdfMock, GetValuesWithFilter("BaseInstallFolder", _)).LR_RETURN(steam_library_dirs);
 
-        Steam steam({default_steam_path});
+        SteamUtils steam({default_steam_path});
         WHEN("GetInstallPaths is called")
         THEN("Main SteamLibrary and two custom libraries are returned")
         CHECK_EQ(expected_paths, steam.GetInstallPaths());
     }
 }
 
-TEST_CASE_FIXTURE(SteamTests, "GetGamePathFromInstallPath_Success")
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetGamePathFromInstallPath_Success")
 {
     GIVEN("Valid appmanifest for Arma 3 game")
     {
@@ -154,14 +154,14 @@ TEST_CASE_FIXTURE(SteamTests, "GetGamePathFromInstallPath_Success")
         REQUIRE_CALL(stdUtilsMock, FileReadAllText(arma3_manifest_path)).LR_RETURN(empty_file_content);
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _)).SIDE_EFFECT(_3.KeyValue["AppState/installdir"] = "Arma 3");
 
-        Steam steam({default_steam_path});
+        SteamUtils steam({default_steam_path});
         WHEN("Getting install path of Arma 3")
         THEN("Arma 3 path is returned")
         CHECK_EQ(arma3_path, steam.GetGamePathFromInstallPath(default_steam_path, arma3_workshop_id));
     }
 }
 
-TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Success")
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Success")
 {
     GIVEN("Valid appid for installed game")
     {
@@ -173,7 +173,7 @@ TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Success")
         REQUIRE_CALL(filesystemUtilsMock, Exists(expected_workshop_path)).RETURN(true);
         REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
-        Steam steam({default_steam_path});
+        SteamUtils steam({default_steam_path});
 
         WHEN("Getting workshop path for installed game")
         THEN("Workshop path for installed game is returned")
@@ -182,7 +182,7 @@ TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Success")
     }
 }
 
-TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Failed_NotExistingApp")
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_NotExistingApp")
 {
     GIVEN("Valid appid for installed game")
     {
@@ -192,7 +192,7 @@ TEST_CASE_FIXTURE(SteamTests, "GetWorkshopDir_Failed_NotExistingApp")
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
         REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
-        Steam steam({default_steam_path});
+        SteamUtils steam({default_steam_path});
 
         WHEN("Getting workshop path for not installed game")
         THEN("Exception is thrown")

@@ -25,7 +25,7 @@ class StdUtilsMock
         MAKE_MOCK1(FileReadAllText, std::string(std::filesystem::path const &));
         MAKE_MOCK2(FileWriteAllText, void(std::filesystem::path const &, std::string const &));
         MAKE_MOCK1(IsProcessRunning, pid_t(std::string const &));
-        MAKE_MOCK1(StartBackgroundProcess, void(std::string const &));
+        MAKE_MOCK2(StartBackgroundProcess, void(std::string const &, std::string_view const));
         MAKE_MOCK1(GetConfigFilePath, std::filesystem::path(std::filesystem::path const &));
 };
 
@@ -51,9 +51,9 @@ namespace StdUtils
         return StdUtilsMock::instance->IsProcessRunning(name);
     }
 
-    void StartBackgroundProcess(std::string const &command)
+    void StartBackgroundProcess(std::string const &command, std::string_view const working_directory)
     {
-        StdUtilsMock::instance->StartBackgroundProcess(command);
+        StdUtilsMock::instance->StartBackgroundProcess(command, working_directory);
     }
 
     std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename)

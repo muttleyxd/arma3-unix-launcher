@@ -10,7 +10,7 @@ namespace ARMA3::Definitions
 {
     static std::string home_directory = getenv("HOME");
 
-    static constexpr const char *app_id = "107410";
+    static constexpr char const *app_id = "107410";
 
     static const std::array<char const *, 23> exclusions{"Addons", "Argo", "BattlEye", "Contact", "Curator", "Dll", "Dta", "Enoch", "Expansion", "fontconfig", "Heli", "Jets", "Kart", "Keys", "Launcher", "MPMissions", "Mark", "Missions", "Orange", "Tacops", "Tank", "legal", "steam_shader_cache"};
 
@@ -40,7 +40,7 @@ namespace ARMA3
             void CreateArmaCfg(std::vector<std::string> const &workshop_mod_ids,
                                std::vector<std::filesystem::path> const &custom_mods, std::filesystem::path cfg_path = "");
             bool IsProton();
-            void Start(std::string const &arguments);
+            void Start(std::string const &arguments, bool launch_directly = false);
 
             std::vector<Mod> GetHomeMods();
             std::vector<Mod> GetWorkshopMods();

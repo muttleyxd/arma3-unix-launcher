@@ -5,22 +5,25 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Svg CONFIG REQUIRED)
 
-file(GLOB SOURCES *.cpp *.h *.hpp *.qrc *.ui)
+file(GLOB_RECURSE SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 
 add_executable(arma3-unix-launcher MACOSX_BUNDLE ${SOURCES})
 target_link_libraries(arma3-unix-launcher PRIVATE
     arma3-unix-launcher-library
+    common
+    steam-integration
     argparse::argparse
     fmt::fmt
     nlohmann::json
+    pugixml::pugixml
     Qt5::Widgets
-    Qt5::Svg)
-#install(TARGETS arma3-unix-launcher DESTINATION bin)
+    Qt5::Svg
+    )
 install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime)
 
-if (APPLE)    
+if (APPLE)
     find_package(Qt5Widgets CONFIG REQUIRED)
     get_target_property(WIDGETS_LOCATION Qt5::Widgets IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR "${WIDGETS_LOCATION}" DIRECTORY)
@@ -31,7 +34,18 @@ if (APPLE)
             "$<TARGET_FILE_DIR:arma3-unix-launcher>/../.."
             -always-overwrite
         COMMENT "Running macdeployqt...")
-    
+
     set(CPACK_GENERATOR "DragNDrop")
     include(CPack)
+
+    if (STEAMWORKS_SDK_DETECTED)
+        add_custom_command(TARGET arma3-unix-launcher POST_BUILD
+                          COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
+                          COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt" "$<TARGET_FILE_DIR:arma3-unix-launcher>/steamworks-LICENSE.txt"
+                          COMMENT "Copying Steamworks SDK")
+   endif()
+elseif (STEAMWORKS_SDK_DETECTED)
+    install(FILES "${STEAMWORKS_LIB_PATH}"
+                  "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
+            DESTINATION share/arma3-unix-launcher/lib)
 endif()

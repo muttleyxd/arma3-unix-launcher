@@ -11,6 +11,7 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "exceptions/path_no_access.hpp"
@@ -19,10 +20,21 @@
 
 namespace StdUtils
 {
-    template<typename T, typename container = std::vector<T>>
-    bool Contains(container const &cnt, T const &t)
+    template <typename T>
+    struct IsStdMap {
+        static constexpr bool value = false;
+    };
+
+    template<typename Key, typename Value>
+    struct IsStdMap<std::map<Key, Value>> {
+        static constexpr bool value = true;
+    };
+
+    template<typename T, typename container_t = std::vector<T>>
+    bool Contains(container_t const &container, T const &t)
     {
-        return std::find(cnt.begin(), cnt.end(), t) != cnt.end();
+        static_assert(!IsStdMap<container_t>::value, "Use ContainsKey for map");
+        return std::find(container.begin(), container.end(), t) != container.end();
     }
 
     template<typename T, typename X>
@@ -42,6 +54,6 @@ namespace StdUtils
     std::string FileReadAllText(std::filesystem::path const &path);
     void FileWriteAllText(std::filesystem::path const &path, std::string const &text);
     pid_t IsProcessRunning(std::string const &name, bool case_insensitive = false);
-    void StartBackgroundProcess(std::string const &command);
+    void StartBackgroundProcess(std::string const &command, std::string_view const working_directory = "");
     std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename);
 }

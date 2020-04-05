@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include <arma3client.hpp>
+#include <steam_integration.hpp>
 
 #include "settings.hpp"
 #include "ui_mod.hpp"
@@ -42,6 +43,7 @@ class MainWindow : public QMainWindow
         void on_checkbox_server_password_stateChanged(int arg1);
 
         void check_if_arma_is_running();
+        void check_steam_api();
 
         void on_checkbox_profile_stateChanged(int arg1);
 
@@ -56,18 +58,28 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;
+        QTimer steam_api_checker;
 
         std::unique_ptr<ARMA3::Client> client;
+        std::unique_ptr<Steam::Integration> steam_integration;
 
         std::filesystem::path config_file;
         Settings manager;
 
+        std::vector<std::uint64_t> mods_to_enable;
+
         void add_item(QTableWidget &table_widget, UiMod const &mod);
         void initialize_table_widget(QTableWidget &table_widget, QStringList const &column_names);
+
+        void load_mods_from_json(nlohmann::json& preset);
+        void load_mods_from_html(std::string const& path);
 
         std::vector<UiMod> get_mods(QTableWidget const &table_widget);
         UiMod get_mod_from_nth_row(QTableWidget const &table_widget, int row);
         void put_mods_from_ui_to_manager_settings();
 
         void update_mod_selection_counters(int state = 0);
+
+        void setup_steam_integration();
+        void on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info);
 };

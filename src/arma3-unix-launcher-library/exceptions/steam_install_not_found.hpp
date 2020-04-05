@@ -5,5 +5,5 @@
 class SteamInstallNotFoundException : public std::exception
 {
     public:
-        const char *what() const noexcept override;
+        char const *what() const noexcept override;
 };

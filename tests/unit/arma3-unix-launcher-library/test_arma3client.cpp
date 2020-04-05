@@ -10,11 +10,13 @@
 #include "cppfilter.hpp"
 #include "filesystem_utils.hpp"
 #include "mod.hpp"
+#include "steam_utils.hpp"
 #include "std_utils.hpp"
 #include "vdf.hpp"
 #include "mock/cppfilter.hpp"
 #include "mock/filesystem_utils.hpp"
 #include "mock/mod.hpp"
+#include "mock/steam_utils.hpp"
 #include "mock/std_utils.hpp"
 #include "mock/vdf.hpp"
 
@@ -26,6 +28,7 @@ class ARMA3ClientTests
         CppFilterMock cppFilterMock;
         FilesystemUtilsMock filesystemUtilsMock;
         ModMock modMock;
+        SteamUtilsMock steamUtilsMock;
         StdUtilsMock stdUtilsMock;
         VdfMock vdfMock;
 
@@ -341,11 +344,11 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux")
         {
             REQUIRE_CALL(filesystemUtilsMock, Exists(arma_path / linux_executable_name)).RETURN(true);
             ARMA3::Client a3c(arma_path, workshop_path);
-            THEN("Arma is started with passed arguments preceded by -nolauncher option")
+            THEN("Arma is started with passed arguments")
             {
                 std::string const launch_command = fmt::format("{} {}", steam_command, arguments);
 
-                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command));
+                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
                 a3c.Start(arguments);
             }
         }
@@ -354,11 +357,11 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux")
             REQUIRE_CALL(filesystemUtilsMock, Exists(arma_path / linux_executable_name)).RETURN(false);
             REQUIRE_CALL(filesystemUtilsMock, Exists(arma_path / proton_executable_name)).RETURN(true);
             ARMA3::Client a3c(arma_path, workshop_path);
-            THEN("Arma is started with passed arguments")
+            THEN("Arma is started with passed arguments preceded by -nolauncher option")
             {
                 std::string const launch_command = fmt::format("{} -nolauncher {}", steam_command, arguments);
 
-                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command));
+                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
                 a3c.Start(arguments);
             }
         }
@@ -380,7 +383,7 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Mac_OS_X")
         THEN("Arma is started with passed arguments")
         {
             std::string const launch_command = fmt::format("{}{}", steam_command, arguments_whitespaces_replaced);
-            REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command));
+            REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
             a3c.Start(arguments);
         }
     }

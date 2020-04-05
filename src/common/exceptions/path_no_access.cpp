@@ -4,7 +4,7 @@ PathNoAccessException::PathNoAccessException(std::string const &path) : message(
 {
 }
 
-const char *PathNoAccessException::PathNoAccessException::what() const noexcept
+char const *PathNoAccessException::PathNoAccessException::what() const noexcept
 {
     return message.c_str();
 }

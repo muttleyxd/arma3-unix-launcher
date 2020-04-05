@@ -5,7 +5,7 @@ SteamWorkshopDirectoryNotFoundException::SteamWorkshopDirectoryNotFoundException
 {
 }
 
-const char *SteamWorkshopDirectoryNotFoundException::SteamWorkshopDirectoryNotFoundException::what() const noexcept
+char const *SteamWorkshopDirectoryNotFoundException::SteamWorkshopDirectoryNotFoundException::what() const noexcept
 {
     return message.c_str();
 }

@@ -4,16 +4,18 @@
 #include <string>
 #include <vector>
 
-class Steam
+class SteamUtils
 {
     public:
-        Steam(std::vector<std::filesystem::path> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam", "$HOME/Library/Application Support/Steam"});
+        SteamUtils(std::vector<std::filesystem::path> search_paths = {"$HOME/.local/share/Steam", "$HOME/.steam/steam", "$HOME/Library/Application Support/Steam"});
 
         std::filesystem::path const &GetSteamPath() const noexcept;
         std::vector<std::filesystem::path> GetInstallPaths() const;
         std::filesystem::path GetGamePathFromInstallPath(std::filesystem::path const &install_path,
                 std::string const &appid) const;
         std::filesystem::path GetWorkshopPath(std::filesystem::path const &install_path, std::string const &appid) const;
+        std::uint64_t GetCompatibilityToolForAppId(std::uint64_t const app_id);
+        std::filesystem::path GetInstallPathFromGamePath(std::filesystem::path const &game_path);
 
     private:
         std::filesystem::path steam_path_;

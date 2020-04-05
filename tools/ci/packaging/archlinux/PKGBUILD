@@ -6,7 +6,7 @@ pkgdesc="Launcher for ArmA 3 on Linux"
 arch=('x86_64')
 url="https://github.com/muttleyxd/arma3-unix-launcher"
 license=('MIT')
-depends=('fmt' 'qt5-base' 'qt5-svg')
+depends=('fmt' 'pugixml' 'qt5-base' 'qt5-svg')
 makedepends=('cmake' 'make')
 provides=('arma3-unix-launcher')
 conflicts=('arma3-unix-launcher')
@@ -24,7 +24,7 @@ build()
   cd "$srcdir/$pkgname"
   mkdir build
   cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON
+  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks
   make
 }
 

@@ -1,10 +1,13 @@
 FROM archlinux/base
 
+# Use faster server (for me, may be worse for you)
+RUN echo 'Server = http://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch' >/etc/pacman.d/mirrorlist
+
 # Update image
 RUN pacman -Syu --noconfirm
 
 # Install required dependencies
-RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg fmt
+RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg fmt wget p7zip pugixml
 
 # Cleanup
 RUN rm -rf /var/cache/pacman/pkg/*
@@ -13,6 +16,9 @@ RUN rm -rf /var/cache/pacman/pkg/*
 ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp
 ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h
 RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
+
+# Enable parallel builds
+RUN sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$(nproc)"/g' /etc/makepkg.conf
 
 # We cannot run makepkg as root, so we need a builduser
 RUN useradd -m builduser && passwd -d builduser

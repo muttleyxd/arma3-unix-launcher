@@ -11,6 +11,7 @@
 
 #include "cppfilter.hpp"
 #include "filesystem_utils.hpp"
+#include "steam_utils.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
 
@@ -80,16 +81,87 @@ namespace ARMA3
         return path_executable_.filename() == "arma3_x64.exe";
     }
 
-    void Client::Start(string const &arguments)
+    void Client::Start(string const &arguments, bool launch_directly)
     {
         #ifdef __linux
+        if (!launch_directly)
+        {
+            if (IsProton())
+                StdUtils::StartBackgroundProcess("steam -applaunch 107410 -nolauncher " + arguments);
+            else
+                StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);
+            return;
+        }
+
         if (IsProton())
-            StdUtils::StartBackgroundProcess("steam -applaunch 107410 -nolauncher " + arguments);
+        {
+            if (!launch_directly)
+                StdUtils::StartBackgroundProcess("steam -applaunch 107410 -nolauncher " + arguments);
+            else
+            {
+                try
+                {
+                    SteamUtils steam_utils;
+                    auto const arma3_id = std::stoull(ARMA3::Definitions::app_id);
+                    auto const compatibility_tool_id = steam_utils.GetCompatibilityToolForAppId(arma3_id);
+
+                    std::string compatibility_tool_path;
+                    for (auto const &install_path : steam_utils.GetInstallPaths())
+                    {
+                        try
+                        {
+                            compatibility_tool_path = steam_utils.GetGamePathFromInstallPath(install_path, std::to_string(compatibility_tool_id));
+                            break;
+                        }
+                        catch (std::exception const&)
+                        {
+                        }
+                    }
+
+                    auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
+                    if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
+                        ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
+
+                    auto const wineserver = fmt::format("{}/dist/bin/wine64", compatibility_tool_path);
+                    auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(GetPath()) / "steamapps/compatdata" / ARMA3::Definitions::app_id;
+
+                    auto const environment = fmt::format(R"env(SteamGameId={} LD_PRELOAD={} WINESERVER="{}" STEAM_COMPAT_DATA_PATH="{}")env", arma3_id, ld_preload_path, wineserver, steam_compat_data_path.string());
+                    auto const command = fmt::format(R"command(env {} "{}/proton" run "{}" {})command", environment, compatibility_tool_path, GetPathExecutable().string(), arguments);
+                    fmt::print("Running Arma:\n{}\n", command);
+                    StdUtils::StartBackgroundProcess(command, GetPath().string());
+                }
+                catch (std::exception const& e)
+                {
+                    fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
+                }
+            }
+        }
         else
-            StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);
+            StdUtils::StartBackgroundProcess(fmt::format("{} {}", GetPathExecutable(), arguments), GetPath().string());
         #else
-        std::string launch_command = "open steam://run/107410//" + StringUtils::Replace(arguments, " ", "%20");
-        StdUtils::StartBackgroundProcess(launch_command);
+        if (launch_directly)
+        {
+            try
+            {
+                SteamUtils steam_utils;
+                auto ld_preload_path = fmt::format("{}/Steam.AppBundle/Steam/Contents/MacOS/gameoverlayrenderer.dylib", steam_utils.GetSteamPath().string());
+                if (char const *old_ld_preload = getenv("DYLD_INSERT_LIBRARIES"); old_ld_preload)
+                    ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
+                auto const environment = fmt::format(R"env(DYLD_INSERT_LIBRARIES="{}")env", ld_preload_path);
+                auto const command = fmt::format(R"command(env {} "{}/Contents/MacOS/ArmA3" {})command", environment, GetPathExecutable().string(), arguments);
+                fmt::print("Running Arma:\n{}\n", command);
+                StdUtils::StartBackgroundProcess(command, GetPath().string());
+            }
+            catch (std::exception const& e)
+            {
+                fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
+            }
+        }
+        else
+        {
+            std::string launch_command = "open steam://run/107410//" + StringUtils::Replace(arguments, " ", "%20");
+            StdUtils::StartBackgroundProcess(launch_command);
+        }
         #endif
     }
 

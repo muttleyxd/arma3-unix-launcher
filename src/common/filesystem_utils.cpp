@@ -9,6 +9,16 @@ namespace FilesystemUtils
         return std::filesystem::create_directories(path);
     }
 
+    std::filesystem::path CurrentPath()
+    {
+        return std::filesystem::current_path();
+    }
+
+    void CurrentPath(std::filesystem::path const &path)
+    {
+        std::filesystem::current_path(path);
+    }
+
     bool Exists(std::filesystem::path const &path)
     {
         return std::filesystem::exists(path);
@@ -30,5 +40,15 @@ namespace FilesystemUtils
                 ret.emplace_back(entity.path().filename());
         }
         return ret;
+    }
+
+    uintmax_t RemoveAll(std::filesystem::path const &path)
+    {
+        return std::filesystem::remove_all(path);
+    }
+
+    std::filesystem::path TempDirectoryPath()
+    {
+        return std::filesystem::temp_directory_path();
     }
 }

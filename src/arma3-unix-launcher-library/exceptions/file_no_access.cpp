@@ -4,7 +4,7 @@ FileNoAccessException::FileNoAccessException(std::string const &path): message("
 {
 }
 
-const char *FileNoAccessException::what() const noexcept
+char const *FileNoAccessException::what() const noexcept
 {
     return message.c_str();
 }
