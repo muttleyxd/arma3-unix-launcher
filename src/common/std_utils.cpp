@@ -129,7 +129,7 @@ namespace StdUtils
         #endif
     }
 
-    void StartBackgroundProcess(std::string const &command)
+    void StartBackgroundProcess(std::string const &command, std::string_view const working_directory)
     {
         auto pid = fork();
         if (pid < 0)
@@ -137,6 +137,10 @@ namespace StdUtils
         if (!pid)
         {
             setsid();
+
+            if (!working_directory.empty())
+                chdir(working_directory.data());
+
             system(command.c_str());
             exit(0);
         }
