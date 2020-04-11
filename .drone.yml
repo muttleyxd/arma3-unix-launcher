@@ -65,6 +65,7 @@ steps:
     path: /tmp/build
   commands:
     - cp -r /drone/src /tmp/arma3-unix-launcher
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
     - /tmp/arma3-unix-launcher/tools/ci/obtain-steamworks.sh
     - mkdir -p /tmp/build && cd /tmp/build
     - cp /tmp/arma3-unix-launcher/tools/ci/packaging/archlinux/PKGBUILD ./
@@ -125,6 +126,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
     - tools/ci/obtain-steamworks.sh
     - . /etc/lsb-release
     - . /etc/os-release
