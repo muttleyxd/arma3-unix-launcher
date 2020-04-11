@@ -51,6 +51,10 @@ steps:
   - git clone $DRONE_GIT_HTTP_URL .
   - git checkout $DRONE_COMMIT
   - chmod 777 /tmp/build
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
   volumes:
   - name: package
     path: /tmp/build
@@ -60,17 +64,17 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - mkdir /tmp/steamworks && cd /tmp/steamworks
-    - wget https://github.com/muttleyxd/gpg_encrypted_secrets/releases/download/secrets/steamworks.7z.gpg
-    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - gpg --import /tmp/key.gpg
-    - gpg --output steamworks.7z --decrypt steamworks.7z.gpg
-    - 7z x steamworks.7z
     - cp -r /drone/src /tmp/arma3-unix-launcher
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - /tmp/arma3-unix-launcher/tools/ci/obtain-steamworks.sh
     - mkdir -p /tmp/build && cd /tmp/build
     - cp /tmp/arma3-unix-launcher/tools/ci/packaging/archlinux/PKGBUILD ./
     - sed -i 's|/arma3-unix-launcher|/tmp/arma3-unix-launcher|g' PKGBUILD
     - makepkg
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -109,6 +113,10 @@ steps:
   - git clone $DRONE_GIT_HTTP_URL .
   - git checkout $DRONE_COMMIT
   - chmod 777 /tmp/build
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
   volumes:
   - name: package
     path: /tmp/build
@@ -118,13 +126,8 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - mkdir /tmp/steamworks && cd /tmp/steamworks
-    - wget https://github.com/muttleyxd/gpg_encrypted_secrets/releases/download/secrets/steamworks.7z.gpg
-    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - gpg --import /tmp/key.gpg
-    - gpg --output steamworks.7z --decrypt steamworks.7z.gpg
-    - 7z x steamworks.7z
-    - cd /drone/src
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg >/dev/null
+    - tools/ci/obtain-steamworks.sh
     - . /etc/lsb-release
     - . /etc/os-release
     - export SHORT_HASH=`git rev-parse --verify HEAD | cut -c -7`
@@ -143,6 +146,10 @@ steps:
     - dpkg-deb --build $PKG_DIR
     - ls -alh
     - cp *.deb /tmp/build
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
