@@ -21,12 +21,14 @@
 namespace StdUtils
 {
     template <typename T>
-    struct IsStdMap {
+    struct IsStdMap
+    {
         static constexpr bool value = false;
     };
 
     template<typename Key, typename Value>
-    struct IsStdMap<std::map<Key, Value>> {
+    struct IsStdMap<std::map<Key, Value>>
+    {
         static constexpr bool value = true;
     };
 

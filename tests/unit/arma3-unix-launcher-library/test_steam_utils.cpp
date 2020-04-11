@@ -86,9 +86,9 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "Constructor_Success")
     {
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
 
-        WHEN("SteamUtils are constructed")
-        THEN("Exception is not thrown")
-        CHECK_NOTHROW(SteamUtils steam({default_steam_path}));
+        WHEN("SteamUtils are constructed"){
+            THEN("Exception is not thrown"){
+                CHECK_NOTHROW(SteamUtils steam({default_steam_path}));}}
     }
 }
 
@@ -102,8 +102,12 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "Constructor_Failed_InvalidPaths")
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(non_existent_config)).RETURN(false);
         WHEN("SteamUtils are constructed")
-        THEN("Exception is thrown")
-        CHECK_THROWS_AS(SteamUtils(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(SteamUtils(std::vector<std::filesystem::path>{non_existent_path}), SteamInstallNotFoundException);
+            }
+        }
     }
 }
 
@@ -120,8 +124,12 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithoutCustomLibrar
 
         SteamUtils steam({default_steam_path});
         WHEN("GetInstallPaths is called")
-        THEN("Only main SteamLibrary is returned")
-        CHECK_EQ(expected_paths, steam.GetInstallPaths());
+        {
+            THEN("Only main SteamLibrary is returned")
+            {
+                CHECK_EQ(expected_paths, steam.GetInstallPaths());
+            }
+        }
     }
 }
 
@@ -138,8 +146,12 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithCustomLibraries
 
         SteamUtils steam({default_steam_path});
         WHEN("GetInstallPaths is called")
-        THEN("Main SteamLibrary and two custom libraries are returned")
-        CHECK_EQ(expected_paths, steam.GetInstallPaths());
+        {
+            THEN("Main SteamLibrary and two custom libraries are returned")
+            {
+                CHECK_EQ(expected_paths, steam.GetInstallPaths());
+            }
+        }
     }
 }
 
@@ -156,8 +168,12 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetGamePathFromInstallPath_Success")
 
         SteamUtils steam({default_steam_path});
         WHEN("Getting install path of Arma 3")
-        THEN("Arma 3 path is returned")
-        CHECK_EQ(arma3_path, steam.GetGamePathFromInstallPath(default_steam_path, arma3_workshop_id));
+        {
+            THEN("Arma 3 path is returned")
+            {
+                CHECK_EQ(arma3_path, steam.GetGamePathFromInstallPath(default_steam_path, arma3_workshop_id));
+            }
+        }
     }
 }
 
@@ -176,9 +192,13 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Success")
         SteamUtils steam({default_steam_path});
 
         WHEN("Getting workshop path for installed game")
-        THEN("Workshop path for installed game is returned")
-        CHECK_EQ(expected_workshop_path, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
-        CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+        {
+            THEN("Workshop path for installed game is returned")
+            {
+                CHECK_EQ(expected_workshop_path, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
+                CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+            }
+        }
     }
 }
 
@@ -195,7 +215,93 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_NotExistingApp")
         SteamUtils steam({default_steam_path});
 
         WHEN("Getting workshop path for not installed game")
-        THEN("Exception is thrown")
-        CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+        {
+            THEN("Exception is thrown")
+            {
+                CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+            }
+        }
+    }
+}
+
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
+{
+    GIVEN("App id to find compatibility tool for")
+    {
+        std::uint64_t const appid = 107410;
+
+        REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        SteamUtils steam({default_steam_path});
+
+        REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(empty_file_content);
+
+        WHEN("Config file does not contain key about compatibility tool for appid")
+        {
+            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
+            THEN("Zero is returned")
+            {
+                CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+            }
+        }
+
+        WHEN("Config file contains key about compatibility tool for appid")
+        {
+            auto const key_name = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", appid);
+            auto const compatibility_tool_shortname = "proton_316";
+            auto const log_file_path = default_steam_path / "logs/compat_log.txt";
+
+            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _)).SIDE_EFFECT(_3.KeyValue[key_name] = compatibility_tool_shortname);
+
+            WHEN("Log file does not contain matching information")
+            {
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(empty_file_content);
+
+                THEN("Zero is returned")
+                {
+                    CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+                }
+            }
+
+            WHEN("Log file contains matching information")
+            {
+                auto const log_content = R"log([2005-04-02 21:37:36] Registering tool proton_5, AppID 1245040
+[2005-04-02 21:37:36] Registering tool proton_411, AppID 1113280
+[2005-04-02 21:37:36] Registering tool proton_42, AppID 1054830
+[2005-04-02 21:37:36] Registering tool proton_316, AppID 961940
+[2005-04-02 21:37:36] Registering tool proton_37, AppID 858280)log";
+
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(log_content);
+
+                THEN("Valid appid is returned")
+                {
+                    CHECK_EQ(961940, steam.GetCompatibilityToolForAppId(appid));
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetInstallPathFromGamePath_Success")
+{
+    GIVEN("Game install path")
+    {
+        auto const game_path = default_steam_path / "steamapps/common/Arma 3";
+
+        REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        SteamUtils steam({default_steam_path});
+
+        WHEN("Obtaining Steam install path from game path")
+        {
+            THEN("Steam install path is returned")
+            {
+                auto returned_path = steam.GetInstallPathFromGamePath(game_path);
+
+                // For some unknown reason 'weakly_canonical' likes to return with trailing slash
+                if (StringUtils::EndsWith(returned_path.string(), "/"))
+                    returned_path = returned_path.string().substr(0, returned_path.string().length() - 1);
+
+                CHECK_EQ(default_steam_path, returned_path);
+            }
+        }
     }
 }

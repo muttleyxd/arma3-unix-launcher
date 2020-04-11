@@ -84,7 +84,7 @@ std::uint64_t SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_i
     if (!StdUtils::ContainsKey(vdf.KeyValue, key))
         return 0;
 
-    /* we need to scan compat_log.txt for something like "proton_5" and get its appid */
+    // we need to scan compat_log.txt for something like "proton_5" and get its appid
     auto const compatibility_tool_shortname = vdf.KeyValue[key]; // "proton_5"
 
     auto const log_file_path = steam_path_ / "logs/compat_log.txt";

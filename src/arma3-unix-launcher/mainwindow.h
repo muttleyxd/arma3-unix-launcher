@@ -71,8 +71,8 @@ class MainWindow : public QMainWindow
         void add_item(QTableWidget &table_widget, UiMod const &mod);
         void initialize_table_widget(QTableWidget &table_widget, QStringList const &column_names);
 
-        void load_mods_from_json(nlohmann::json& preset);
-        void load_mods_from_html(std::string const& path);
+        void load_mods_from_json(nlohmann::json &preset);
+        void load_mods_from_html(std::string const &path);
 
         std::vector<UiMod> get_mods(QTableWidget const &table_widget);
         UiMod get_mod_from_nth_row(QTableWidget const &table_widget, int row);
