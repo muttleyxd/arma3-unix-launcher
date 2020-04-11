@@ -17,6 +17,7 @@ jobs:
         pip3 install pygithub
         curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
         chmod +x github-release
+        echo ${{ secrets.GPG_DECRYPTION_KEY }} | base64 -d >/tmp/key.gpg >/dev/null
         tools/ci/obtain-steamworks.sh
     - name: make build directory
       run: mkdir build && cd build
