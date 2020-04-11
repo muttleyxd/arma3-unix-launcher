@@ -1,0 +1,21 @@
+name: Mac OS X check
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test-no-steamworks:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install-dependencies
+      run: brew install gcc cmake qt
+    - name: make build directory
+      run: mkdir build && cd build
+    - name: cmake
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-9 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+    - name: build
+      run: cd build && make -j$(sysctl -n hw.ncpu)
+    - name: run tests
+      run: cd build && ctest --output-on-failure
