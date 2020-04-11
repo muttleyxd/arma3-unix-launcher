@@ -223,5 +223,85 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_NotExistingApp")
         }
     }
 }
+
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
+{
+    GIVEN("App id to find compatibility tool for")
+    {
+        std::uint64_t const appid = 107410;
+
+        REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        SteamUtils steam({default_steam_path});
+
+        REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(empty_file_content);
+
+        WHEN("Config file does not contain key about compatibility tool for appid")
+        {
+            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
+            THEN("Zero is returned")
+            {
+                CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+            }
+        }
+
+        WHEN("Config file contains key about compatibility tool for appid")
+        {
+            auto const key_name = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", appid);
+            auto const compatibility_tool_shortname = "proton_316";
+            auto const log_file_path = default_steam_path / "logs/compat_log.txt";
+
+            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _)).SIDE_EFFECT(_3.KeyValue[key_name] = compatibility_tool_shortname);
+
+            WHEN("Log file does not contain matching information")
+            {
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(empty_file_content);
+
+                THEN("Zero is returned")
+                {
+                    CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+                }
+            }
+
+            WHEN("Log file contains matching information")
+            {
+                auto const log_content = R"log([2005-04-02 21:37:36] Registering tool proton_5, AppID 1245040
+[2005-04-02 21:37:36] Registering tool proton_411, AppID 1113280
+[2005-04-02 21:37:36] Registering tool proton_42, AppID 1054830
+[2005-04-02 21:37:36] Registering tool proton_316, AppID 961940
+[2005-04-02 21:37:36] Registering tool proton_37, AppID 858280)log";
+
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(log_content);
+
+                THEN("Valid appid is returned")
+                {
+                    CHECK_EQ(961940, steam.GetCompatibilityToolForAppId(appid));
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetInstallPathFromGamePath_Success")
+{
+    GIVEN("Game install path")
+    {
+        auto const game_path = default_steam_path / "steamapps/common/Arma 3";
+
+        REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        SteamUtils steam({default_steam_path});
+
+        WHEN("Obtaining Steam install path from game path")
+        {
+            THEN("Steam install path is returned")
+            {
+                auto returned_path = steam.GetInstallPathFromGamePath(game_path);
+
+                // For some unknown reason 'weakly_canonical' likes to return with trailing slash
+                if (StringUtils::EndsWith(returned_path.string(), "/"))
+                    returned_path = returned_path.string().substr(0, returned_path.string().length() - 1);
+
+                CHECK_EQ(default_steam_path, returned_path);
+            }
+        }
     }
 }
