@@ -536,7 +536,7 @@ try
         load_mods_from_json(preset);
         loaded = true;
     }
-    catch (std::exception const& e)
+    catch (std::exception const &e)
     {
         error_messages += fmt::format("JSON parser: {}\n", e.what());
     }
@@ -548,7 +548,7 @@ try
             load_mods_from_html(filename.toStdString());
             loaded = true;
         }
-        catch (std::exception const& e)
+        catch (std::exception const &e)
         {
             error_messages += fmt::format("HTML parser: {}\n", e.what());
         }
@@ -648,7 +648,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
     nlohmann::json existing_mods = nlohmann::json::array();
     nlohmann::json not_existing_mods = nlohmann::json::array();
 
-    for (auto const& json_mod : json)
+    for (auto const &json_mod : json)
     {
         if (FilesystemUtils::Exists(client->GetPathWorkshop() / json_mod["workshopId"]))
             existing_mods.push_back(json_mod);
@@ -656,9 +656,9 @@ void MainWindow::load_mods_from_html(std::string const &path)
             not_existing_mods.push_back(json_mod);
     }
 
-    auto contains_mod = [&](std::string const& workshop_id)
+    auto contains_mod = [&](std::string const & workshop_id)
     {
-        for (auto const& json_mod : existing_mods)
+        for (auto const &json_mod : existing_mods)
             if (json_mod["workshopId"] == workshop_id)
                 return true;
         return false;
@@ -691,8 +691,10 @@ void MainWindow::load_mods_from_html(std::string const &path)
 
     if (steam_integration->is_initialized())
     {
-        auto const message = fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to them now?", mod_list);
-        auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message), QMessageBox::Yes | QMessageBox::No).exec();
+        auto const message = fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to them now?",
+                                         mod_list);
+        auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message),
+                                        QMessageBox::Yes | QMessageBox::No).exec();
         if (result == QMessageBox::Yes)
         {
             for (auto const &json_mod : not_existing_mods)

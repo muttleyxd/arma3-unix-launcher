@@ -15,7 +15,7 @@ extern "C" int LLVMFuzzerTestOneInput(uint8_t const *data, size_t size)
     catch (SyntaxErrorException const &e)
     {
     }
-    catch (std::out_of_range const& e)
+    catch (std::out_of_range const &e)
     {
     }
     return 0;
