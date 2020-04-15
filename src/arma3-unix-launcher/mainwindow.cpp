@@ -144,6 +144,11 @@ try
         if (mod.enabled)
             custom_mods.push_back(StringUtils::Replace(mod.path_or_workshop_id, "~arma", client->GetPath()));
 
+    if (parameters["dlcContact"])
+        custom_mods.push_back(client->GetPath() / "Contact");
+    if (parameters["dlcGlobalMobilization"])
+        custom_mods.push_back(client->GetPath() / "GM");
+
     client->CreateArmaCfg(workshop_mod_ids, custom_mods);
     client->Start(manager.get_launch_parameters(), steam_integration->is_initialized());
 }
