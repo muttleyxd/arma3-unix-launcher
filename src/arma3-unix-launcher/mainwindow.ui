@@ -44,7 +44,7 @@
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <widget class="QWidget" name="">
+            <widget class="QWidget" name="layoutWidget">
              <layout class="QVBoxLayout" name="layout_vertical_workshop_mods">
               <item>
                <widget class="QLabel" name="label_workshop_mods">
@@ -84,7 +84,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="">
+            <widget class="QWidget" name="layoutWidget">
              <layout class="QVBoxLayout" name="layout_vertical_custom_mods">
               <item>
                <widget class="QLabel" name="label_custom_mods">
@@ -258,19 +258,6 @@
               <string>Basic</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="1" column="0">
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="0" column="0">
                <layout class="QVBoxLayout" name="layout_vertical_parameters_basic">
                 <item>
@@ -312,7 +299,34 @@
                   </item>
                  </layout>
                 </item>
+                <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_contact">
+                  <property name="text">
+                   <string>Enable Contact DLC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_global_mobilization">
+                  <property name="text">
+                   <string>Enable Global Mobilization - Cold War Germany DLC</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
+              </item>
+              <item row="1" column="0">
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>

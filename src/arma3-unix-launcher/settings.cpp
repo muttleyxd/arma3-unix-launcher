@@ -28,6 +28,8 @@ namespace
                                                             "connect": null,
                                                             "cpuCount": -1,
                                                             "customParameters": null,
+                                                            "dlcContact": false,
+                                                            "dlcGlobalMobilization": false,
                                                             "enableHT": false,
                                                             "exThreads": -1,
                                                             "filePatching": false,
@@ -67,10 +69,11 @@ std::string Settings::get_launch_parameters()
     std::string ret;
     for (auto const &parameter : settings["parameters"].items())
     {
-        if (parameter.key() == "customParameters")
+        if (StringUtils::StartsWith(parameter.key(), "dlc"))
             continue;
-
-        if (parameter.value().type() == nlohmann::json::value_t::boolean && parameter.value())
+        else if (parameter.key() == "customParameters" && parameter.value().is_string())
+            ret += fmt::format(" {}", std::string(parameter.value()));
+        else if (parameter.value().type() == nlohmann::json::value_t::boolean && parameter.value())
             ret += fmt::format(" -{}", parameter.key());
         else if (parameter.value().type() == nlohmann::json::value_t::string)
         {
@@ -99,6 +102,8 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("noSplash", ui->checkbox_skip_logos_at_startup);
     read_setting("window", ui->checkbox_force_window_mode);
     read_setting("name", ui->checkbox_profile, ui->textbox_profile);
+    read_setting("dlcContact", ui->checkbox_dlc_contact);
+    read_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
 
     // advanced tab
     read_setting("par", ui->checkbox_parameter_file, ui->textbox_parameter_file);
@@ -170,6 +175,8 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("noSplash", ui->checkbox_skip_logos_at_startup);
     write_setting("window", ui->checkbox_force_window_mode);
     write_setting("name", ui->checkbox_profile, ui->textbox_profile);
+    write_setting("dlcContact", ui->checkbox_dlc_contact);
+    write_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
 
     // advanced tab
     write_setting("par", ui->checkbox_parameter_file, ui->textbox_parameter_file);
