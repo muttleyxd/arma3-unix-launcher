@@ -20,6 +20,8 @@
 #include "exceptions/steam_install_not_found.hpp"
 #include "exceptions/steam_workshop_directory_not_found.hpp"
 
+#include "static_todo.hpp"
+
 namespace doctest
 {
     template<> struct StringMaker<std::vector<std::string>>
@@ -233,48 +235,65 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
         SteamUtils steam({default_steam_path});
 
-        REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(empty_file_content);
+        ALLOW_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(default_config_path);
 
         WHEN("Config file does not contain key about compatibility tool for appid")
         {
-            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
-            THEN("Zero is returned")
+            REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _));
+            THEN("Exception is thrown")
             {
-                CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+                CHECK_THROWS_AS(steam.GetCompatibilityToolForAppId(appid), std::runtime_error);
             }
         }
 
         WHEN("Config file contains key about compatibility tool for appid")
         {
+            trompeloeil::sequence sequence;
+
             auto const key_name = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", appid);
             auto const compatibility_tool_shortname = "proton_316";
             auto const log_file_path = default_steam_path / "logs/compat_log.txt";
 
-            REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _)).SIDE_EFFECT(_3.KeyValue[key_name] = compatibility_tool_shortname);
+            REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _)).SIDE_EFFECT(_3.KeyValue[key_name] = compatibility_tool_shortname).IN_SEQUENCE(sequence);
 
             WHEN("Log file does not contain matching information")
             {
                 REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(empty_file_content);
 
-                THEN("Zero is returned")
+                THEN("Exception is thrown")
                 {
-                    CHECK_EQ(0, steam.GetCompatibilityToolForAppId(appid));
+                    CHECK_THROWS_AS(steam.GetCompatibilityToolForAppId(appid), std::runtime_error);
                 }
             }
 
-            WHEN("Log file contains matching information")
+            WHEN("Log file contains information about tool provided by Steam (AppID != 0)")
             {
                 auto const log_content = R"log([2005-04-02 21:37:36] Registering tool proton_5, AppID 1245040
 [2005-04-02 21:37:36] Registering tool proton_411, AppID 1113280
 [2005-04-02 21:37:36] Registering tool proton_42, AppID 1054830
 [2005-04-02 21:37:36] Registering tool proton_316, AppID 961940
 [2005-04-02 21:37:36] Registering tool proton_37, AppID 858280)log";
+                auto const tool_appmanifest_file = default_steam_path / "steamapps/appmanifest_961940.acf";
+                auto const install_dir_key = "AppState/installdir";
+                auto const install_dir = "Proton 3.16";
+                auto const manifest_file = default_steam_path / "steamapps/common/Proton 3.16/toolmanifest.vdf";
+                auto const manifest_commandline_key = "manifest/commandline";
+                auto const manifest_commandline = "/proton run";
 
+                TODO_BEFORE(05, 2020, "Refactor these into separate tests");
                 REQUIRE_CALL(stdUtilsMock, FileReadAllText(log_file_path)).LR_RETURN(log_content);
+                REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _)).IN_SEQUENCE(sequence);
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(tool_appmanifest_file)).LR_RETURN(tool_appmanifest_file);
+                REQUIRE_CALL(vdfMock, LoadFromText(tool_appmanifest_file.string(), false, _)).SIDE_EFFECT(_3.KeyValue[install_dir_key] = install_dir);
+                REQUIRE_CALL(vdfMock, GetValuesWithFilter(_, _)).RETURN(std::vector<std::string>{});
+                REQUIRE_CALL(stdUtilsMock, FileReadAllText(manifest_file)).LR_RETURN(manifest_file);
+                REQUIRE_CALL(vdfMock, LoadFromText(manifest_file.string(), false, _)).SIDE_EFFECT(_3.KeyValue[manifest_commandline_key] = manifest_commandline);
 
-                THEN("Valid appid is returned")
+                THEN("Valid compatibility tool path & argument pair is returned")
                 {
-                    CHECK_EQ(961940, steam.GetCompatibilityToolForAppId(appid));
+                    auto const compatibility_tool = steam.GetCompatibilityToolForAppId(appid);
+                    CHECK_EQ("/somewhere/steam/steamapps/common/Proton 3.16/proton", compatibility_tool.first);
+                    CHECK_EQ("run", compatibility_tool.second);
                 }
             }
         }

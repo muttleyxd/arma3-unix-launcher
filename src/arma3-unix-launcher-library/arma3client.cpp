@@ -103,30 +103,16 @@ namespace ARMA3
                 {
                     SteamUtils steam_utils;
                     auto const arma3_id = std::stoull(ARMA3::Definitions::app_id);
-                    auto const compatibility_tool_id = steam_utils.GetCompatibilityToolForAppId(arma3_id);
-
-                    std::string compatibility_tool_path;
-                    for (auto const &install_path : steam_utils.GetInstallPaths())
-                    {
-                        try
-                        {
-                            compatibility_tool_path = steam_utils.GetGamePathFromInstallPath(install_path, std::to_string(compatibility_tool_id));
-                            break;
-                        }
-                        catch (std::exception const&)
-                        {
-                        }
-                    }
+                    auto const compatibility_tool = steam_utils.GetCompatibilityToolForAppId(arma3_id);
 
                     auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
                     if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
                         ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
 
-                    auto const wineserver = fmt::format("{}/dist/bin/wine64", compatibility_tool_path);
                     auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(GetPath()) / "steamapps/compatdata" / ARMA3::Definitions::app_id;
 
-                    auto const environment = fmt::format(R"env(SteamGameId={} LD_PRELOAD={} WINESERVER="{}" STEAM_COMPAT_DATA_PATH="{}")env", arma3_id, ld_preload_path, wineserver, steam_compat_data_path.string());
-                    auto const command = fmt::format(R"command(env {} "{}/proton" run "{}" {})command", environment, compatibility_tool_path, GetPathExecutable().string(), arguments);
+                    auto const environment = fmt::format(R"env(SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env", arma3_id, ld_preload_path, steam_compat_data_path.string());
+                    auto const command = fmt::format(R"command(env {} {} {} "{}" {})command", environment, compatibility_tool.first, compatibility_tool.second, GetPathExecutable().string(), arguments);
                     fmt::print("Running Arma:\n{}\n", command);
                     StdUtils::StartBackgroundProcess(command, GetPath().string());
                 }
