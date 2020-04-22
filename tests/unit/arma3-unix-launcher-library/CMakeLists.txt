@@ -61,6 +61,8 @@ create_unit_test(TEST_GROUP library
                  SOURCES    test_steam_utils.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/steam_utils.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/steam_utils.hpp
+                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.cpp
+                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/directory_not_found.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_install_not_found.cpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_install_not_found.hpp
                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/exceptions/steam_workshop_directory_not_found.cpp
