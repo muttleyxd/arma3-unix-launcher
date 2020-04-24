@@ -12,7 +12,6 @@ Since Bohemia didn't port their launcher to Linux and Mac and existing launcher 
     * [Building from source](#building-from-source)
 * [Launch parameters](#launch-parameters)
 
-
 ## Installing
 ### From package
 
