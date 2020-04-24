@@ -577,7 +577,7 @@ void MainWindow::load_mods_from_json(nlohmann::json &preset)
     auto &mods = preset.at("mods");
 
     auto const &workshop_mods = mods.at("workshop");
-    auto workshop_contains_mod = [&](std::string id)
+    auto workshop_contains_mod = [&](std::string const& id)
     {
         for (auto const &mod : workshop_mods)
             if (mod.at("id") == id)
