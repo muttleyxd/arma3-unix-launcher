@@ -52,7 +52,7 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
 
     for (auto const &mod : mods["custom"])
         if (mod["enabled"])
-            custom_mods.push_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
+            custom_mods.emplace_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
     for (auto const &mod : mods["workshop"])
         workshop_mods.push_back(mod["id"]);
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
                             "--preset-to-run").help("preset to run, launcher will start Arma with given mods and exit").nargs(1);
         parser.add_argument("--server-ip").help("server ip to connect to, usable only with --preset-to-run").nargs(1);
         parser.add_argument("--server-port").help("server port to connect to, usable only with --preset-to-run").nargs(1);
-        parser.add_argument("--server-password").help("server pasword to connect to, usable only with --preset-to-run").nargs(
+        parser.add_argument("--server-password").help("server password to connect to, usable only with --preset-to-run").nargs(
             1);
         parser.add_argument("-v", "--verbose").help("verbose mode which enables more logging").default_value(
             false).implicit_value(true);
