@@ -14,8 +14,6 @@
 #include "exceptions/steam_install_not_found.hpp"
 #include "exceptions/steam_workshop_directory_not_found.hpp"
 
-#include "static_todo.hpp"
-
 using namespace StringUtils;
 
 using std::filesystem::exists;
@@ -23,7 +21,7 @@ using std::filesystem::path;
 
 namespace fs = FilesystemUtils;
 
-SteamUtils::SteamUtils(std::vector<path> search_paths)
+SteamUtils::SteamUtils(std::vector<path> const &search_paths)
 {
     steam_path_ = "";
     for (auto const &search_path : search_paths)
@@ -59,13 +57,13 @@ std::vector<path> SteamUtils::GetInstallPaths() const
     return ret;
 }
 
-path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::string const &appid) const
+path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::string_view const appid) const
 {
-    std::filesystem::path manifest_file = install_path / "steamapps" / ("appmanifest_" + appid + ".acf");
+    std::filesystem::path manifest_file = install_path / "steamapps" / fmt::format("appmanifest_{}.acf", appid.data());
 
     VDF vdf;
     vdf.LoadFromText(StdUtils::FileReadAllText(manifest_file));
-    return install_path / "steamapps/common" / vdf.KeyValue["AppState/installdir"];
+    return install_path / "steamapps/common" / vdf.KeyValue.at("AppState/installdir");
 }
 
 path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &appid) const
@@ -79,7 +77,6 @@ path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &ap
 
 std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id)
 {
-    TODO_BEFORE(05, 2020, "Refactor this");
     auto const config_vdf_path = steam_path_ / "config/config.vdf";
     auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
 
@@ -88,48 +85,7 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
     if (!StdUtils::ContainsKey(config_vdf.KeyValue, key))
         throw std::runtime_error("compatibility tool entry not found");
 
-    // we need to scan compat_log.txt for something like "proton_5" and get its appid
-    auto const compatibility_tool_shortname = config_vdf.KeyValue[key]; // "proton_5"
-
-    auto const log_file_path = steam_path_ / "logs/compat_log.txt";
-    auto const log_content = StdUtils::FileReadAllText(log_file_path);
-
-    auto const text_to_look_for = fmt::format("Registering tool {}, AppID ", compatibility_tool_shortname);
-    auto const position = log_content.rfind(text_to_look_for);
-    if (position == std::string::npos)
-        throw std::runtime_error(fmt::format("cannot find entry for '{}' compatibility tool", compatibility_tool_shortname));
-
-    // expecting somethingth like "Registering tool proton_5, AppID 12345678\n<nextlogline>"
-    auto const app_id_start = position + text_to_look_for.length();
-    auto const app_id_end = log_content.find_first_of("\r\n[", app_id_start);
-    auto const app_id_str = log_content.substr(app_id_start, app_id_end - app_id_start);
-
-    std::filesystem::path compatibility_tool_path;
-    if (app_id_str == "0") // custom compatiblity tool installed in ~Steam/compatibilitytools.d/
-    {
-        TODO_BEFORE(05, 2020, "Write tests for this");
-        compatibility_tool_path = GetSteamPath() / "compatibilitytools.d" / compatibility_tool_shortname;
-        if (!fs::Exists(compatibility_tool_path))
-            throw DirectoryNotFoundException(compatibility_tool_path);
-    }
-    else // compatibility tool provided by Steam
-    {
-        for (auto const &install_path : GetInstallPaths())
-        {
-            try
-            {
-                compatibility_tool_path = GetGamePathFromInstallPath(install_path, app_id_str);
-                break;
-            }
-            catch (std::exception const &)
-            {
-            }
-        }
-    }
-
-    if (compatibility_tool_path.empty())
-        throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'", app_id_str,
-                                             compatibility_tool_shortname));
+    auto const compatibility_tool_path = get_compatibility_tool_path(config_vdf.KeyValue[key]);
 
     std::string const command_line_key = "manifest/commandline";
     auto const tool_manifest = compatibility_tool_path / "toolmanifest.vdf";
@@ -138,7 +94,7 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
     if (!StdUtils::ContainsKey(tool_manifest_vdf.KeyValue, command_line_key))
         throw std::runtime_error(fmt::format("cannot read '{}' from '{}'", command_line_key, tool_manifest.string()));
 
-    auto const tool_name = tool_manifest_vdf.KeyValue["manifest/commandline"];
+    auto const tool_name = tool_manifest_vdf.KeyValue.at("manifest/commandline");
     auto const separator = tool_name.find(' ');
     auto const tool_args = StringUtils::trim(tool_name.substr(separator));
     auto const tool_path = StringUtils::trim(tool_name.substr(0, separator));
@@ -151,4 +107,50 @@ std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::pa
 {
     //game_path == "~/.local/share/Steam/steamapps/common/Arma 3"
     return std::filesystem::weakly_canonical(game_path / "../../../");
+}
+
+std::filesystem::path SteamUtils::get_compatibility_tool_path(std::string const &shortname) const
+{
+    auto const log_file_path = steam_path_ / "logs/compat_log.txt";
+    auto const log_content = StdUtils::FileReadAllText(log_file_path);
+
+    // we need to scan compat_log.txt for something like "proton_5" and get its appid
+    auto const text_to_look_for = fmt::format("Registering tool {}, AppID ", shortname);
+    auto const position = log_content.rfind(text_to_look_for);
+    if (position == std::string::npos)
+        throw std::runtime_error(fmt::format("cannot find entry for '{}' compatibility tool", shortname));
+
+    // expecting something like "Registering tool proton_5, AppID 12345678\n<nextlogline>"
+    auto const app_id_start = position + text_to_look_for.length();
+    auto const app_id_end = log_content.find_first_of("\r\n[", app_id_start);
+    auto const app_id_str = log_content.substr(app_id_start, app_id_end - app_id_start);
+
+    if (app_id_str == "0") // custom compatibility tool installed in ~Steam/compatibilitytools.d/
+        return get_user_compatibility_tool(shortname);
+    else // compatibility tool provided by Steam
+        return get_builtin_compatibility_tool(shortname, app_id_str);
+}
+
+std::filesystem::path SteamUtils::get_user_compatibility_tool(std::string const &shortname) const
+{
+    auto compatibility_tool_path = GetSteamPath() / "compatibilitytools.d" / shortname;
+    if (!fs::Exists(compatibility_tool_path))
+        throw DirectoryNotFoundException(compatibility_tool_path);
+    return compatibility_tool_path;
+}
+
+std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string const &shortname,
+        std::string_view const app_id_str) const
+{
+    for (auto const &install_path : GetInstallPaths())
+    {
+        try
+        {
+            return GetGamePathFromInstallPath(install_path, app_id_str);
+        }
+        catch (std::exception const &)
+        {
+        }
+    }
+    throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'", app_id_str.data(), shortname));
 }
