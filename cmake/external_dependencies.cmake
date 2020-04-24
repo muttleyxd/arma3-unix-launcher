@@ -49,6 +49,7 @@ function(setup_argparse)
     setup_library("${CHECK_SOURCE}"
                   NAME argparse
                   GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+                  GIT_TAG 45664c4
                   HEADER_ONLY
                   )
     if (NOT TARGET argparse::argparse)
