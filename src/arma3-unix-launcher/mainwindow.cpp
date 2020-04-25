@@ -5,9 +5,11 @@
 
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QListView>
 #include <QMessageBox>
 #include <QTabBar>
 #include <QTimer>
+#include <QTreeView>
 
 #include <QResizeEvent>
 
@@ -343,64 +345,79 @@ std::unique_ptr<QFileDialog> get_open_dialog(QString const &title)
 void MainWindow::on_button_add_custom_mod_clicked()
 try
 {
-    auto open_dir_dialog = get_open_dialog("Select directory with mod to add");
-    if (!open_dir_dialog->exec())
+    QFileDialog open_dir_dialog(nullptr, tr("Select mod directories to add"), QDir::homePath());
+    open_dir_dialog.setFileMode(QFileDialog::FileMode::Directory);
+    open_dir_dialog.setOption(QFileDialog::Option::ShowDirsOnly);
+    open_dir_dialog.setOption(QFileDialog::Option::DontUseNativeDialog);
+    if (auto list_view = open_dir_dialog.findChild<QListView*>("listView"))
+        list_view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+    if (auto tree_view = open_dir_dialog.findChild<QTreeView*>())
+        tree_view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+    if (!open_dir_dialog.exec())
         return;
 
-    auto mod_dir_string = open_dir_dialog->selectedFiles()[0].toStdString();
+    auto selected_dirs = open_dir_dialog.selectedFiles();
+    if (selected_dirs.size() > 0 && selected_dirs[0] == open_dir_dialog.directory().path())
+        selected_dirs.removeFirst();
 
-    using std::filesystem::exists;
-    if (!exists(mod_dir_string))
+    std::string failed_mods;
+    for (auto const &dir : selected_dirs)
     {
-        auto error_message = fmt::format("{} does not exist.", mod_dir_string);
-        QMessageBox(QMessageBox::Icon::Information, "Cannot add mod", QString::fromStdString(error_message)).exec();
+        auto const mod_dir_string = dir.toStdString();
+
+        using std::filesystem::exists;
+        if (!exists(mod_dir_string))
+        {
+            failed_mods += fmt::format("{} does not exist.\n", mod_dir_string);
+            continue;
+        }
+
+        auto mod_dir = std::filesystem::canonical(mod_dir_string);
+        if (mod_dir == client->GetPath())
+        {
+            failed_mods += fmt::format("{} is Arma's main directory.\n", mod_dir);
+            continue;
+        }
+
+        auto dir_listing = fs::Ls(mod_dir, true);
+        if (!StdUtils::Contains(dir_listing, "addons"))
+        {
+            failed_mods += fmt::format("{} does not exist.\n", mod_dir / "addons");
+            continue;
+        }
+
+        auto &settings_mods_custom = manager.settings["mods"]["custom"];
+        auto existing_mod = std::find_if(settings_mods_custom.begin(),
+                                         settings_mods_custom.end(), [&mod_dir](nlohmann::json const & item)
+        {
+            auto it = item.find("path");
+            return it != item.end() && it.value() == mod_dir.string();
+        });
+
+        if (existing_mod != settings_mods_custom.end())
+        {
+            failed_mods += fmt::format("{} already exists.\n", mod_dir);
+            continue;
+        }
+
+        try
+        {
+            Mod m(mod_dir);
+            add_item(*ui->table_custom_mods, UiMod{false, m.GetValueOrReturnDefault("name", "cannot read name"), mod_dir});
+            settings_mods_custom.push_back({{"enabled", false}, {"path", mod_dir}});
+        }
+        catch (std::exception const &e)
+        {
+            failed_mods += fmt::format("{}.\n", e.what());
+        }
+    }
+
+    if (failed_mods.length() > 0)
+    {
+        auto error_message = fmt::format("Failed when adding mods:\n{}", failed_mods);
+        QMessageBox(QMessageBox::Icon::Information, "Cannot add mods", QString::fromStdString(error_message)).exec();
         return;
     }
-
-    auto mod_dir = std::filesystem::canonical(mod_dir_string);
-    if (mod_dir == client->GetPath())
-    {
-        auto error_message = fmt::format("{} is Arma's main directory.", mod_dir);
-        QMessageBox(QMessageBox::Icon::Information, "Cannot add mod", QString::fromStdString(error_message)).exec();
-        return;
-    }
-
-    auto dir_listing = fs::Ls(mod_dir, true);
-    if (!StdUtils::Contains(dir_listing, "addons"))
-    {
-        auto error_message = fmt::format("{} does not exist.", mod_dir / "addons");
-        QMessageBox(QMessageBox::Icon::Information, "Cannot add mod", QString::fromStdString(error_message)).exec();
-        return;
-    }
-
-    auto &settings_mods_custom = manager.settings["mods"]["custom"];
-    auto existing_mod = std::find_if(settings_mods_custom.begin(),
-                                     settings_mods_custom.end(), [&mod_dir](nlohmann::json const & item)
-    {
-        auto it = item.find("path");
-        return it != item.end() && it.value() == mod_dir.string();
-    });
-
-    if (existing_mod != settings_mods_custom.end())
-    {
-        auto error_message = fmt::format("{} already exists.", mod_dir);
-        QMessageBox(QMessageBox::Icon::Information, "Cannot add mod", QString::fromStdString(error_message)).exec();
-        return;
-    }
-
-    try
-    {
-        Mod m(mod_dir);
-        add_item(*ui->table_custom_mods, UiMod{false, m.GetValueOrReturnDefault("name", "cannot read name"), mod_dir});
-        settings_mods_custom.push_back({{"enabled", false}, {"path", mod_dir}});
-    }
-    catch (std::exception const &e)
-    {
-        auto error_message = fmt::format("{}.", e.what());
-        QMessageBox(QMessageBox::Icon::Information, "Cannot add mod", QString::fromStdString(error_message)).exec();
-        return;
-    }
-
 }
 catch (std::exception const &ex)
 {
