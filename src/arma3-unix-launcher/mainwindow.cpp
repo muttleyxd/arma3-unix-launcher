@@ -309,7 +309,7 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
         Mod mod(client->GetPathWorkshop() / workshop_id);
         auto const ui_mods = get_mods(*ui->table_workshop_mods);
 
-        for (auto const ui_mod : ui_mods)
+        for (auto const& ui_mod : ui_mods)
         {
             if (ui_mod.path_or_workshop_id == workshop_id)
                 return;
