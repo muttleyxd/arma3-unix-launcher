@@ -24,10 +24,9 @@
 #include "ui_mod.hpp"
 #include "std_utils.hpp"
 
-#include "static_todo.hpp"
-
 #include "exceptions/preset_loading_failed.hpp"
 #include "html_preset_parser.hpp"
+#include "arma_path_chooser_dialog.h"
 
 namespace fs = FilesystemUtils;
 
@@ -328,20 +327,6 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
     }
 }
 
-std::unique_ptr<QFileDialog> get_open_dialog(QString const &title)
-{
-    TODO_BEFORE(05, 2020, "This already exists in arma_path_chooser_dialog.cpp");
-    auto dialog = std::make_unique<QFileDialog>();
-    dialog->setFilter(QDir::AllDirs | QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
-    dialog->setWindowTitle(title);
-    dialog->setFileMode(QFileDialog::FileMode::Directory);
-    dialog->setViewMode(QFileDialog::ViewMode::Detail);
-    dialog->setOption(QFileDialog::DontResolveSymlinks, false);
-    dialog->setOption(QFileDialog::ShowDirsOnly);
-    dialog->setDirectory(QDir::homePath());
-    return dialog;
-}
-
 void MainWindow::on_button_add_custom_mod_clicked()
 try
 {
@@ -522,7 +507,8 @@ void MainWindow::on_checkbox_profile_stateChanged(int arg1)
 
 void MainWindow::on_button_parameter_file_open_clicked()
 {
-    auto open_parameter_file_dialog = get_open_dialog("Select parameter file");
+    ArmaPathChooserDialog apcd;
+    auto open_parameter_file_dialog = apcd.get_open_dialog("Select parameter file");
     open_parameter_file_dialog->setFileMode(QFileDialog::FileMode::ExistingFile);
     open_parameter_file_dialog->setOption(QFileDialog::ShowDirsOnly, false);
     if (!open_parameter_file_dialog->exec())
