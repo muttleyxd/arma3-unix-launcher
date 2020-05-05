@@ -19,6 +19,8 @@ class ArmaPathChooserDialog : public QDialog
         explicit ArmaPathChooserDialog(QWidget *parent = nullptr);
         ~ArmaPathChooserDialog();
 
+        std::unique_ptr<QFileDialog> get_open_dialog(QString const &title);
+
         std::filesystem::path arma_path_;
         std::filesystem::path workshop_path_;
 
@@ -38,7 +40,6 @@ class ArmaPathChooserDialog : public QDialog
 
         QPushButton *button_ok_;
 
-        std::unique_ptr<QFileDialog> get_open_dialog(QString const &title);
 
         bool is_arma_path_valid(QString const &arg1);
         bool is_workshop_path_valid(QString const &arg1);
