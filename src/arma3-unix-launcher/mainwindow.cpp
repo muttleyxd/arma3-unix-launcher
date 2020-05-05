@@ -694,8 +694,25 @@ void MainWindow::load_mods_from_html(std::string const &path)
         return;
 
     std::string mod_list;
+    int mod_count, mod_count_overload;
     for (auto const &json_mod : not_existing_mods)
-        mod_list += fmt::format("{}\n", std::string(json_mod["displayName"]));
+    {
+        if (mod_count >= 25)
+        {
+            mod_count_overload++;
+        }
+        else
+        {
+            mod_list += fmt::format("{}\n", std::string(json_mod["displayName"]));
+            mod_count++;
+        }
+    }
+
+    if (mod_count >= 25)
+    {
+        mod_list += fmt::format("and {} more...\n", std::to_string(mod_count_overload));
+    }
+
 
     if (steam_integration->is_initialized())
     {
