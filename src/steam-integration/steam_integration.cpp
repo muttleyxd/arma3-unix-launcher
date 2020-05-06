@@ -35,7 +35,7 @@ namespace
 
         auto old_path = fs::CurrentPath();
         auto tmp_path = fs::TempDirectoryPath() / "arma3-unix-launcher.tmp";
-        TODO_BEFORE(05, 2020, "Better temporary path - this will break with 2 processes");
+        TODO_BEFORE(06, 2020, "Better temporary path - this will break with 2 processes");
         fs::CreateDirectories(tmp_path);
         fs::CurrentPath(tmp_path);
         StdUtils::FileWriteAllText(tmp_path / "steam_appid.txt", app_id);
