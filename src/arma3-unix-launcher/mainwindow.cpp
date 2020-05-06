@@ -694,7 +694,8 @@ void MainWindow::load_mods_from_html(std::string const &path)
         return;
 
     std::string mod_list;
-    int mod_count, mod_count_overload;
+    int mod_count = 0;
+    int mod_count_overload = 0;
     for (auto const &json_mod : not_existing_mods)
     {
         if (mod_count >= 25)
