@@ -79,9 +79,19 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
 {
     auto const config_vdf_path = steam_path_ / "config/config.vdf";
     auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
+    fmt::print("GetCompatibilityToolForAppId({}) = {}\n", app_id, key);
 
     VDF config_vdf;
     config_vdf.LoadFromText(StdUtils::FileReadAllText(config_vdf_path));
+
+    fmt::print("Loaded VDF from: {}\n", config_vdf_path.string());
+    for (auto const& [key, pair] : config_vdf.KeyValue)
+    {
+        if (key.find("CompatToolMapping") == std::string::npos)
+            continue;
+        fmt::print("key: {}\n", key);
+    }
+
     if (!StdUtils::ContainsKey(config_vdf.KeyValue, key))
         throw std::runtime_error("compatibility tool entry not found");
 

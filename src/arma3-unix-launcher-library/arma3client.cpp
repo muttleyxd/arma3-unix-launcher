@@ -103,7 +103,9 @@ namespace ARMA3
                 {
                     SteamUtils steam_utils;
                     auto const arma3_id = std::stoull(ARMA3::Definitions::app_id);
+                    fmt::print("Start(app_id: {}, {});\n", arma3_id, ARMA3::Definitions::app_id);
                     auto const compatibility_tool = steam_utils.GetCompatibilityToolForAppId(arma3_id);
+                    fmt::print("Compat tool: '{}' '{}'\n", compatibility_tool.first, compatibility_tool.second);
 
                     auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
                     if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
