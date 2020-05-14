@@ -310,7 +310,7 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
         Mod mod(client->GetPathWorkshop() / workshop_id);
         auto const ui_mods = get_mods(*ui->table_workshop_mods);
 
-        for (auto const& ui_mod : ui_mods)
+        for (auto const &ui_mod : ui_mods)
         {
             if (ui_mod.path_or_workshop_id == workshop_id)
                 return;
@@ -334,9 +334,9 @@ try
     open_dir_dialog.setFileMode(QFileDialog::FileMode::Directory);
     open_dir_dialog.setOption(QFileDialog::Option::ShowDirsOnly);
     open_dir_dialog.setOption(QFileDialog::Option::DontUseNativeDialog);
-    if (auto list_view = open_dir_dialog.findChild<QListView*>("listView"))
+    if (auto list_view = open_dir_dialog.findChild<QListView *>("listView"))
         list_view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
-    if (auto tree_view = open_dir_dialog.findChild<QTreeView*>())
+    if (auto tree_view = open_dir_dialog.findChild<QTreeView *>())
         tree_view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
     if (!open_dir_dialog.exec())
         return;
@@ -580,7 +580,7 @@ void MainWindow::load_mods_from_json(nlohmann::json &preset)
     auto &mods = preset.at("mods");
 
     auto const &workshop_mods = mods.at("workshop");
-    auto workshop_contains_mod = [&](std::string const& id)
+    auto workshop_contains_mod = [&](std::string const & id)
     {
         for (auto const &mod : workshop_mods)
             if (mod.at("id") == id)
