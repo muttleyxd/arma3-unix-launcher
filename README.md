@@ -27,7 +27,7 @@ For Arch based distributions there's an AUR package available - it's called `arm
 Requirements:
 * GCC 8 or newer (Clang with C++17 support should work too)
 * CMake 3.11
-* Qt5 with SVG support
+* Qt5 with SVG support, version 5.9 or later
 * fmt (optional)
 
 #### Debian based (Debian, Ubuntu)
