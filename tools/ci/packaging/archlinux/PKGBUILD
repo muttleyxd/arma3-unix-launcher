@@ -10,34 +10,38 @@ depends=('fmt' 'pugixml' 'qt5-base' 'qt5-svg')
 makedepends=('cmake' 'make')
 provides=('arma3-unix-launcher')
 conflicts=('arma3-unix-launcher')
-source=("git+file:///arma3-unix-launcher")
+source=("git+file:///A3ULPATH")
 md5sums=('SKIP')
 
 pkgver()
 {
-  cd "/arma3-unix-launcher"
+  cd "/A3ULPATH"
   echo $(git rev-list --count HEAD).$(git rev-parse --short HEAD)
 }
 
 build()
 {
-  cd "$srcdir/$pkgname"
+  cd $(basename "$source")
   mkdir build
   cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks
+  STEAMWORKS_PARAMETER=""
+  if [ -d "/tmp/steamworks" ]; then
+    STEAMWORKS_PARAMETER="-DSTEAMWORKS_SDK_PATH=/tmp/steamworks"
+  fi
+  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON $STEAMWORKS_PARAMETER
   make
 }
 
 check()
 {
-  cd "$srcdir/$pkgname/build"
+  cd $(basename "$source")/build
   ctest -V
 }
 
 package()
 {
-  cd "$srcdir/$pkgname"
+  cd $(basename "$source")
   install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-  cd "$srcdir/$pkgname/build"
+  cd build
   make DESTDIR="$pkgdir" install
 }
