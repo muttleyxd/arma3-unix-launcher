@@ -1,0 +1,38 @@
+FROM ubuntu:16.04
+
+# Update image
+RUN apt-get update && apt-get upgrade -y
+
+# Enable CMake PPA
+RUN apt-get install -y apt-transport-https ca-certificates gnupg software-properties-common wget
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+
+# Add g++-8 PPA
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+
+# Update apt
+RUN apt-get update
+
+# Install required dependencies
+RUN apt-get install -y build-essential devscripts cmake git g++-8 p7zip-full wget python3-requests python3-semantic-version python3-lxml
+
+# Install Qt 5.14.2
+ADD https://raw.githubusercontent.com/engnr/qt-downloader/master/qt-downloader /qt/qt-downloader
+RUN chmod +x /qt/qt-downloader && cd qt && ./qt-downloader linux desktop 5.14.2 gcc_64
+
+# Download nlohmann-json and doctest from GitHub
+ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp
+ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h
+RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
+
+# Add mesa
+RUN apt-get install -y mesa-common-dev libglu1-mesa-dev
+
+# Cleanup
+RUN rm -rf /var/lib/apt/lists/*
+
+# Let's not run as root
+RUN useradd -m builduser && passwd -d builduser
+
+USER builduser

@@ -12,6 +12,19 @@ steps:
 
 ---
 kind: pipeline
+name: ubuntu-16.04-g++-8
+
+steps:
+- name: build-and-test
+  image: muttleyxd/a3ul_ubuntu-16.04_build:latest
+  commands:
+    - mkdir /tmp/build && cd /tmp/build
+    - cmake /drone/src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libstdc++" -DCMAKE_CXX_COMPILER=g++-8 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_PREFIX_PATH=/qt/5.14.2/gcc_64
+    - make -j$(nproc)
+    - ctest -V
+
+---
+kind: pipeline
 name: ubuntu-18.04-g++-8
 
 steps:
@@ -64,13 +77,9 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - cp -r /drone/src /tmp/arma3-unix-launcher
     - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - /tmp/arma3-unix-launcher/tools/ci/obtain-steamworks.sh
-    - mkdir -p /tmp/build && cd /tmp/build
-    - cp /tmp/arma3-unix-launcher/tools/ci/packaging/archlinux/PKGBUILD ./
-    - sed -i 's|/arma3-unix-launcher|/tmp/arma3-unix-launcher|g' PKGBUILD
-    - makepkg
+    - tools/ci/obtain-steamworks.sh
+    - tools/ci/packaging/archlinux/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
   when:
     event: [push, tag, deployment]
     branch:
@@ -85,6 +94,7 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
+    - find .
     - mv $(echo *.tar.xz) $(echo *.tar.xz | sed 's/x86_64.pkg.tar.xz/archlinux-x86_64.pkg.tar.xz/g')
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.tar.xz"
   when:
@@ -101,7 +111,65 @@ volumes:
 
 ---
 kind: pipeline
-name: ubuntu-g++-8-package
+name: ubuntu-16.04-g++-8-package
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: alpine/git
+  commands:
+  - git clone $DRONE_GIT_HTTP_URL .
+  - git checkout $DRONE_COMMIT
+  - chmod 777 /tmp/build
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
+  volumes:
+  - name: package
+    path: /tmp/build
+- name: build-test-makepkg
+  image: muttleyxd/a3ul_ubuntu-16.04_build:latest
+  volumes:
+  - name: package
+    path: /tmp/build
+  commands:
+    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - tools/ci/obtain-steamworks.sh
+    - tools/ci/packaging/ubuntu-16.04/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
+  when:
+    event: [push, tag, deployment]
+    branch:
+      - master
+  environment:
+    GPG_DECRYPTION_KEY_BASE64:
+      from_secret: gpg_decryption_key_base64
+- name: publish_release
+  image: muttleyxd/github-release
+  when:
+    event: [push, tag, deployment]
+    branch:
+    - master
+  environment:
+    GITHUB_PUBLISH_TOKEN:
+      from_secret: github_publish_key
+  commands:
+    - cd /tmp/build
+    - find .
+    - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.deb"
+  volumes:
+  - name: package
+    path: /tmp/build
+
+volumes:
+- name: package
+  temp: {}
+
+---
+kind: pipeline
+name: ubuntu-18.04-g++-8-package
 
 clone:
   disable: true
@@ -126,26 +194,9 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - tools/ci/obtain-steamworks.sh
-    - . /etc/lsb-release
-    - . /etc/os-release
-    - export SHORT_HASH=`git rev-parse --verify HEAD | cut -c -7`
-    - export COMMIT_COUNT=`git rev-list HEAD --count`
-    - export TMP_BUILD="/tmp/build_deb"
-    - export PKG_DIR="$TMP_BUILD/arma3-unix-launcher-$COMMIT_COUNT.$SHORT_HASH-$ID-$VERSION_ID-amd64"
-    - mkdir -p $PKG_DIR/DEBIAN
-    - cd $PKG_DIR
-    - sed 's/VERSION/$COMMIT_COUNT-$SHORT_HASH/g' /drone/src/tools/ci/packaging/ubuntu-18.04/control >./DEBIAN/control
-    - mkdir $TMP_BUILD/cmake_build && cd $TMP_BUILD/cmake_build
-    - cmake /drone/src -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks
-    - make -j$(nproc)
-    - ctest --output-on-failure
-    - make install DESTDIR=$PKG_DIR
-    - cd $TMP_BUILD
-    - dpkg-deb --build $PKG_DIR
-    - ls -alh
-    - cp *.deb /tmp/build
+  - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+  - tools/ci/obtain-steamworks.sh
+  - tools/ci/packaging/ubuntu-18.04/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
   when:
     event: [push, tag, deployment]
     branch:
@@ -164,6 +215,7 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
+    - find .
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.deb"
   volumes:
   - name: package
