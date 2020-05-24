@@ -19,11 +19,10 @@ source /etc/os-release
 
 pushd $A3UL_DIR
   SHORT_HASH=`git rev-parse --verify HEAD | cut -c -7`
-  BRANCH=`"$SELF_PATH/../../get-branch-name.sh"`
   COMMIT_COUNT=`git rev-list HEAD --count`
 popd
 
-PKG_DIR="$BUILD_DIR/arma3-unix-launcher_$BRANCH-$COMMIT_COUNT-$SHORT_HASH-$ID-$VERSION_ID-amd64"
+PKG_DIR="$BUILD_DIR/arma3-unix-launcher-$COMMIT_COUNT.$SHORT_HASH-$ID-$VERSION_ID-amd64"
 mkdir -p $PKG_DIR/DEBIAN
 
 sed "s/VERSION/$COMMIT_COUNT-$SHORT_HASH/g" ./control >$PKG_DIR/DEBIAN/control
