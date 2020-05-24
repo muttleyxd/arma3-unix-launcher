@@ -33,7 +33,7 @@ jobs:
         make package
         export COMMIT_COUNT=`git rev-list --count HEAD`
         export COMMIT_HASH=`git rev-parse --verify HEAD | cut -c -7`
-        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT-$COMMIT_HASH-mac_os_x-x86_64.dmg
+        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT.$COMMIT_HASH-mac_os_x-x86_64.dmg
     - name: deploy release
       if: github.ref == 'refs/heads/master'
       run: ./github-release --token ${{ secrets.GITHUB_ACTION_RELEASE_KEY }} --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
