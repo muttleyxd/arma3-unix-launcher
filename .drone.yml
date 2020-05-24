@@ -94,7 +94,6 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
-    - find .
     - mv $(echo *.tar.xz) $(echo *.tar.xz | sed 's/x86_64.pkg.tar.xz/archlinux-x86_64.pkg.tar.xz/g')
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.tar.xz"
   when:
@@ -157,7 +156,6 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
-    - find .
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.deb"
   volumes:
   - name: package
@@ -215,7 +213,6 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
-    - find .
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.deb"
   volumes:
   - name: package
