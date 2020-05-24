@@ -36,4 +36,4 @@ jobs:
         mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT.$COMMIT_HASH-mac_os_x-x86_64.dmg
     - name: deploy release
       if: github.ref == 'refs/heads/master'
-      run: ./github-release --token ${{ secrets.GITHUB_ACTION_RELEASE_KEY }} --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
+      run: ./github-release --token ${{ secrets.actionrelease }} --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
