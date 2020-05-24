@@ -39,8 +39,8 @@ pushd $BUILD_DIR
   popd
 
   pushd $PKG_DIR
-    mkdir opt/lib
-    pushd opt/lib
+    mkdir opt/arma3-unix-launcher/lib
+    pushd opt/arma3-unix-launcher/lib
       cp -L /qt/5.14.2/gcc_64/lib/libQt5Widgets.so.5 ./
       cp -L /qt/5.14.2/gcc_64/lib/libQt5Gui.so.5 ./
       cp -L /qt/5.14.2/gcc_64/lib/libQt5Core.so.5 ./
