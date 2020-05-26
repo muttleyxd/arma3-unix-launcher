@@ -658,7 +658,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
 
     for (auto const &json_mod : json)
     {
-        if (FilesystemUtils::Exists(client->GetPathWorkshop() / json_mod["workshopId"]))
+        if (json_mod.find("workshopId") != json_mod.end() && FilesystemUtils::Exists(client->GetPathWorkshop() / json_mod["workshopId"]))
             existing_mods.push_back(json_mod);
         else
             not_existing_mods.push_back(json_mod);
