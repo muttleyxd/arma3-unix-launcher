@@ -653,20 +653,39 @@ void MainWindow::load_mods_from_html(std::string const &path)
     auto const content = StdUtils::FileReadAllText(path);
     auto const json = Html::Preset::Parser::html_to_json(content);
 
-    nlohmann::json existing_mods = nlohmann::json::array();
-    nlohmann::json not_existing_mods = nlohmann::json::array();
+    nlohmann::json existing_local_mods = nlohmann::json::array();
+    nlohmann::json existing_steam_mods = nlohmann::json::array();
+    nlohmann::json not_existing_local_mods = nlohmann::json::array();
+    nlohmann::json not_existing_steam_mods = nlohmann::json::array();
 
-    for (auto const &json_mod : json)
+    for (auto local_mod : json["local"])
     {
-        if (FilesystemUtils::Exists(client->GetPathWorkshop() / json_mod["workshopId"]))
-            existing_mods.push_back(json_mod);
-        else
-            not_existing_mods.push_back(json_mod);
+        try
+        {
+            auto &path = local_mod["path"];
+            if (!FilesystemUtils::Exists(path))
+                path = client->GetPath() / path;
+            Mod m(path);
+            existing_local_mods.push_back(local_mod);
+        }
+        catch (std::exception const &e)
+        {
+            fmt::print(stderr, "Found not existing mod, error: {}\n", e.what());
+            not_existing_local_mods.push_back(local_mod);
+        }
     }
 
-    auto contains_mod = [&](std::string const & workshop_id)
+    for (auto const &steam_mod : json["steam"])
     {
-        for (auto const &json_mod : existing_mods)
+        if (FilesystemUtils::Exists(client->GetPathWorkshop() / steam_mod["workshopId"]))
+            existing_steam_mods.push_back(steam_mod);
+        else
+            not_existing_steam_mods.push_back(steam_mod);
+    }
+
+    auto contains_workshop_mod = [&](std::string const & workshop_id)
+    {
+        for (auto const &json_mod : existing_steam_mods)
             if (json_mod["workshopId"] == workshop_id)
                 return true;
         return false;
@@ -677,7 +696,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
         auto checkbox = cell_widget->findChild<QCheckBox *>();
         std::string workshop_id = ui->table_workshop_mods->item(row, 2)->text().toStdString();
 
-        if (contains_mod(workshop_id))
+        if (contains_workshop_mod(workshop_id))
             checkbox->setCheckState(Qt::CheckState::Checked);
         else
             checkbox->setCheckState(Qt::CheckState::Unchecked);
@@ -690,42 +709,80 @@ void MainWindow::load_mods_from_html(std::string const &path)
         checkbox->setCheckState(Qt::CheckState::Unchecked);
     }
 
-    if (not_existing_mods.empty())
+    auto find_local_mod_in_custom = [&](std::string const & path)->QCheckBox *
+    {
+        for (int row = 0; row < ui->table_custom_mods->rowCount(); ++row)
+        {
+            auto const mod_path = StringUtils::Replace(ui->table_custom_mods->item(row, 2)->text().toStdString(), "~arma",
+                    client->GetPath());
+            if (mod_path == path)
+            {
+                auto cell_widget = ui->table_custom_mods->cellWidget(row, 0);
+                return cell_widget->findChild<QCheckBox *>();
+            }
+        }
+        return nullptr;
+    };
+    for (auto const &local_mod : existing_local_mods)
+    {
+        if (auto checkbox = find_local_mod_in_custom(local_mod["path"]); checkbox == nullptr)
+        {
+            Mod m(local_mod["path"]);
+            auto full_path = StringUtils::Replace(local_mod.at("path"), client->GetPath().string(), "~arma");
+            add_item(*ui->table_custom_mods, {true,
+                                              m.GetValueOrReturnDefault("name", "cannot read name"),
+                                              full_path
+                                             });
+        }
+        else
+            checkbox->setCheckState(Qt::CheckState::Checked);
+    }
+
+    if (not_existing_local_mods.empty() && not_existing_steam_mods.empty())
         return;
 
     std::string mod_list;
     int mod_count = 0;
     int mod_count_overload = 0;
-    for (auto const &json_mod : not_existing_mods)
+    for (auto const &json_mod : not_existing_steam_mods)
     {
         if (mod_count >= 25)
-        {
             mod_count_overload++;
-        }
         else
         {
-            mod_list += fmt::format("{}\n", std::string(json_mod["displayName"]));
+            mod_list += fmt::format("Steam: {}\n", std::string(json_mod["displayName"]));
+            mod_count++;
+        }
+    }
+    for (auto const &json_mod : not_existing_local_mods)
+    {
+        if (mod_count >= 25)
+            mod_count_overload++;
+        else
+        {
+            mod_list += fmt::format("Local: {}\n", std::string(json_mod["displayName"]));
             mod_count++;
         }
     }
 
     if (mod_count >= 25)
-    {
         mod_list += fmt::format("and {} more...\n", std::to_string(mod_count_overload));
-    }
 
 
     if (steam_integration->is_initialized())
     {
-        auto const message = fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to them now?",
-                                         mod_list);
+        auto const message =
+            fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to missing Steam mods now?",
+                        mod_list);
         auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message),
                                         QMessageBox::Yes | QMessageBox::No).exec();
         if (result == QMessageBox::Yes)
         {
-            for (auto const &json_mod : not_existing_mods)
+            for (auto const &json_mod : not_existing_steam_mods)
             {
-                auto workshop_id = std::stoull(std::string(json_mod["workshopId"]));
+                if (json_mod["origin"] != "Steam")
+                    continue;
+                auto workshop_id = std::stoull(std::string(json_mod["path"]));
                 steam_integration->subscribe(workshop_id);
                 mods_to_enable.push_back(workshop_id);
             }
