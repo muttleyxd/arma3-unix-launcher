@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui_mainwindow.h"
+
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMainWindow>
@@ -13,11 +15,6 @@
 
 #include "settings.hpp"
 #include "ui_mod.hpp"
-
-namespace Ui
-{
-    class MainWindow;
-}
 
 class MainWindow : public QMainWindow
 {
@@ -54,6 +51,8 @@ class MainWindow : public QMainWindow
         void on_button_mod_preset_save_clicked();
 
         void on_button_quit_clicked();
+
+        void on_button_export_workshop_to_txt_clicked();
 
     private:
         Ui::MainWindow *ui;
