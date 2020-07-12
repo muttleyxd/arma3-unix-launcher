@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui_mainwindow.h"
+
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMainWindow>
@@ -13,11 +15,6 @@
 
 #include "settings.hpp"
 #include "ui_mod.hpp"
-
-namespace Ui
-{
-    class MainWindow;
-}
 
 class MainWindow : public QMainWindow
 {
