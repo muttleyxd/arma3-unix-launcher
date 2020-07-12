@@ -52,6 +52,8 @@ class MainWindow : public QMainWindow
 
         void on_button_quit_clicked();
 
+        void on_button_export_workshop_to_txt_clicked();
+
     private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;

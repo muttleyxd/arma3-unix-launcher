@@ -59,6 +59,7 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         add_item(*ui->table_workshop_mods, {is_mod_enabled(mod_id), i.GetValueOrReturnDefault("name", "cannot read name"),
                                             mod_id
                                            });
+        steam_integration->get_item_title(std::stoull(mod_id));
     }
 
     for (auto const &i : client->GetHomeMods())
@@ -823,4 +824,33 @@ catch (std::exception const &e)
 void MainWindow::on_button_quit_clicked()
 {
     this->close();
+}
+
+void MainWindow::on_button_export_workshop_to_txt_clicked()
+try
+{
+    auto config_dir = QString::fromStdString(config_file.parent_path().string());
+    auto filename = QFileDialog::getSaveFileName(this, tr("Save workshop mods to .txt file"), config_dir,
+                    tr("Workshop mod list | *.txt (*.txt)"));
+    if (filename.isEmpty())
+        return;
+    auto filename_str = filename.toStdString();
+    if (!StringUtils::EndsWith(filename_str, ".txt"))
+        filename_str += ".txt";
+
+    put_mods_from_ui_to_manager_settings();
+    std::string output;
+    for (auto const &mod : manager.settings["mods"]["workshop"])
+    {
+        auto mod_id = std::stoull(std::string(mod["id"]));
+        output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n",
+                              steam_integration->get_item_title(mod_id), mod_id);
+    }
+    StdUtils::FileWriteAllText(filename_str, output);
+}
+catch (std::exception const &e)
+{
+    auto error_message = fmt::format("{}.", e.what());
+    QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
+    return;
 }
