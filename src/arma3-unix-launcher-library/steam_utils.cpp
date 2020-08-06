@@ -152,5 +152,6 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
         {
         }
     }
-    throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'", app_id_str.data(), shortname));
+    throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'. Is it installed in Steam?",
+                                         app_id_str.data(), shortname));
 }

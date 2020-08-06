@@ -122,7 +122,7 @@ try
 
     manager.save_settings_from_ui(ui);
 
-    auto parameters = manager.settings["parameters"];
+    auto const parameters = manager.settings["parameters"];
     if (parameters["name"].is_string())
     {
         std::string profile = parameters["name"];
@@ -152,7 +152,7 @@ try
         custom_mods.push_back(client->GetPath() / "GM");
 
     client->CreateArmaCfg(workshop_mod_ids, custom_mods);
-    client->Start(manager.get_launch_parameters(), steam_integration->is_initialized());
+    client->Start(manager.get_launch_parameters(), steam_integration->is_initialized(), parameters["protonDisableEsync"]);
 }
 catch (std::exception const &e)
 {
