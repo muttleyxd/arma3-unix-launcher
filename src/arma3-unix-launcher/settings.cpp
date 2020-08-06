@@ -69,7 +69,7 @@ std::string Settings::get_launch_parameters()
     std::string ret;
     for (auto const &parameter : settings["parameters"].items())
     {
-        if (StringUtils::StartsWith(parameter.key(), "dlc"))
+        if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton"))
             continue;
         else if (parameter.key() == "customParameters" && parameter.value().is_string())
             ret += fmt::format(" {}", std::string(parameter.value()));
@@ -104,6 +104,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("name", ui->checkbox_profile, ui->textbox_profile);
     read_setting("dlcContact", ui->checkbox_dlc_contact);
     read_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
+    read_setting("protonDisableEsync", ui->checkbox_disable_esync);
 
     // advanced tab
     read_setting("par", ui->checkbox_parameter_file, ui->textbox_parameter_file);
@@ -177,6 +178,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("name", ui->checkbox_profile, ui->textbox_profile);
     write_setting("dlcContact", ui->checkbox_dlc_contact);
     write_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
+    write_setting("protonDisableEsync", ui->checkbox_disable_esync);
 
     // advanced tab
     write_setting("par", ui->checkbox_parameter_file, ui->textbox_parameter_file);

@@ -29,6 +29,62 @@ using namespace StringUtils;
 
 namespace fs = FilesystemUtils;
 
+#ifdef __linux
+namespace
+{
+    std::string get_esync_prefix(bool disable_esync)
+    {
+        if (disable_esync)
+            return "PROTON_NO_ESYNC=1 ";
+        return "";
+    }
+
+    void direct_launch(std::filesystem::path const &arma_path, std::filesystem::path const &executable_path,
+                       string const &arguments, bool is_proton, bool disable_esync)
+    {
+        if (!is_proton)
+        {
+            StdUtils::StartBackgroundProcess(fmt::format("{} {}", executable_path, arguments), arma_path.string());
+            return;
+        }
+
+        try
+        {
+            SteamUtils steam_utils;
+            auto const arma3_id = std::stoull(ARMA3::Definitions::app_id);
+            auto const compatibility_tool = steam_utils.GetCompatibilityToolForAppId(arma3_id);
+
+            auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
+            if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
+                ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
+
+            auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(arma_path) / "steamapps/compatdata" /
+                                                ARMA3::Definitions::app_id;
+
+            auto const environment = fmt::format(R"env({}SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env",
+                                                 get_esync_prefix(disable_esync), arma3_id, ld_preload_path, steam_compat_data_path.string());
+            auto const command = fmt::format(R"command(env {} {} {} "{}" {})command", environment, compatibility_tool.first,
+                                             compatibility_tool.second, executable_path.string(), arguments);
+            fmt::print("Running Arma:\n{}\n", command);
+            StdUtils::StartBackgroundProcess(command, arma_path.string());
+        }
+        catch (std::exception const &e)
+        {
+            fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
+        }
+    }
+
+    void indirect_launch_through_steam(string const &arguments, bool is_proton, bool disable_esync)
+    {
+        if (is_proton)
+            StdUtils::StartBackgroundProcess(fmt::format("env {}steam -applaunch 107410 -nolauncher {}",
+                                             get_esync_prefix(disable_esync), arguments));
+        else
+            StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);
+    }
+}
+#endif
+
 namespace ARMA3
 {
     Client::Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path)
@@ -81,50 +137,15 @@ namespace ARMA3
         return path_executable_.filename() == "arma3_x64.exe";
     }
 
-    void Client::Start(string const &arguments, bool launch_directly)
+    void Client::Start(string const &arguments, bool launch_directly, bool disable_esync)
     {
         #ifdef __linux
-        if (!launch_directly)
-        {
-            if (IsProton())
-                StdUtils::StartBackgroundProcess("steam -applaunch 107410 -nolauncher " + arguments);
-            else
-                StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);
-            return;
-        }
-
-        if (IsProton())
-        {
-            if (!launch_directly)
-                StdUtils::StartBackgroundProcess("steam -applaunch 107410 -nolauncher " + arguments);
-            else
-            {
-                try
-                {
-                    SteamUtils steam_utils;
-                    auto const arma3_id = std::stoull(ARMA3::Definitions::app_id);
-                    auto const compatibility_tool = steam_utils.GetCompatibilityToolForAppId(arma3_id);
-
-                    auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
-                    if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
-                        ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
-
-                    auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(GetPath()) / "steamapps/compatdata" / ARMA3::Definitions::app_id;
-
-                    auto const environment = fmt::format(R"env(SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env", arma3_id, ld_preload_path, steam_compat_data_path.string());
-                    auto const command = fmt::format(R"command(env {} {} {} "{}" {})command", environment, compatibility_tool.first, compatibility_tool.second, GetPathExecutable().string(), arguments);
-                    fmt::print("Running Arma:\n{}\n", command);
-                    StdUtils::StartBackgroundProcess(command, GetPath().string());
-                }
-                catch (std::exception const& e)
-                {
-                    fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
-                }
-            }
-        }
+        if (launch_directly)
+            direct_launch(GetPath(), GetPathExecutable(), arguments, IsProton(), disable_esync);
         else
-            StdUtils::StartBackgroundProcess(fmt::format("{} {}", GetPathExecutable(), arguments), GetPath().string());
+            indirect_launch_through_steam(arguments, IsProton(), disable_esync);
         #else
+        (void)disable_esync; // esync does not apply on Mac OS X
         if (launch_directly)
         {
             try
