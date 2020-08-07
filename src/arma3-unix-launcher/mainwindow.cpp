@@ -844,12 +844,10 @@ try
 
     put_mods_from_ui_to_manager_settings();
     std::string output;
-    for (auto const &mod : manager.settings["mods"]["workshop"])
-    {
-        auto mod_id = std::stoull(std::string(mod["id"]));
-        output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n",
-                              steam_integration->get_item_title(mod_id), mod_id);
-    }
+
+    for (auto const &mod : get_mods(*ui->table_workshop_mods))
+        if (mod.enabled)
+            output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n", mod.name, mod.path_or_workshop_id);
     StdUtils::FileWriteAllText(filename_str, output);
 }
 catch (std::exception const &e)
