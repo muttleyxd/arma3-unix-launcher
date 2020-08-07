@@ -25,6 +25,7 @@
 #include "std_utils.hpp"
 
 #include "exceptions/preset_loading_failed.hpp"
+#include "exceptions/steam_api_not_initialized.hpp"
 #include "html_preset_parser.hpp"
 #include "arma_path_chooser_dialog.h"
 
@@ -59,7 +60,10 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         add_item(*ui->table_workshop_mods, {is_mod_enabled(mod_id), i.GetValueOrReturnDefault("name", "cannot read name"),
                                             mod_id
                                            });
-        steam_integration->get_item_title(std::stoull(mod_id));
+        try {
+            steam_integration->get_item_title(std::stoull(mod_id));
+        }  catch (SteamApiNotInitializedException const&) {
+        }
     }
 
     for (auto const &i : client->GetHomeMods())
