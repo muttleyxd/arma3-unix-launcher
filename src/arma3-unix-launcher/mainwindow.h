@@ -81,4 +81,7 @@ class MainWindow : public QMainWindow
 
         void setup_steam_integration();
         void on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info);
+
+        void on_custom_mods_disable_all_mods();
+        void on_workshop_mods_disable_all_mods();
 };

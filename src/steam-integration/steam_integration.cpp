@@ -155,6 +155,9 @@ namespace Steam
 
     std::string Integration::get_item_title(std::uint64_t const id)
     {
+        if (!is_initialized())
+            throw SteamApiNotInitializedException();
+
         std::unique_lock lock(title_cache_access);
 
         if (StdUtils::ContainsKey(title_cache, id))

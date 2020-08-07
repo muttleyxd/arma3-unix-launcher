@@ -25,6 +25,7 @@
 #include "std_utils.hpp"
 
 #include "exceptions/preset_loading_failed.hpp"
+#include "exceptions/steam_api_not_initialized.hpp"
 #include "html_preset_parser.hpp"
 #include "arma_path_chooser_dialog.h"
 
@@ -59,7 +60,10 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         add_item(*ui->table_workshop_mods, {is_mod_enabled(mod_id), i.GetValueOrReturnDefault("name", "cannot read name"),
                                             mod_id
                                            });
-        steam_integration->get_item_title(std::stoull(mod_id));
+        try {
+            steam_integration->get_item_title(std::stoull(mod_id));
+        }  catch (SteamApiNotInitializedException const&) {
+        }
     }
 
     for (auto const &i : client->GetHomeMods())
@@ -101,6 +105,11 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 
     if (steam_integration->is_initialized())
         setup_steam_integration();
+
+    ui->label_custom_mods->addAction(ui->action_custom_mods_disable_all);
+    ui->label_workshop_mods->addAction(ui->action_workshop_mods_disable_all);
+    connect(ui->action_custom_mods_disable_all, &QAction::triggered, this, &MainWindow::on_custom_mods_disable_all_mods);
+    connect(ui->action_workshop_mods_disable_all, &QAction::triggered, this, &MainWindow::on_workshop_mods_disable_all_mods);
 }
 
 MainWindow::~MainWindow()
@@ -840,12 +849,10 @@ try
 
     put_mods_from_ui_to_manager_settings();
     std::string output;
-    for (auto const &mod : manager.settings["mods"]["workshop"])
-    {
-        auto mod_id = std::stoull(std::string(mod["id"]));
-        output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n",
-                              steam_integration->get_item_title(mod_id), mod_id);
-    }
+
+    for (auto const &mod : get_mods(*ui->table_workshop_mods))
+        if (mod.enabled)
+            output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n", mod.name, mod.path_or_workshop_id);
     StdUtils::FileWriteAllText(filename_str, output);
 }
 catch (std::exception const &e)
@@ -853,4 +860,26 @@ catch (std::exception const &e)
     auto error_message = fmt::format("{}.", e.what());
     QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
     return;
+}
+
+void disable_all_mods(QTableWidget& table_mods)
+{
+    for (int row = 0; row < table_mods.rowCount(); ++row)
+    {
+        auto cell_widget = table_mods.cellWidget(row, 0);
+        auto checkbox = cell_widget->findChild<QCheckBox *>();
+        checkbox->setCheckState(Qt::CheckState::Unchecked);
+    }
+}
+
+void MainWindow::on_custom_mods_disable_all_mods()
+{
+    disable_all_mods(*ui->table_custom_mods);
+    put_mods_from_ui_to_manager_settings();
+}
+
+void MainWindow::on_workshop_mods_disable_all_mods()
+{
+    disable_all_mods(*ui->table_workshop_mods);
+    put_mods_from_ui_to_manager_settings();
 }
