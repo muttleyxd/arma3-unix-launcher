@@ -12,6 +12,7 @@
 #include "std_utils.hpp"
 
 #include "exceptions/file_not_found.hpp"
+#include "exceptions/steam_install_not_found.hpp"
 
 #include "settings.hpp"
 
@@ -125,22 +126,29 @@ int main(int argc, char *argv[])
 
         if (arma_path.empty() || !std::filesystem::exists(arma_path))
         {
-            SteamUtils steam;
-
-            for (auto const &path : steam.GetInstallPaths())
+            try
             {
-                try
+                SteamUtils steam;
+
+                for (auto const &path : steam.GetInstallPaths())
                 {
-                    fmt::print("Install path: {}\n", path);
-                    arma_path = steam.GetGamePathFromInstallPath(path, ARMA3::Definitions::app_id);
-                    workshop_path = steam.GetWorkshopPath(path, ARMA3::Definitions::app_id);
-                    client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
-                    break;
+                    try
+                    {
+                        fmt::print("Install path: {}\n", path);
+                        arma_path = steam.GetGamePathFromInstallPath(path, ARMA3::Definitions::app_id);
+                        workshop_path = steam.GetWorkshopPath(path, ARMA3::Definitions::app_id);
+                        client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
+                        break;
+                    }
+                    catch (std::exception const &e)
+                    {
+                        fmt::print("Didn't find game at {}\nError: {}\n", path, e.what());
+                    }
                 }
-                catch (std::exception const &e)
-                {
-                    fmt::print("Didn't find game at {}\nError: {}\n", path, e.what());
-                }
+            }
+            catch (SteamInstallNotFoundException const& e)
+            {
+                fmt::print(stderr, "Exception: {}\n", e.what());
             }
 
             if (arma_path.empty() || workshop_path.empty() || client == nullptr)
