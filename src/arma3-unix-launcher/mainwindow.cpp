@@ -105,6 +105,11 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 
     if (steam_integration->is_initialized())
         setup_steam_integration();
+
+    ui->label_custom_mods->addAction(ui->action_custom_mods_disable_all);
+    ui->label_workshop_mods->addAction(ui->action_workshop_mods_disable_all);
+    connect(ui->action_custom_mods_disable_all, &QAction::triggered, this, &MainWindow::on_custom_mods_disable_all_mods);
+    connect(ui->action_workshop_mods_disable_all, &QAction::triggered, this, &MainWindow::on_workshop_mods_disable_all_mods);
 }
 
 MainWindow::~MainWindow()
@@ -855,4 +860,26 @@ catch (std::exception const &e)
     auto error_message = fmt::format("{}.", e.what());
     QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
     return;
+}
+
+void disable_all_mods(QTableWidget& table_mods)
+{
+    for (int row = 0; row < table_mods.rowCount(); ++row)
+    {
+        auto cell_widget = table_mods.cellWidget(row, 0);
+        auto checkbox = cell_widget->findChild<QCheckBox *>();
+        checkbox->setCheckState(Qt::CheckState::Unchecked);
+    }
+}
+
+void MainWindow::on_custom_mods_disable_all_mods()
+{
+    disable_all_mods(*ui->table_custom_mods);
+    put_mods_from_ui_to_manager_settings();
+}
+
+void MainWindow::on_workshop_mods_disable_all_mods()
+{
+    disable_all_mods(*ui->table_workshop_mods);
+    put_mods_from_ui_to_manager_settings();
 }

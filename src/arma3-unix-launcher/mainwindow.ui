@@ -48,6 +48,9 @@
              <layout class="QVBoxLayout" name="layout_vertical_workshop_mods">
               <item>
                <widget class="QLabel" name="label_workshop_mods">
+                <property name="contextMenuPolicy">
+                 <enum>Qt::ActionsContextMenu</enum>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::Box</enum>
                 </property>
@@ -88,6 +91,9 @@
              <layout class="QVBoxLayout" name="layout_vertical_custom_mods">
               <item>
                <widget class="QLabel" name="label_custom_mods">
+                <property name="contextMenuPolicy">
+                 <enum>Qt::ActionsContextMenu</enum>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::Box</enum>
                 </property>
@@ -666,6 +672,16 @@
     </item>
    </layout>
   </widget>
+  <action name="action_workshop_mods_disable_all">
+   <property name="text">
+    <string>Disable all workshop mods</string>
+   </property>
+  </action>
+  <action name="action_custom_mods_disable_all">
+   <property name="text">
+    <string>Disable all custom mods</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
