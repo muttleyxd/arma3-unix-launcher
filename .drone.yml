@@ -91,7 +91,7 @@ steps:
       from_secret: github_publish_key
   commands:
     - cd /tmp/build
-    - mv $(echo *.tar.xz) $(echo *.tar.xz | sed 's/x86_64.pkg.tar.xz/archlinux-x86_64.pkg.tar.xz/g')
+    - mv $(echo *.tar.*) $(echo *.tar.* | sed 's/x86_64.pkg.tar./archlinux-x86_64.pkg.tar./g')
     - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.tar.*"
   when:
     event: [push, tag, deployment]
