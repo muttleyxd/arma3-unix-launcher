@@ -125,8 +125,6 @@ nlohmann::json Html::Preset::Parser::html_to_json(std::string const &html_text)
     if (auto const result = html.load_string(html_text.c_str()); !result)
         throw HtmlParserException(result.description());
 
-    nlohmann::json mods = nlohmann::json::array();
-
     auto const mod_table = html.select_nodes(R"path(/html/body/div["mod-list"]/table/tr)path");
     return get_mods(mod_table);
 }

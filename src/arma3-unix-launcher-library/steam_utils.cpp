@@ -23,7 +23,6 @@ namespace fs = FilesystemUtils;
 
 SteamUtils::SteamUtils(std::vector<path> const &search_paths)
 {
-    steam_path_ = "";
     for (auto const &search_path : search_paths)
     {
         path replace_var = Replace(search_path.c_str(), "$HOME", getenv("HOME"));
