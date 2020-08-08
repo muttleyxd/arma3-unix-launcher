@@ -46,6 +46,13 @@ if (APPLE)
     set(CPACK_GENERATOR "DragNDrop")
     include(CPack)
 
+    set(MACOSX_BUNDLE_ICON_FILE arma3-unix-launcher.icns)
+    set(ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/blagoicons/arma3-unix-launcher.icns)
+    set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(arma3-unix-launcher PRIVATE ${ICON_FILE})
+
+    set_target_properties(arma3-unix-launcher PROPERTIES OUTPUT_NAME "Arma 3 Unix Launcher")
+
     if (STEAMWORKS_SDK_DETECTED)
         add_custom_command(TARGET arma3-unix-launcher POST_BUILD
                           COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
