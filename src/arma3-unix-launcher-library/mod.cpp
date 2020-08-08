@@ -64,6 +64,8 @@ void Mod::ParseCPP(std::string const &text)
         if (line[value_end - 1] == '"')
             value_end--;
 
-        KeyValue[std::string(line.substr(0, split_place))] = std::string(line.substr(value_start, value_end - value_start));
+        std::string const key(StringUtils::trim(line.substr(0, split_place)));
+        std::string const value(StringUtils::trim(line.substr(value_start, value_end - value_start)));
+        KeyValue[key] = value;
     }
 }
