@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Arma 3 Unix Launcher
+Exec=arma3-unix-launcher
+Icon=arma3-unix-launcher
+Terminal=false
+Type=Application
+Categories=Game;

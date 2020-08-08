@@ -23,6 +23,14 @@ install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime)
 
+if (NOT APPLE)
+    install(FILES blagoicons/arma3.png
+            DESTINATION share/icons/hicolor/256x256/apps
+            RENAME arma3-unix-launcher.png)
+    install(FILES arma3-unix-launcher.desktop
+            DESTINATION share/applications)
+endif()
+
 if (APPLE)
     find_package(Qt5Widgets CONFIG REQUIRED)
     get_target_property(WIDGETS_LOCATION Qt5::Widgets IMPORTED_LOCATION)
@@ -37,6 +45,13 @@ if (APPLE)
 
     set(CPACK_GENERATOR "DragNDrop")
     include(CPack)
+
+    set(MACOSX_BUNDLE_ICON_FILE arma3-unix-launcher.icns)
+    set(ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/blagoicons/arma3-unix-launcher.icns)
+    set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(arma3-unix-launcher PRIVATE ${ICON_FILE})
+
+    set_target_properties(arma3-unix-launcher PROPERTIES OUTPUT_NAME "Arma 3 Unix Launcher")
 
     if (STEAMWORKS_SDK_DETECTED)
         add_custom_command(TARGET arma3-unix-launcher POST_BUILD

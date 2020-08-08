@@ -23,8 +23,9 @@ ArmaPathChooserDialog::ArmaPathChooserDialog(QWidget *parent) :
     ui->verticalLayout->setAlignment(Qt::AlignTop);
 
     this->setMaximumSize(1024000, 1);
+#ifndef __APPLE__
     this->setMinimumSize(450, 106);
-
+#endif
     button_ok_ = ui->buttonBox->button(ui->buttonBox->Ok);
 
     QIcon icon_ok = QIcon(":/icons/open-iconic/check.svg");

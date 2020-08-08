@@ -64,10 +64,6 @@ steps:
   - git clone $DRONE_GIT_HTTP_URL .
   - git checkout $DRONE_COMMIT
   - chmod 777 /tmp/build
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
   volumes:
   - name: package
     path: /tmp/build
@@ -77,13 +73,14 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - tools/ci/obtain-steamworks.sh
-    - tools/ci/packaging/archlinux/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
+    - export STEAMWORKS_SDK_PATH=""
+
+    # run these commands only if gpg decryption key is available
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
+
+    - tools/ci/packaging/archlinux/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -122,10 +119,6 @@ steps:
   - git clone $DRONE_GIT_HTTP_URL .
   - git checkout $DRONE_COMMIT
   - chmod 777 /tmp/build
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
   volumes:
   - name: package
     path: /tmp/build
@@ -135,13 +128,14 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - tools/ci/obtain-steamworks.sh
-    - tools/ci/packaging/ubuntu-16.04/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
+    - export STEAMWORKS_SDK_PATH=""
+
+    # run these commands only if gpg decryption key is available
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
+
+    - tools/ci/packaging/ubuntu-16.04/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -179,10 +173,6 @@ steps:
   - git clone $DRONE_GIT_HTTP_URL .
   - git checkout $DRONE_COMMIT
   - chmod 777 /tmp/build
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
   volumes:
   - name: package
     path: /tmp/build
@@ -192,13 +182,14 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-  - echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-  - tools/ci/obtain-steamworks.sh
-  - tools/ci/packaging/ubuntu-18.04/build.sh /drone/src /tmp/build /tmp/build /tmp/steamworks
-  when:
-    event: [push, tag, deployment]
-    branch:
-      - master
+    - export STEAMWORKS_SDK_PATH=""
+
+    # run these commands only if gpg decryption key is available
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
+
+    - tools/ci/packaging/ubuntu-18.04/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64

@@ -42,6 +42,8 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 {
     ui->setupUi(this);
 
+    setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
+
     initialize_table_widget(*ui->table_workshop_mods, {"Enabled", "Name", "Workshop ID"});
     initialize_table_widget(*ui->table_custom_mods, {"Enabled", "Name", "Path"});
     ui->table_custom_mods->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
