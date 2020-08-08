@@ -23,6 +23,14 @@ install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION bin COMPONENT Runtime)
 
+if (NOT APPLE)
+    install(FILES blagoicons/arma3.png
+            DESTINATION share/icons/hicolor/256x256/apps
+            RENAME arma3-unix-launcher.png)
+    install(FILES arma3-unix-launcher.desktop
+            DESTINATION share/applications)
+endif()
+
 if (APPLE)
     find_package(Qt5Widgets CONFIG REQUIRED)
     get_target_property(WIDGETS_LOCATION Qt5::Widgets IMPORTED_LOCATION)
