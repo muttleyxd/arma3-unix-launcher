@@ -24,7 +24,7 @@ log_and_exit()
 
 list_targets()
 {
-    ls docker/Dockerfile.a3ul_*_build | awk '{split($0, a, "_"); print a[2]}'
+    ls -1 packaging | grep -v mac-os-x
     exit 0
 }
 
@@ -52,10 +52,11 @@ if [ "$BUILD_TARGET" == "" ]; then
     print_help
 else
     CONTAINER_NAME=`echo "a3ul_" "$BUILD_TARGET" "_build" | awk '{print $1$2$3}'`
-    DOCKERFILE_EXISTS=`ls "docker/Dockerfile.$CONTAINER_NAME" 2>&1`
-    if [ $? -ne 0 ]; then
-        log_and_exit "$DOCKERFILE_EXISTS"
-    fi
+fi
+
+DOCKERFILE_EXISTS=`ls "docker/Dockerfile.$CONTAINER_NAME" 2>&1`
+if [ $? -ne 0 ]; then
+    log_and_exit "$DOCKERFILE_EXISTS"
 fi
 
 echo "container name: $CONTAINER_NAME"
