@@ -17,7 +17,7 @@ target_include_directories(steam-integration INTERFACE .)
 
 if (STEAMWORKS_SDK_DETECTED)
     target_sources(steam-integration PRIVATE ${SOURCES})
-    target_link_libraries(steam-integration PRIVATE common fmt::fmt steamworks::sdk)
+    target_link_libraries(steam-integration PRIVATE common fmt::fmt-header-only steamworks::sdk)
 else()
     target_sources(steam-integration PRIVATE ${SOURCES_STUB})
 endif()
