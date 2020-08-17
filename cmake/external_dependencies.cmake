@@ -78,12 +78,7 @@ function(setup_fmt)
     setup_library("${CHECK_SOURCE}"
                   NAME fmt
                   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-                  TEST_LINK_LIBS fmt
                   )
-    get_target_property(TARGET_TYPE fmt::fmt TYPE)
-    if ("${TARGET_TYPE}" STREQUAL "SHARED_LIBRARY")
-        target_compile_options(fmt::fmt INTERFACE "-fpic")
-    endif()
 endfunction()
 
 function(setup_nlohmann_json)

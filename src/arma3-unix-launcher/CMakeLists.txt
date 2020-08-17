@@ -13,7 +13,7 @@ target_link_libraries(arma3-unix-launcher PRIVATE
     common
     steam-integration
     argparse::argparse
-    fmt::fmt
+    fmt::fmt-header-only
     nlohmann::json
     pugixml::pugixml
     Qt5::Widgets
