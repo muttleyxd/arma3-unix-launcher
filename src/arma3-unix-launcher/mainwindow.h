@@ -54,6 +54,8 @@ class MainWindow : public QMainWindow
 
         void on_button_export_workshop_to_txt_clicked();
 
+        void on_combobox_theme_currentTextChanged(QString const &theme);
+
     private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;
@@ -84,4 +86,6 @@ class MainWindow : public QMainWindow
 
         void on_custom_mods_disable_all_mods();
         void on_workshop_mods_disable_all_mods();
+
+        void initialize_theme_combobox();
 };

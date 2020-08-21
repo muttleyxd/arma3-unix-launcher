@@ -10,6 +10,7 @@ namespace Ui
 }
 
 class QCheckBox;
+class QComboBox;
 class QLineEdit;
 
 class Settings
@@ -27,6 +28,8 @@ class Settings
     private:
         std::filesystem::path config_file;
 
+        void read_setting(char const *const setting_name, QComboBox *combobox);
         void read_setting(char const *const setting_name, QCheckBox *checkbox, QLineEdit *textbox = nullptr);
+        void write_setting(char const *const setting_name, QComboBox *combobox);
         void write_setting(char const *const setting_name, QCheckBox *checkbox, QLineEdit *textbox = nullptr);
 };

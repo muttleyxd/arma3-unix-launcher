@@ -1,0 +1,68 @@
+--- QTDark.stylesheet	2020-08-21 17:19:40.419713778 +0200
++++ QTDark.stylesheet	2020-08-21 17:19:12.821531360 +0200
+@@ -25,39 +25,18 @@
+ * {
+ 	background: #191919;
+ 	color: #DDDDDD;
+-	border: 1px solid #5A5A5A;
+ }
+ 
+ QWidget::item:selected {
+ 	background: #3D7848;
+ }
+ 
+-QCheckBox, QRadioButton {
+-	border: none;
+-}
+-
+-QRadioButton::indicator, QCheckBox::indicator {
+-	width: 13px;
+-	height: 13px;
+-}
+-
+-QRadioButton::indicator::unchecked, QCheckBox::indicator::unchecked {
+-	border: 1px solid #5A5A5A;
+-	background: none;
++QCheckBox::indicator:unchecked {
++    background-color: #353535;
+ }
+ 
+-QRadioButton::indicator:unchecked:hover, QCheckBox::indicator:unchecked:hover {
+-	border: 1px solid #DDDDDD;
+-}
+-
+-QRadioButton::indicator::checked, QCheckBox::indicator::checked {
+-	border: 1px solid #5A5A5A;
+-	background: #5A5A5A;
+-}
+-
+-QRadioButton::indicator:checked:hover, QCheckBox::indicator:checked:hover {
+-	border: 1px solid #DDDDDD;
+-	background: #DDDDDD;
++QCheckBox::indicator:checked {
++    background-color: #3D7848;
+ }
+ 
+ QGroupBox {
+@@ -147,14 +126,6 @@
+ 	background: none;
+ }
+ 
+-QAbstractButton:hover {
+-	background: #353535;
+-}
+-
+-QAbstractButton:pressed {
+-	background: #5A5A5A;
+-}
+-
+ QAbstractItemView {
+ 	show-decoration-selected: 1;
+ 	selection-background-color: #3D7848;
+@@ -278,4 +249,4 @@
+ 
+ QMenu::separator {
+ 	background: #353535;
+-}
+\ No newline at end of file
++}
