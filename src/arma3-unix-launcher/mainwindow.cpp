@@ -44,6 +44,7 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 
     setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
 
+    initialize_theme_combobox();
     initialize_table_widget(*ui->table_workshop_mods, {"Enabled", "Name", "Workshop ID"});
     initialize_table_widget(*ui->table_custom_mods, {"Enabled", "Name", "Path"});
     ui->table_custom_mods->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
@@ -62,9 +63,12 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         add_item(*ui->table_workshop_mods, {is_mod_enabled(mod_id), i.GetValueOrReturnDefault("name", "cannot read name"),
                                             mod_id
                                            });
-        try {
+        try
+        {
             steam_integration->get_item_title(std::stoull(mod_id));
-        }  catch (SteamApiNotInitializedException const&) {
+        }
+        catch (SteamApiNotInitializedException const &)
+        {
         }
     }
 
@@ -111,7 +115,8 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     ui->label_custom_mods->addAction(ui->action_custom_mods_disable_all);
     ui->label_workshop_mods->addAction(ui->action_workshop_mods_disable_all);
     connect(ui->action_custom_mods_disable_all, &QAction::triggered, this, &MainWindow::on_custom_mods_disable_all_mods);
-    connect(ui->action_workshop_mods_disable_all, &QAction::triggered, this, &MainWindow::on_workshop_mods_disable_all_mods);
+    connect(ui->action_workshop_mods_disable_all, &QAction::triggered, this,
+            &MainWindow::on_workshop_mods_disable_all_mods);
 }
 
 MainWindow::~MainWindow()
@@ -854,7 +859,8 @@ try
 
     for (auto const &mod : get_mods(*ui->table_workshop_mods))
         if (mod.enabled)
-            output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n", mod.name, mod.path_or_workshop_id);
+            output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n", mod.name,
+                                  mod.path_or_workshop_id);
     StdUtils::FileWriteAllText(filename_str, output);
 }
 catch (std::exception const &e)
@@ -864,7 +870,7 @@ catch (std::exception const &e)
     return;
 }
 
-void disable_all_mods(QTableWidget& table_mods)
+void disable_all_mods(QTableWidget &table_mods)
 {
     for (int row = 0; row < table_mods.rowCount(); ++row)
     {
@@ -884,4 +890,34 @@ void MainWindow::on_workshop_mods_disable_all_mods()
 {
     disable_all_mods(*ui->table_workshop_mods);
     put_mods_from_ui_to_manager_settings();
+}
+
+void MainWindow::initialize_theme_combobox()
+{
+    auto &theme_combobox = ui->combobox_theme;
+
+    theme_combobox->addItem("System");
+
+    auto const entries = QDir(":/stylesheet").entryList();
+
+    for (auto const &entry : entries)
+    {
+        auto const theme_name = StringUtils::Replace(entry.toStdString(), ".stylesheet", "");
+        theme_combobox->addItem(QString::fromStdString(theme_name));
+    }
+}
+
+void MainWindow::on_combobox_theme_currentTextChanged(QString const &combobox_theme)
+{
+    QString style;
+
+    if (combobox_theme != "System")
+    {
+        QFile style_resource(fmt::format(":/stylesheet/{}.stylesheet", combobox_theme.toStdString()).c_str());
+        style_resource.open(QIODevice::ReadOnly);
+        style = style_resource.readAll();
+        style_resource.close();
+    }
+
+    qApp->setStyleSheet(style);
 }

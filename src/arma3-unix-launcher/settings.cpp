@@ -45,6 +45,9 @@ namespace
                                                             "skipIntro": false,
                                                             "window": false,
                                                             "world": null
+                                                        },
+                                                        "settings": {
+                                                            "theme": "System"
                                                         }
                                                     })json");
         StdUtils::FileWriteAllText(config_file, json.dump(4));
@@ -165,6 +168,9 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("port", ui->checkbox_server_port, ui->textbox_server_port);
     read_setting("password", ui->checkbox_server_password, ui->textbox_server_password);
     read_setting("host", ui->checkbox_host_session);
+
+    // other tab
+    read_setting("theme", ui->combobox_theme);
 }
 
 void Settings::save_settings_from_ui(Ui::MainWindow *ui)
@@ -210,6 +216,22 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("port", ui->checkbox_server_password, ui->textbox_server_port);
     write_setting("password", ui->checkbox_server_password, ui->textbox_server_password);
     write_setting("host", ui->checkbox_host_session);
+
+    // other tab
+    write_setting("theme", ui->combobox_theme);
+}
+
+void Settings::read_setting(char const *const setting_name, QComboBox *combobox)
+{
+    auto const &json_settings = settings["settings"];
+    try
+    {
+        combobox->setCurrentText(QString::fromStdString(json_settings[setting_name]));
+    }
+    catch (std::exception const &ex)
+    {
+        fmt::print("exception while parsing settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+    }
 }
 
 void Settings::read_setting(char const *const setting_name, QCheckBox *checkbox, QLineEdit *textbox)
@@ -237,6 +259,19 @@ void Settings::read_setting(char const *const setting_name, QCheckBox *checkbox,
     catch (std::exception const &ex)
     {
         fmt::print("exception while parsing settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+    }
+}
+
+void Settings::write_setting(char const *const setting_name, QComboBox *combobox)
+{
+    try
+    {
+        auto &json_settings = settings["settings"];
+        json_settings[setting_name] = combobox->currentText().toStdString();
+    }
+    catch (std::exception const &ex)
+    {
+        fmt::print("exception while saving settings[\"{}\"]:\n{}\n", setting_name, ex.what());
     }
 }
 

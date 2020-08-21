@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            catch (SteamInstallNotFoundException const& e)
+            catch (SteamInstallNotFoundException const &e)
             {
                 fmt::print(stderr, "Exception: {}\n", e.what());
             }
