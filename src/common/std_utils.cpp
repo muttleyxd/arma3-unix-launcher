@@ -4,7 +4,10 @@
 #include <fstream>
 #include <filesystem>
 
+extern "C" {
+#include <dlfcn.h>
 #include <unistd.h>
+}
 
 namespace StdUtils
 {
@@ -156,4 +159,15 @@ namespace StdUtils
 
         return config_directory / config_filename;
     }
+
+    bool IsLibraryAvailable(char const *const library_filename)
+    {
+        void *handle = dlopen(library_filename, RTLD_LAZY);
+        if (handle == nullptr)
+            return false;
+
+        dlclose(handle);
+        return true;
+    }
+
 }

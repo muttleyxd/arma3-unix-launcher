@@ -10,7 +10,7 @@ create_unit_test(TEST_GROUP common
 
                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
-                 LINK_LIBS  fmt::fmt-header-only
+                 LINK_LIBS  fmt::fmt-header-only ${CMAKE_DL_LIBS}
                  )
 
 create_unit_test(TEST_GROUP common

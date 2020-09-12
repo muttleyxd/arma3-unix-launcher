@@ -27,6 +27,7 @@ class StdUtilsMock
         MAKE_MOCK1(IsProcessRunning, pid_t(std::string const &));
         MAKE_MOCK2(StartBackgroundProcess, void(std::string const &, std::string_view const));
         MAKE_MOCK1(GetConfigFilePath, std::filesystem::path(std::filesystem::path const &));
+        MAKE_MOCK1(IsLibraryAvailable, bool(char const *));
 };
 
 namespace StdUtils
@@ -59,5 +60,10 @@ namespace StdUtils
     std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename)
     {
         return StdUtilsMock::instance->GetConfigFilePath(config_filename);
+    }
+
+    bool IsLibraryAvailable(char const *const library_filename)
+    {
+        return StdUtilsMock::instance->IsLibraryAvailable(library_filename);
     }
 }

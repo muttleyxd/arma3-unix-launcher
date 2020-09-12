@@ -35,7 +35,18 @@ namespace
     std::string get_esync_prefix(bool disable_esync)
     {
         if (disable_esync)
-            return "PROTON_NO_ESYNC=1 ";
+            return "PROTON_NO_ESYNC=1";
+        return "";
+    }
+
+    std::string optional_steam_runtime(SteamUtils const &steam_utils)
+    {
+        if (StdUtils::IsLibraryAvailable("libpng12.so"))
+            return "";
+        auto const steam_runtime_path = steam_utils.GetSteamPath() / "ubuntu12_32/steam-runtime/run.sh";
+        if (fs::Exists(steam_runtime_path))
+            return steam_runtime_path;
+        fmt::print(stderr, "Did not find {} and libpng12.so is missing. Thermal optics will be broken!\n", steam_runtime_path);
         return "";
     }
 
@@ -61,9 +72,10 @@ namespace
             auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(arma_path) / "steamapps/compatdata" /
                                                 ARMA3::Definitions::app_id;
 
-            auto const environment = fmt::format(R"env({}SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env",
+            auto const environment = fmt::format(R"env({} SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env",
                                                  get_esync_prefix(disable_esync), arma3_id, ld_preload_path, steam_compat_data_path.string());
-            auto const command = fmt::format(R"command(env {} {} {} "{}" {})command", environment, compatibility_tool.first,
+            auto const command = fmt::format(R"command(env {} {} {} {} "{}" {})command", environment,
+                                             optional_steam_runtime(steam_utils), compatibility_tool.first,
                                              compatibility_tool.second, executable_path.string(), arguments);
             fmt::print("Running Arma:\n{}\n", command);
             StdUtils::StartBackgroundProcess(command, arma_path.string());
@@ -77,7 +89,7 @@ namespace
     void indirect_launch_through_steam(string const &arguments, bool is_proton, bool disable_esync)
     {
         if (is_proton)
-            StdUtils::StartBackgroundProcess(fmt::format("env {}steam -applaunch 107410 -nolauncher {}",
+            StdUtils::StartBackgroundProcess(fmt::format("env {} steam -applaunch 107410 -nolauncher {}",
                                              get_esync_prefix(disable_esync), arguments));
         else
             StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);

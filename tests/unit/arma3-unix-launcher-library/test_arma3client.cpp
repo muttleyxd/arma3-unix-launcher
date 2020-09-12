@@ -384,13 +384,15 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
             REQUIRE_CALL(steamUtilsMock, GetSteamPath(_)).RETURN(steam_path);
             REQUIRE_CALL(steamUtilsMock, GetInstallPathFromGamePath(arma_path, _)).RETURN(steam_path);
 
+            REQUIRE_CALL(stdUtilsMock, IsLibraryAvailable(_)).RETURN(true);
+
             TODO_BEFORE(01, 2021, "Verify LD_PRELOAD preservation");
 
             WHEN("esync is disabled")
             {
                 THEN("Arma is started with passed arguments")
                 {
-                    constexpr char const* launch_command = R"command(env SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410" "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+                    constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"  "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
                     a3c.Start(arguments, true, false);
@@ -401,7 +403,7 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
             {
                 THEN("Arma is started with passed arguments and PROTON_NO_ESYNC environment variable set to 1")
                 {
-                    constexpr char const* launch_command = R"command(env PROTON_NO_ESYNC=1 SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410" "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+                    constexpr char const* launch_command = R"command(env PROTON_NO_ESYNC=1 SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"  "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
                     a3c.Start(arguments, true, true);
@@ -453,7 +455,7 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_IndirectLaunchThroughSteam")
             {
                 THEN("Arma is started with passed arguments preceded by -nolauncher option")
                 {
-                    std::string const launch_command = fmt::format("env {} -nolauncher {}", steam_command, arguments);
+                    std::string const launch_command = fmt::format("env  {} -nolauncher {}", steam_command, arguments);
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
                     a3c.Start(arguments, false, false);
