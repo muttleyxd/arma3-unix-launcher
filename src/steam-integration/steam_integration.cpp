@@ -28,10 +28,34 @@ namespace
         return (status & flag) == flag;
     }
 
+    bool is_steam_flatpak()
+    {
+        try
+        {
+            std::filesystem::path const home_directory = getenv("HOME");
+            auto const steam_flatpak_path = home_directory / ".var/app/com.valvesoftware.Steam";
+            auto const path = home_directory / ".steam/steam/linux64/steamclient.so";
+
+            return fs::Exists(steam_flatpak_path) || (fs::Exists(path)
+                    && StdUtils::Contains(fs::RealPath(path), "com.valvesoftware.Steam"));
+        }
+        catch (std::exception const &e)
+        {
+            fmt::print(stderr, "is_steam_flatpak() exception, disabling SteamAPI integration");
+            return true;
+        }
+    }
+
     bool initialize_steam_api(std::string const &app_id)
     {
         if (initialized)
             return true;
+
+        if (is_steam_flatpak())
+        {
+            fmt::print(stderr, "Steam initialization failed - Flatpak detected!\n");
+            return false;
+        }
 
         auto old_path = fs::CurrentPath();
         std::filesystem::path tmp_path = fmt::format("{}/arma3-unix-launcher.{}", fs::TempDirectoryPath().string(), getpid());

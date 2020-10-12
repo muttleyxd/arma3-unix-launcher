@@ -34,6 +34,7 @@ class SteamUtilsMock
         MAKE_MOCK2(GetCompatibilityToolForAppId, (std::pair<std::filesystem::path, std::string>(std::uint64_t const,
                    SteamUtils const &)));
         MAKE_MOCK2(GetInstallPathFromGamePath, std::filesystem::path(std::filesystem::path const &, SteamUtils const &));
+        MAKE_MOCK1(IsFlatpak, bool(SteamUtils const &));
 };
 
 SteamUtils::SteamUtils(std::vector<std::filesystem::path> const &search_paths)
@@ -63,12 +64,17 @@ std::filesystem::path SteamUtils::GetWorkshopPath(std::filesystem::path const &i
     return SteamUtilsMock::instance->GetWorkshopPath(install_path, appid, *this);
 }
 
-std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id)
+std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id) const
 {
     return SteamUtilsMock::instance->GetCompatibilityToolForAppId(app_id, *this);
 }
 
-std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::path const &game_path)
+std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::path const &game_path) const
 {
     return SteamUtilsMock::instance->GetInstallPathFromGamePath(game_path, *this);
+}
+
+bool SteamUtils::IsFlatpak() const
+{
+    return SteamUtilsMock::instance->IsFlatpak(*this);
 }

@@ -22,6 +22,7 @@ class StdUtilsMock
         static inline StdUtilsMock *instance;
 
         MAKE_MOCK1(CreateFile, bool(std::filesystem::path const &));
+        MAKE_MOCK1(ExecuteCommand, (std::pair<int, std::string> (std::string_view const)));
         MAKE_MOCK1(FileReadAllText, std::string(std::filesystem::path const &));
         MAKE_MOCK2(FileWriteAllText, void(std::filesystem::path const &, std::string const &));
         MAKE_MOCK1(IsProcessRunning, pid_t(std::string const &));
@@ -35,6 +36,11 @@ namespace StdUtils
     bool CreateFile(std::filesystem::path const &path)
     {
         return StdUtilsMock::instance->CreateFile(path);
+    }
+
+    std::pair<int, std::string> ExecuteCommand(std::string_view const command)
+    {
+        return StdUtilsMock::instance->ExecuteCommand(command);
     }
 
     std::string FileReadAllText(std::filesystem::path const &path)

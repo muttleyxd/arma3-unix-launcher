@@ -42,6 +42,11 @@ namespace FilesystemUtils
         return ret;
     }
 
+    std::filesystem::path RealPath(std::filesystem::path const &path)
+    {
+        return std::filesystem::canonical(path);
+    }
+
     uintmax_t RemoveAll(std::filesystem::path const &path)
     {
         return std::filesystem::remove_all(path);

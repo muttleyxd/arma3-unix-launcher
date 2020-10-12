@@ -26,6 +26,7 @@ namespace ARMA3::Definitions
     static constexpr char const *game_config_path = "GameDocuments/Arma 3/Arma3.cfg";
     #endif
 
+    static constexpr char const *flatpak_prefix = ".var/app/com.valvesoftware.Steam";
     static constexpr char const *proton_config_relative_path =
         "../../compatdata/107410/pfx/drive_c/users/steamuser/My Documents/Arma 3/Arma3.cfg";
 }
@@ -54,6 +55,7 @@ namespace ARMA3
             std::filesystem::path GetCfgPath();
             char GetFakeDriveLetter();
             std::string GenerateCfgCppForMod(std::filesystem::path const &path, int mod_index);
+            bool IsFlatpak();
 
             std::filesystem::path path_;
             std::filesystem::path path_custom_;

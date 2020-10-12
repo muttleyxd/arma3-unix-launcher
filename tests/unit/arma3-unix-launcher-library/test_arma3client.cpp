@@ -420,6 +420,8 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_IndirectLaunchThroughSteam")
         std::string const arguments = "some random arguments";
         std::string const steam_command = "steam -applaunch 107410";
 
+        REQUIRE_CALL(steamUtilsMock, Constructor(_, _)).THROW(std::runtime_error(""));
+
         WHEN("Arma path contains ARMA 3 Linux executable")
         {
             REQUIRE_CALL(filesystemUtilsMock, Exists(arma_path / linux_executable_name)).RETURN(true);

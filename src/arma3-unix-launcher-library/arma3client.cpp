@@ -86,13 +86,33 @@ namespace
         }
     }
 
-    void indirect_launch_through_steam(string const &arguments, bool is_proton, bool disable_esync)
+    void indirect_flatpak_launch(string const &arguments, bool is_proton, bool disable_esync)
+    {
+        if (is_proton)
+            StdUtils::StartBackgroundProcess(
+                fmt::format("flatpak run --env=\"{}\" com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
+                            get_esync_prefix(disable_esync), arguments));
+        else
+            StdUtils::StartBackgroundProcess(fmt::format("flatpak run com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
+                                             arguments));
+    }
+
+    void indirect_launch(string const &arguments, bool is_proton, bool disable_esync)
     {
         if (is_proton)
             StdUtils::StartBackgroundProcess(fmt::format("env {} steam -applaunch 107410 -nolauncher {}",
                                              get_esync_prefix(disable_esync), arguments));
         else
-            StdUtils::StartBackgroundProcess("steam -applaunch 107410 " + arguments);
+            StdUtils::StartBackgroundProcess(fmt::format("steam -applaunch 107410 {}", arguments));
+    }
+
+    void indirect_launch_through_steam(string const &arguments, bool is_proton, bool disable_esync, bool is_flatpak)
+    {
+        std::string steam_executable = "steam";
+        if (is_flatpak)
+            indirect_flatpak_launch(arguments, is_proton, disable_esync);
+        else
+            indirect_launch(arguments, is_proton, disable_esync);
     }
 }
 #endif
@@ -155,7 +175,7 @@ namespace ARMA3
         if (launch_directly)
             direct_launch(GetPath(), GetPathExecutable(), arguments, IsProton(), disable_esync);
         else
-            indirect_launch_through_steam(arguments, IsProton(), disable_esync);
+            indirect_launch_through_steam(arguments, IsProton(), disable_esync, IsFlatpak());
         #else
         (void)disable_esync; // esync does not apply on Mac OS X
         if (launch_directly)
@@ -198,6 +218,12 @@ namespace ARMA3
     {
         if (IsProton())
             return GetPath() / Definitions::proton_config_relative_path;
+        else if (IsFlatpak())
+            return std::filesystem::path(Definitions::home_directory)
+                   / Definitions::flatpak_prefix
+                   / Definitions::local_share_prefix
+                   / Definitions::bohemia_interactive_prefix
+                   / Definitions::game_config_path;
         else
             return std::filesystem::path(Definitions::home_directory)
                    / Definitions::local_share_prefix
@@ -229,6 +255,24 @@ namespace ARMA3
         auto name = mod.GetValueOrReturnDefault(dir, "name", "dir", "tooltip", "name_read_failed");
 
         return fmt::format(mod_template, mod_index, dir.string(), name, final_path.string());
+    }
+
+    bool Client::IsFlatpak()
+    {
+#ifdef __linux
+        try
+        {
+            SteamUtils steam_utils;
+            return steam_utils.IsFlatpak();
+        }
+        catch (std::exception const &e)
+        {
+            fmt::print(stderr, "Exception trying to determine if Flatpak, exception text: {}\n", e.what());
+            return false;
+        }
+#else
+        return false;
+#endif
     }
 
     std::filesystem::path const &Client::GetPath()

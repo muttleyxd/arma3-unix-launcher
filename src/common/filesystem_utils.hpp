@@ -12,6 +12,7 @@ namespace FilesystemUtils
     bool Exists(std::filesystem::path const &path);
     bool IsDirectory(std::filesystem::path const &path);
     std::vector<std::string> Ls(std::filesystem::path const &path, bool set_lowercase = false);
+    std::filesystem::path RealPath(std::filesystem::path const &path);
     uintmax_t RemoveAll(std::filesystem::path const &path);
     std::filesystem::path TempDirectoryPath();
 }
