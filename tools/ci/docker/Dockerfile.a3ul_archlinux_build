@@ -13,8 +13,8 @@ RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg f
 RUN rm -rf /var/cache/pacman/pkg/*
 
 # Download nlohmann-json and doctest from GitHub
-ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp
-ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h
+ADD https://github.com/nlohmann/json/releases/download/v3.9.1/json.hpp /usr/include/nlohmann/json.hpp
+ADD https://raw.githubusercontent.com/onqtam/doctest/2.4.0/doctest/doctest.h /usr/include/doctest/doctest.h
 RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
 
 # Enable parallel builds
