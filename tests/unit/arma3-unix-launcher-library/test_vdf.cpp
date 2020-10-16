@@ -157,25 +157,25 @@ TEST_CASE("BasicParser")
         WHEN("\"Key\" \"Value\"")
         {
             std::string simple_key_value = R"vdf("Key""Value")vdf";
-            vdf.LoadFromText(simple_key_value);
-            THEN("Key points to Value")
-            {
-                CHECK_EQ("Value", vdf.KeyValue["Key"]);
-                CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
-            }
-        }
+vdf.LoadFromText(simple_key_value);
+THEN("Key points to Value")
+{
+    CHECK_EQ("Value", vdf.KeyValue["Key"]);
+    CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
+}
+}
 
-        WHEN("\"Branch\" { \"Key\" \"Value\" }")
-        {
-            std::string simple_key_value = R"vdf("Branch"{"Key""Value"})vdf";
-            vdf.LoadFromText(simple_key_value);
-            THEN("Branch\\Key points to Value")
-            {
-                CHECK_EQ("Value", vdf.KeyValue["Branch/Key"]);
-                CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
-            }
-        }
+WHEN("\"Branch\" { \"Key\" \"Value\" }")
+{
+    std::string simple_key_value = R"vdf("Branch"{"Key""Value"})vdf";
+    vdf.LoadFromText(simple_key_value);
+    THEN("Branch\\Key points to Value")
+    {
+        CHECK_EQ("Value", vdf.KeyValue["Branch/Key"]);
+        CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }
+}
+}
 }
 
 TEST_CASE("LoadFromFile")

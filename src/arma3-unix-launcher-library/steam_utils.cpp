@@ -29,7 +29,7 @@ SteamUtils::SteamUtils(std::vector<path> const &search_paths)
         std::string final_path = replace_var / config_path_;
         if (fs::Exists(final_path))
         {
-            steam_path_ = replace_var;
+            steam_path_ = fs::RealPath(replace_var);
             break;
         }
     }
@@ -74,7 +74,7 @@ path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &ap
     throw SteamWorkshopDirectoryNotFoundException(appid);
 }
 
-std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id)
+std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id) const
 {
     auto const config_vdf_path = steam_path_ / "config/config.vdf";
     auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
@@ -102,7 +102,7 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
     return std::pair<std::filesystem::path, std::string>(full_path, tool_args);
 }
 
-std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::path const &game_path)
+std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::path const &game_path) const
 {
     //game_path == "~/.local/share/Steam/steamapps/common/Arma 3"
     return std::filesystem::weakly_canonical(game_path / "../../../");
@@ -153,4 +153,9 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
     }
     throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'. Is it installed in Steam?",
                                          app_id_str.data(), shortname));
+}
+
+bool SteamUtils::IsFlatpak() const
+{
+    return StdUtils::Contains(GetSteamPath(), "com.valvesoftware.Steam");
 }

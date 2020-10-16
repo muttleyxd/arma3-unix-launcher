@@ -134,19 +134,7 @@ namespace StdUtils
 
     void StartBackgroundProcess(std::string const &command, std::string_view const working_directory)
     {
-        auto pid = fork();
-        if (pid < 0)
-            throw std::runtime_error("cannot fork to start background process");
-        if (!pid)
-        {
-            setsid();
-
-            if (!working_directory.empty())
-                chdir(working_directory.data());
-
-            system(command.c_str());
-            exit(0);
-        }
+        system(fmt::format("bash -c 'cd \"{}\"; {} <&- &\'", working_directory, command).c_str());
     }
 
     std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename)

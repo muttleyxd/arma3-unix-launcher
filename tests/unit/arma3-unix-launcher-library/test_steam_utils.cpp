@@ -88,6 +88,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "Constructor_Success")
     GIVEN("Steam config file that exists in correct path")
     {
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
 
         WHEN("SteamUtils are constructed"){
             THEN("Exception is not thrown"){
@@ -121,6 +122,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithoutCustomLibrar
         std::vector<std::filesystem::path> expected_paths{default_steam_path};
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(empty_file_content);
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
         REQUIRE_CALL(vdfMock, GetValuesWithFilter("BaseInstallFolder", _)).RETURN(std::vector<std::string>{});
@@ -143,6 +145,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "FindInstallPaths_Success_WithCustomLibraries
         std::vector<std::filesystem::path> expected_paths{default_steam_path, "/mnt/games/SteamLibrary", "/mnt/disk2/steamgames"};
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(empty_file_content);
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _));
         REQUIRE_CALL(vdfMock, GetValuesWithFilter("BaseInstallFolder", _)).LR_RETURN(steam_library_dirs);
@@ -166,6 +169,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetGamePathFromInstallPath_Success")
         std::filesystem::path const arma3_manifest_path = default_steam_path / "steamapps/appmanifest_107410.acf";
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         REQUIRE_CALL(stdUtilsMock, FileReadAllText(arma3_manifest_path)).LR_RETURN(empty_file_content);
         REQUIRE_CALL(vdfMock, LoadFromText(empty_file_content, false, _)).SIDE_EFFECT(_3.KeyValue["AppState/installdir"] = "Arma 3");
 
@@ -189,6 +193,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Success")
         std::filesystem::path const not_existing_workshop_path = default_steam_path / "steamapps/workshop/content" / invalid_game;
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         REQUIRE_CALL(filesystemUtilsMock, Exists(expected_workshop_path)).RETURN(true);
         REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
@@ -213,6 +218,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_NotExistingApp")
         std::filesystem::path const not_existing_workshop_path = default_steam_path / "steamapps/workshop/content" / invalid_game;
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
         SteamUtils steam({default_steam_path});
@@ -234,6 +240,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
         std::uint64_t const appid = 107410;
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         SteamUtils steam({default_steam_path});
 
         ALLOW_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(default_config_path);
@@ -382,6 +389,7 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetInstallPathFromGamePath_Success")
         auto const game_path = default_steam_path / "steamapps/common/Arma 3";
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
+        REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
         SteamUtils steam({default_steam_path});
 
         WHEN("Obtaining Steam install path from game path")
