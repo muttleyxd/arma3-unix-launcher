@@ -142,6 +142,7 @@ function(setup_trompeloeil)
     setup_library("${CHECK_SOURCE}"
                   NAME trompeloeil
                   GIT_REPOSITORY https://github.com/rollbear/trompeloeil.git
+                  GIT_TAG 64fd171
                   HEADER_ONLY
                   )
     add_library(trompeloeil::trompeloeil ALIAS trompeloeil)
