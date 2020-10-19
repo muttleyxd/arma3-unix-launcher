@@ -50,6 +50,11 @@ namespace
         return "";
     }
 
+    std::string get_verb(std::string const &arguments)
+    {
+        return StringUtils::Replace(arguments, "%verb%", "run");;
+    }
+
     void direct_launch(std::filesystem::path const &arma_path, std::filesystem::path const &executable_path,
                        string const &arguments, bool is_proton, bool disable_esync)
     {
@@ -76,7 +81,7 @@ namespace
                                                  get_esync_prefix(disable_esync), arma3_id, ld_preload_path, steam_compat_data_path.string());
             auto const command = fmt::format(R"command(env {} {} {} {} "{}" {})command", environment,
                                              optional_steam_runtime(steam_utils), compatibility_tool.first,
-                                             compatibility_tool.second, executable_path.string(), arguments);
+                                             get_verb(compatibility_tool.second), executable_path.string(), arguments);
             fmt::print("Running Arma:\n{}\n", command);
             StdUtils::StartBackgroundProcess(command, arma_path.string());
         }
