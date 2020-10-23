@@ -25,7 +25,7 @@ popd
 PKG_DIR="$BUILD_DIR/arma3-unix-launcher-$COMMIT_COUNT.$SHORT_HASH-$ID-$VERSION_ID-amd64"
 mkdir -p $PKG_DIR/DEBIAN
 
-sed "s/VERSION/$COMMIT_COUNT-$SHORT_HASH/g" ./control >$PKG_DIR/DEBIAN/control
+sed "s/VERSION/$COMMIT_COUNT.$SHORT_HASH/g" ./control >$PKG_DIR/DEBIAN/control
 
 mkdir -p $BUILD_DIR
 pushd $BUILD_DIR
