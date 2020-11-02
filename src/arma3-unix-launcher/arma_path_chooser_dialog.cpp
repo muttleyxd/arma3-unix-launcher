@@ -22,7 +22,7 @@ ArmaPathChooserDialog::ArmaPathChooserDialog(QWidget *parent) :
     ui->horizontalLayout->setAlignment(Qt::AlignBottom);
     ui->verticalLayout->setAlignment(Qt::AlignTop);
 
-    this->setMaximumSize(1024000, 1);
+    this->setMaximumSize(1024000, 0);
     #ifndef __APPLE__
     this->setMinimumSize(450, 106);
     #endif
