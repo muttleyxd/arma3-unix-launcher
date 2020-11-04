@@ -31,6 +31,9 @@ namespace FilesystemUtils
 
     std::vector<std::string> Ls(std::filesystem::path const &path, bool set_lowercase)
     {
+        if (path.empty())
+            return {};
+
         std::vector<std::string> ret;
         for (auto const &entity : std::filesystem::directory_iterator(path))
         {
