@@ -147,6 +147,11 @@ QHeaderView::section:selected, QHeaderView::section::checked {
 	background: #353535;
 }
 
+QPushButton {
+        background-color: #353535;
+        border: none;
+}
+
 QTableView {
 	gridline-color: #5A5A5A;
 }
@@ -157,7 +162,7 @@ QTabBar {
 
 QTabBar::tab {
 	border-radius: 0px;
-	padding: 4px;
+        padding: 4px;
 	margin: 4px;
 }
 
