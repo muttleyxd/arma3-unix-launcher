@@ -293,7 +293,7 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "CreateArmaCfg")
             {
                 REQUIRE_CALL(cppFilterMock, RemoveClass("class ModLauncherList", _)).RETURN("");
                 REQUIRE_CALL(stdUtilsMock, FileWriteAllText(random_config_path, config_file_mod_part));
-                a3c.CreateArmaCfg({"123", "456"}, {}, random_config_path);
+                a3c.CreateArmaCfg({"/workshop_path/123", "/workshop_path/456"}, random_config_path);
             }
         }
 
@@ -309,7 +309,7 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "CreateArmaCfg")
             {
                 REQUIRE_CALL(cppFilterMock, RemoveClass("class ModLauncherList", _)).RETURN("");
                 REQUIRE_CALL(stdUtilsMock, FileWriteAllText(random_config_path, config_file_mod_part));
-                a3c.CreateArmaCfg({"123", "456"}, {}, random_config_path);
+                a3c.CreateArmaCfg({"/workshop_path/123", "/workshop_path/456"}, random_config_path);
             }
         }
 
@@ -327,7 +327,7 @@ someInt=5;
             {
                 REQUIRE_CALL(cppFilterMock, RemoveClass("class ModLauncherList", _)).RETURN(entries);
                 REQUIRE_CALL(stdUtilsMock, FileWriteAllText(random_config_path, expected_config_file));
-                a3c.CreateArmaCfg({"123", "456"}, {}, random_config_path);
+                a3c.CreateArmaCfg({"/workshop_path/123", "/workshop_path/456"}, random_config_path);
             }
         }
     }

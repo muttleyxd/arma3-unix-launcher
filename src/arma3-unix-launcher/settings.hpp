@@ -13,6 +13,9 @@ class QCheckBox;
 class QComboBox;
 class QLineEdit;
 
+nlohmann::json convert_old_mod_format_to_new_format(nlohmann::json const& mods);
+bool is_old_mod_format(nlohmann::json const& mods);
+
 class Settings
 {
     public:

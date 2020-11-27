@@ -40,99 +40,22 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QSplitter" name="splitter_mods">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <widget class="QLabel" name="label_workshop_status">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
             </property>
-            <widget class="QWidget" name="layoutWidget">
-             <layout class="QVBoxLayout" name="layout_vertical_workshop_mods">
-              <item>
-               <widget class="QLabel" name="label_workshop_mods">
-                <property name="contextMenuPolicy">
-                 <enum>Qt::ActionsContextMenu</enum>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::Box</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Plain</enum>
-                </property>
-                <property name="text">
-                 <string>&lt;b&gt;Workshop mods&lt;/b&gt;&lt;br/&gt;
-&lt;small&gt;Here you can see mods you are subscribed to&lt;/small&gt;</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QTableWidget" name="table_workshop_mods">
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="columnCount">
-                 <number>3</number>
-                </property>
-                <attribute name="horizontalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <attribute name="verticalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <column/>
-                <column/>
-                <column/>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="layoutWidget">
-             <layout class="QVBoxLayout" name="layout_vertical_custom_mods">
-              <item>
-               <widget class="QLabel" name="label_custom_mods">
-                <property name="contextMenuPolicy">
-                 <enum>Qt::ActionsContextMenu</enum>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::Box</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Plain</enum>
-                </property>
-                <property name="text">
-                 <string>&lt;b&gt;Custom mods&lt;/b&gt;&lt;br/&gt;&lt;small&gt;Here you can add your own mods&lt;/small&gt;</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QTableWidget" name="table_custom_mods">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="columnCount">
-                 <number>3</number>
-                </property>
-                <attribute name="horizontalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <attribute name="verticalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <column/>
-                <column/>
-                <column/>
-               </widget>
-              </item>
-             </layout>
-            </widget>
+            <property name="text">
+             <string>Steam Workshop - idle</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
+          </item>
+          <item>
+           <widget class="ModTableWidget" name="table_mods"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="layout_horizontal_buttons_add_remove">
@@ -689,18 +612,23 @@
     </item>
    </layout>
   </widget>
-  <action name="action_workshop_mods_disable_all">
+  <action name="action_mods_disable_all">
    <property name="text">
-    <string>Disable all workshop mods</string>
+    <string>Disable all mods</string>
    </property>
-  </action>
-  <action name="action_custom_mods_disable_all">
-   <property name="text">
-    <string>Disable all custom mods</string>
+   <property name="toolTip">
+    <string>Disable all mods</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>ModTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">modtablewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>

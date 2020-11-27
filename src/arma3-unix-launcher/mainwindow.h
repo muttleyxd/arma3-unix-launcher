@@ -69,23 +69,24 @@ class MainWindow : public QMainWindow
 
         std::vector<std::uint64_t> mods_to_enable;
 
-        void add_item(QTableWidget &table_widget, UiMod const &mod);
-        void initialize_table_widget(QTableWidget &table_widget, QStringList const &column_names);
-
-        void load_mods_from_json(nlohmann::json &preset);
+        void load_mods_from_json(nlohmann::json preset);
         void load_mods_from_html(std::string const &path);
+        void propose_subscribing_to_mods(std::string const& mod_list_message, std::vector<std::uint64_t> const& workshop_mods);
 
         std::vector<UiMod> get_mods(QTableWidget const &table_widget);
-        UiMod get_mod_from_nth_row(QTableWidget const &table_widget, int row);
         void put_mods_from_ui_to_manager_settings();
 
-        void update_mod_selection_counters(int state = 0);
+        void update_mod_selection_counters(int workshop_mod_count, int custom_mod_count);
 
         void setup_steam_integration();
         void on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info);
 
-        void on_custom_mods_disable_all_mods();
-        void on_workshop_mods_disable_all_mods();
+        void on_mods_disable_all_mods();
 
         void initialize_theme_combobox();
+
+        std::string ui_path_to_full_path(std::string ui_path) const;
+        std::string full_path_to_ui_path(std::string ui_path) const;
+        bool is_workshop_mod(std::string const& path_or_workshop_id);
+        Mod get_mod(std::string const& path_or_workshop_id);
 };

@@ -180,3 +180,18 @@ evenNewLineCapable=It can also load without quotes;)cpp";
     Mod mod(remove_stamina_path);
     CHECK_EQ(mod_map, mod.KeyValue);
 }
+
+TEST_CASE_FIXTURE(ModTests, "IsWorkshopMod")
+{
+    std::filesystem::path const workshop_path = "/workshop";
+    std::filesystem::path const non_workshop_mod_path = "/somewhere/mod";
+    std::filesystem::path const workshop_mod_path = "/workshop/1";
+
+    REQUIRE_CALL(filesystemUtilsMock, Ls(non_workshop_mod_path, _)).TIMES(2).RETURN(std::vector<std::string> {"addons"});
+    Mod non_workshop_mod(non_workshop_mod_path);
+    CHECK_FALSE(non_workshop_mod.IsWorkshopMod(workshop_path));
+
+    REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_mod_path, _)).TIMES(2).RETURN(std::vector<std::string> {"addons"});
+    Mod workshop_mod(workshop_mod_path);
+    CHECK(workshop_mod.IsWorkshopMod(workshop_path));
+}

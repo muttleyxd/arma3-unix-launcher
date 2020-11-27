@@ -140,7 +140,7 @@ namespace ARMA3
         path_workshop_target_ = target_workshop_path;
     }
 
-    void Client::CreateArmaCfg(vector<string> const &workshop_mod_ids, vector<path> const &custom_mods, path cfg_path)
+    void Client::CreateArmaCfg(vector<path> const &mod_paths, path cfg_path)
     {
         if (cfg_path.empty())
             cfg_path = GetCfgPath();
@@ -159,9 +159,7 @@ namespace ARMA3
 )cpp";
 
         int mod_number = 1;
-        for (auto const& mod_id : workshop_mod_ids)
-            stripped_config += GenerateCfgCppForMod(GetPathWorkshop() / mod_id, mod_number++);
-        for (auto const& mod_path : custom_mods)
+        for (auto const& mod_path : mod_paths)
             stripped_config += GenerateCfgCppForMod(mod_path, mod_number++);
 
         stripped_config += "};\n";

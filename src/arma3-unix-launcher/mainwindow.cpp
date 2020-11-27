@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <optional>
+#include <set>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -41,28 +42,22 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     manager(config_file_path)
 {
     ui->setupUi(this);
+    ui->table_mods->set_mod_counter_callback([&](int workshop_mod_count, int custom_mod_count) { this->update_mod_selection_counters(workshop_mod_count, custom_mod_count); });
 
     setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
 
     initialize_theme_combobox();
-    initialize_table_widget(*ui->table_workshop_mods, {"Enabled", "Name", "Workshop ID"});
-    initialize_table_widget(*ui->table_custom_mods, {"Enabled", "Name", "Path"});
-    ui->table_custom_mods->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-    for (auto const &i : client->GetWorkshopMods())
-    {
-        auto is_mod_enabled = [&](std::string const & workshop_id)
-        {
-            for (auto const &mod : manager.settings["mods"]["workshop"])
-                if (mod["id"] == workshop_id)
-                    return true;
-            return false;
-        };
+    for (auto const &mod : manager.settings["mods"]) {
+        auto const m = get_mod(mod["path"]);
+        ui->table_mods->add_mod({mod["enabled"], m.GetName(), full_path_to_ui_path(mod["path"]), m.IsWorkshopMod(client->GetPathWorkshop())});
+    }
+    for (auto const& mod : client->GetWorkshopMods()) {
+        auto mod_id = mod.GetValueOrReturnDefault("publishedid", "cannot read id");
 
-        auto mod_id = i.GetValueOrReturnDefault("publishedid", "cannot read id");
-        add_item(*ui->table_workshop_mods, {is_mod_enabled(mod_id), i.GetValueOrReturnDefault("name", "cannot read name"),
-                                            mod_id
-                                           });
+        if (!ui->table_mods->contains_mod(mod_id))
+            ui->table_mods->add_mod({false, mod.GetName(), mod_id, true});
+
         try
         {
             steam_integration->get_item_title(std::stoull(mod_id));
@@ -71,52 +66,27 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         {
         }
     }
-
     for (auto const &i : client->GetHomeMods())
     {
-        std::string shortname = StringUtils::Replace(i.path_, client->GetPath().string(), "~arma");
-        auto is_mod_enabled = [&](std::string const & shortname)
-        {
-            for (auto const &mod : manager.settings["mods"]["custom"])
-                if (mod["path"] == shortname && mod["enabled"] == true)
-                    return true;
-            return false;
-        };
-        add_item(*ui->table_custom_mods, {is_mod_enabled(shortname),
-                                          i.GetValueOrReturnDefault("name", "cannot read name"),
-                                          shortname
-                                         });
-    }
-
-    for (auto const &mod : manager.settings["mods"]["custom"])
-    {
-        if (StringUtils::StartsWith(mod["path"], "~arma"))
-            continue;
-        try
-        {
-            Mod i(mod["path"]);
-            add_item(*ui->table_custom_mods, {mod["enabled"], i.GetValueOrReturnDefault("name", "cannot read name"), mod["path"]});
-        }
-        catch (std::exception const &ex)
-        {
-            fmt::print("{}(): Uncaught exception: {}\n", __FUNCTION__, ex.what());
-        }
+        std::string shortname = full_path_to_ui_path(i.path_);
+        if (!ui->table_mods->contains_mod(shortname))
+            ui->table_mods->add_mod({false, i.GetValueOrReturnDefault("name", "cannot read name"), shortname, false});
     }
 
     manager.load_settings_to_ui(ui);
-    update_mod_selection_counters();
+    ui->table_mods->update_mod_selection_counters();
 
     connect(&arma_status_checker, &QTimer::timeout, this, QOverload<>::of(&MainWindow::check_if_arma_is_running));
     arma_status_checker.start(2000);
 
+    ui->label_workshop_status->setVisible(false);
     if (steam_integration->is_initialized())
         setup_steam_integration();
 
-    ui->label_custom_mods->addAction(ui->action_custom_mods_disable_all);
-    ui->label_workshop_mods->addAction(ui->action_workshop_mods_disable_all);
-    connect(ui->action_custom_mods_disable_all, &QAction::triggered, this, &MainWindow::on_custom_mods_disable_all_mods);
-    connect(ui->action_workshop_mods_disable_all, &QAction::triggered, this,
-            &MainWindow::on_workshop_mods_disable_all_mods);
+    ui->table_mods->addAction(ui->action_mods_disable_all);
+    ui->table_mods->setContextMenuPolicy(Qt::ContextMenuPolicy::ActionsContextMenu);
+    connect(ui->action_mods_disable_all, &QAction::triggered, this,
+            &MainWindow::on_mods_disable_all_mods);
 }
 
 MainWindow::~MainWindow()
@@ -132,6 +102,10 @@ MainWindow::~MainWindow()
 void MainWindow::on_button_start_clicked()
 try
 {
+    ui->table_mods->add_mod({false, "XD", "XD", false});
+    ui->table_mods->add_mod({false, "XD", "XD", true});
+    return;
+
     for (auto const &executable_name : ARMA3::Definitions::executable_names)
         if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
             throw std::runtime_error("Arma is already running");
@@ -152,22 +126,20 @@ try
             throw std::invalid_argument("Parameters -> Parameter file cannot be empty");
     }
 
-    std::vector<std::string> workshop_mod_ids;
-    for (auto const &mod : get_mods(*ui->table_workshop_mods))
-        if (mod.enabled)
-            workshop_mod_ids.push_back(mod.path_or_workshop_id);
-
-    std::vector<std::filesystem::path> custom_mods;
-    for (auto const &mod : get_mods(*ui->table_custom_mods))
-        if (mod.enabled)
-            custom_mods.push_back(StringUtils::Replace(mod.path_or_workshop_id, "~arma", client->GetPath()));
+    std::vector<std::filesystem::path> mods;
+    for (auto const &mod : get_mods(*ui->table_mods)) {
+        if (mod.enabled) {
+            auto m = get_mod(ui_path_to_full_path(mod.path_or_workshop_id));
+            mods.push_back(m.path_);
+        }
+    }
 
     if (parameters["dlcContact"])
-        custom_mods.push_back(client->GetPath() / "Contact");
+        mods.push_back(client->GetPath() / "Contact");
     if (parameters["dlcGlobalMobilization"])
-        custom_mods.push_back(client->GetPath() / "GM");
+        mods.push_back(client->GetPath() / "GM");
 
-    client->CreateArmaCfg(workshop_mod_ids, custom_mods);
+    client->CreateArmaCfg(mods);
     client->Start(manager.get_launch_parameters(), steam_integration->is_initialized(), parameters["protonDisableEsync"]);
 }
 catch (std::exception const &e)
@@ -177,101 +149,19 @@ catch (std::exception const &e)
     return;
 }
 
-void MainWindow::add_item(QTableWidget &table_widget, UiMod const &mod)
-{
-    int id = table_widget.rowCount();
-    table_widget.insertRow(id);
-
-    QWidget *checkbox_widget = new QWidget();
-    QHBoxLayout *checkbox_layout = new QHBoxLayout(checkbox_widget);
-    QCheckBox *checkbox = new QCheckBox();
-
-    checkbox_layout->addWidget(checkbox);
-    checkbox_layout->setAlignment(Qt::AlignCenter);
-    checkbox_layout->setContentsMargins(0, 0, 0, 0);
-
-    checkbox_widget->setLayout(checkbox_layout);
-
-    if (mod.enabled)
-        checkbox->setCheckState(Qt::Checked);
-    else
-        checkbox->setCheckState(Qt::Unchecked);
-
-    table_widget.setCellWidget(id, 0, checkbox_widget);
-    table_widget.setItem(id, 1, new QTableWidgetItem(mod.name.c_str()));
-    table_widget.setItem(id, 2, new QTableWidgetItem(mod.path_or_workshop_id.c_str()));
-
-    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &MainWindow::update_mod_selection_counters);
-
-    for (int i = 1; i <= 2; ++i)
-    {
-        auto item = table_widget.item(id, i);
-        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-        item->setTextAlignment(Qt::AlignCenter);
-    }
-}
-
-void MainWindow::initialize_table_widget(QTableWidget &table_widget, QStringList const &column_names)
-{
-    table_widget.clear();
-    table_widget.setHorizontalHeaderLabels(column_names);
-    table_widget.horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-}
-
-std::vector<UiMod> MainWindow::get_mods(QTableWidget const &table_widget)
-{
-    std::vector<UiMod> mods;
-
-    for (int i = 0; i < table_widget.rowCount(); ++i)
-        mods.emplace_back(get_mod_from_nth_row(table_widget, i));
-    return mods;
-}
-
-UiMod MainWindow::get_mod_from_nth_row(const QTableWidget &table_widget, int row)
-{
-    auto cell_widget = table_widget.cellWidget(row, 0);
-    auto checkbox = cell_widget->findChild<QCheckBox *>();
-
-    bool enabled = checkbox->checkState() == Qt::CheckState::Checked;
-    std::string name = table_widget.item(row, 1)->text().toStdString();
-    std::string path_or_workshop_id = table_widget.item(row, 2)->text().toStdString();
-    return {enabled, name, path_or_workshop_id};
-}
-
 void MainWindow::put_mods_from_ui_to_manager_settings()
 {
-    auto &custom_mods = manager.settings["mods"]["custom"];
-    custom_mods = nlohmann::json::array();
+    auto &mods = manager.settings["mods"];
+    mods = nlohmann::json::array();
 
-    for (auto const &mod : get_mods(*ui->table_custom_mods))
-        custom_mods.push_back({{"enabled", mod.enabled}, {"path", mod.path_or_workshop_id}});
-
-    auto &workshop_mods = manager.settings["mods"]["workshop"];
-    workshop_mods = nlohmann::json::array();
-
-    for (auto const &mod : get_mods(*ui->table_workshop_mods))
-        if (mod.enabled)
-            workshop_mods.push_back({{"enabled", true}, {"id", mod.path_or_workshop_id}});
+    for (auto const &mod : ui->table_mods->get_mods())
+        mods.push_back({{"enabled", mod.enabled}, {"name", mod.name}, {"path", mod.path_or_workshop_id}});
 }
 
-void MainWindow::update_mod_selection_counters(int)
+void MainWindow::update_mod_selection_counters(int workshop_mod_count, int custom_mod_count)
 {
-    auto workshop_mods = get_mods(*ui->table_workshop_mods);
-    auto custom_mods = get_mods(*ui->table_custom_mods);
-
-    int count_workshop = 0;
-    int count_custom = 0;
-
-    for (auto const &mod : workshop_mods)
-        if (mod.enabled)
-            ++count_workshop;
-
-    for (auto const &mod : custom_mods)
-        if (mod.enabled)
-            ++count_custom;
-
-    auto text = fmt::format("Selected {} mods ({} from workshop, {} custom)", count_workshop + count_custom, count_workshop,
-                            count_custom);
+    auto text = fmt::format("Selected {} mods ({} from workshop, {} custom)", workshop_mod_count + custom_mod_count, workshop_mod_count,
+                            custom_mod_count);
     ui->label_selected_mods->setText(QString::fromStdString(text));
 }
 
@@ -291,11 +181,7 @@ void MainWindow::check_steam_api()
 {
     steam_integration->poll_events();
 
-    std::string const workshop_label_text_formattable = "<b>Workshop mods</b><br/>\n<small>{}</small>";
-    std::string const default_second_line = "Here you can see mods you are subscribed to";
-
-    ui->label_workshop_mods->setText(QString::fromStdString(fmt::format(workshop_label_text_formattable,
-                                     default_second_line)));
+    bool visible = false;
 
     auto const mods = steam_integration->get_subscribed_items();
     for (auto const &mod : mods)
@@ -307,12 +193,14 @@ void MainWindow::check_steam_api()
             auto const percentage = static_cast<uint64_t>((static_cast<float>(download_info.bytes_downloaded) / static_cast<float>
                                     (download_info.bytes_total)) * 100);
             auto const mod_name = steam_integration->get_item_title(mod).substr(0, 40);
-            auto const string_to_insert = fmt::format("Downloading {} - {}%", mod_name, percentage);
-            ui->label_workshop_mods->setText(QString::fromStdString(fmt::format(workshop_label_text_formattable,
-                                             string_to_insert)));
+            auto const downloading_label = fmt::format("Steam Workshop - downloading {} - {}%", mod_name, percentage);
+            ui->label_workshop_status->setText(QString::fromStdString(downloading_label));
+            visible = true;
             break;
         }
     }
+
+    ui->label_workshop_status->setVisible(visible);
 }
 
 void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info)
@@ -325,18 +213,12 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
     {
         auto const workshop_id = std::to_string(info.workshop_id);
         Mod mod(client->GetPathWorkshop() / workshop_id);
-        auto const ui_mods = get_mods(*ui->table_workshop_mods);
 
-        for (auto const &ui_mod : ui_mods)
-        {
-            if (ui_mod.path_or_workshop_id == workshop_id)
-                return;
-        }
+        if (ui->table_mods->contains_mod(workshop_id))
+            return;
 
         auto const enabled = StdUtils::Contains(mods_to_enable, info.workshop_id);
-        add_item(*ui->table_workshop_mods, {enabled, mod.GetValueOrReturnDefault("name", "cannot read name"),
-                                            workshop_id
-                                           });
+        ui->table_mods->add_mod({enabled, mod.GetValueOrReturnDefault("name", "cannot read name"), workshop_id, true});
     }
     catch (std::exception const &e)
     {
@@ -381,6 +263,11 @@ try
             continue;
         }
 
+        if (StdUtils::Contains(mod_dir, client->GetPathWorkshop())) {
+            failed_mods += fmt::format("{} is a workshop mod.\n", mod_dir);
+            continue;
+        }
+
         auto dir_listing = fs::Ls(mod_dir, true);
         if (!StdUtils::Contains(dir_listing, "addons"))
         {
@@ -388,15 +275,15 @@ try
             continue;
         }
 
-        auto &settings_mods_custom = manager.settings["mods"]["custom"];
-        auto existing_mod = std::find_if(settings_mods_custom.begin(),
-                                         settings_mods_custom.end(), [&mod_dir](nlohmann::json const & item)
+        auto &settings_mods = manager.settings["mods"];
+        auto existing_mod = std::find_if(settings_mods.begin(),
+                                         settings_mods.end(), [&mod_dir](nlohmann::json const & item)
         {
             auto it = item.find("path");
             return it != item.end() && it.value() == mod_dir.string();
         });
 
-        if (existing_mod != settings_mods_custom.end())
+        if (existing_mod != settings_mods.end())
         {
             failed_mods += fmt::format("{} already exists.\n", mod_dir);
             continue;
@@ -405,8 +292,8 @@ try
         try
         {
             Mod m(mod_dir);
-            add_item(*ui->table_custom_mods, UiMod{false, m.GetValueOrReturnDefault("name", "cannot read name"), mod_dir});
-            settings_mods_custom.push_back({{"enabled", false}, {"path", mod_dir}});
+            ui->table_mods->add_mod(UiMod{false, m.GetName(), mod_dir, false});
+            settings_mods.push_back({{"enabled", false}, {"path", mod_dir}});
         }
         catch (std::exception const &e)
         {
@@ -429,30 +316,42 @@ catch (std::exception const &ex)
 void MainWindow::on_button_remove_custom_mod_clicked()
 try
 {
-    auto selected_items = ui->table_custom_mods->selectedItems();
+    std::set<int> selected_items;
+    for (auto const index : ui->table_mods->selectedItems())
+        selected_items.insert(index->row());
+
     if (selected_items.size() < 1)
     {
-        QMessageBox(QMessageBox::Icon::Information, "Cannot remove custom mod", "Need to select a mod to remove").exec();
+        QMessageBox(QMessageBox::Icon::Information, "Cannot remove mod", "Need to select a mod to remove").exec();
         return;
     }
 
-    auto mod = get_mod_from_nth_row(*ui->table_custom_mods, selected_items[0]->row());
-    if (StringUtils::StartsWith(mod.path_or_workshop_id, "~arma"))
-    {
-        QMessageBox(QMessageBox::Icon::Information, "Cannot remove custom mod",
-                    "Selected mod is in home directory, delete its files manually").exec();
-        return;
-    }
+    for (auto it = selected_items.rbegin(); it != selected_items.rend(); ++it) {
+        auto const mod = ui->table_mods->get_mod_at(*it);
+        if (mod.is_workshop_mod)
+        {
+            QMessageBox(QMessageBox::Icon::Information, "Cannot remove workshop mod",
+                        "Selected mod is in workshop mod, please unsubscribe from it in Steam's options").exec();
+            return;
+        }
+        else if (StringUtils::StartsWith(mod.path_or_workshop_id, "~arma"))
+        {
+            QMessageBox(QMessageBox::Icon::Information, "Cannot remove custom mod",
+                        "Selected mod is in home directory, delete its files manually").exec();
+            return;
+        }
 
-    auto &settings_mods_custom = manager.settings["mods"]["custom"];
-    for (auto it = settings_mods_custom.begin(); it < settings_mods_custom.end(); ++it)
-    {
-        auto &json_mod = *it;
-        if (json_mod["path"] == mod.path_or_workshop_id)
-            settings_mods_custom.erase(it);
-    }
+        auto &settings_mods_custom = manager.settings["mods"];
+        auto const full_path = ui_path_to_full_path(mod.path_or_workshop_id);
+        for (auto it = settings_mods_custom.begin(); it < settings_mods_custom.end(); ++it)
+        {
+            auto &json_mod = *it;
+            if (json_mod["path"] == full_path)
+                settings_mods_custom.erase(it);
+        }
 
-    ui->table_custom_mods->removeRow(selected_items[0]->row());
+        ui->table_mods->removeRow(*it);
+    }
 }
 catch (std::exception const &ex)
 {
@@ -547,18 +446,21 @@ void MainWindow::on_button_parameter_file_open_clicked()
 void MainWindow::on_button_mod_preset_open_clicked()
 try
 {
+    // todo: loading mod preset should order loaded mods next to each other, so original load order gets preserved
     auto config_dir = QString::fromStdString(config_file.parent_path().string());
     auto filename = QFileDialog::getOpenFileName(this, tr("Mod preset"), config_dir,
                     tr("Mod preset files | *.a3ulml, *.html (*.a3ulml *.html);;A3UL mod list | *.a3ulml (*.a3ulml);;HTML preset | *.html (*.html)"));
     if (filename.isEmpty())
         return;
 
+    ui->table_mods->disable_all_mods();
+
     bool loaded = false;
     std::string error_messages;
     try
     {
         nlohmann::json preset = nlohmann::json::parse(StdUtils::FileReadAllText(filename.toStdString()));
-        load_mods_from_json(preset);
+        load_mods_from_json(std::move(preset));
         loaded = true;
     }
     catch (std::exception const &e)
@@ -582,7 +484,7 @@ try
     if (!loaded)
         throw PresetLoadingFailedException(error_messages);
 
-    update_mod_selection_counters();
+    ui->table_mods->update_mod_selection_counters();
     put_mods_from_ui_to_manager_settings();
 }
 catch (std::exception const &e)
@@ -592,167 +494,145 @@ catch (std::exception const &e)
     return;
 }
 
-void MainWindow::load_mods_from_json(nlohmann::json &preset)
+struct FailedMod {
+    std::string path;
+    std::string name;
+    std::string reason;
+};
+
+void MainWindow::load_mods_from_json(nlohmann::json preset)
 {
     auto &mods = preset.at("mods");
+    if (is_old_mod_format(mods))
+        mods = convert_old_mod_format_to_new_format(mods);
 
-    auto const &workshop_mods = mods.at("workshop");
-    auto workshop_contains_mod = [&](std::string const & id)
+    auto find_mod = [&](std::string const & workshop_id_or_path)
     {
-        for (auto const &mod : workshop_mods)
-            if (mod.at("id") == id)
-                return true;
-        return false;
+        auto full_path = ui_path_to_full_path(workshop_id_or_path);
+        for (auto const &mod : mods)
+            if (mod.at("path") == full_path)
+                return mod;
+        return nlohmann::json{};
     };
 
-    for (int row = 0; row < ui->table_workshop_mods->rowCount(); ++row)
+    for (int row = ui->table_mods->rowCount() - 1; row >= 0; --row)
     {
-        auto cell_widget = ui->table_workshop_mods->cellWidget(row, 0);
-        auto checkbox = cell_widget->findChild<QCheckBox *>();
-        std::string workshop_id = ui->table_workshop_mods->item(row, 2)->text().toStdString();
+        auto const ui_mod = ui->table_mods->get_mod_at(row);
+        auto const mod = find_mod(ui_mod.path_or_workshop_id);
+        if (mod.empty())
+            continue;
 
-        if (workshop_contains_mod(workshop_id))
-            checkbox->setCheckState(Qt::CheckState::Checked);
-        else
-            checkbox->setCheckState(Qt::CheckState::Unchecked);
+        ui->table_mods->removeRow(row);
     }
 
-    auto &custom_mods = mods.at("custom");
-    for (int row = 0; row < ui->table_custom_mods->rowCount(); ++row)
-    {
-        auto cell_widget = ui->table_custom_mods->cellWidget(row, 0);
-        auto checkbox = cell_widget->findChild<QCheckBox *>();
-        std::string path = ui->table_custom_mods->item(row, 2)->text().toStdString();
+    auto const all_mods = ui->table_mods->get_mods();
 
-        auto custom_mod = std::find_if(custom_mods.begin(), custom_mods.end(), [&](nlohmann::json & mod)
-        {
-            return mod.at("path") == path;
-        });
-
-        if (custom_mod != custom_mods.end())
-            (*custom_mod)["done"] = true;
-
-        if (custom_mod != custom_mods.end() && custom_mod->at("enabled"))
-            checkbox->setCheckState(Qt::CheckState::Checked);
-        else
-            checkbox->setCheckState(Qt::CheckState::Unchecked);
-    }
-
-    std::vector<std::pair<std::string, std::string>> failed_custom_mods;
-    for (auto const &mod : custom_mods)
-    {
+    auto const workshop_path = client->GetPathWorkshop();
+    std::vector<FailedMod> failed_mods;
+    for (auto it = mods.rbegin(); it < mods.rend(); ++it) {
+        std::string const name = it->at("name");
+        std::string const path = it->at("path");
         try
         {
-            if (mod.contains("done"))
-                continue;
-            auto full_path = StringUtils::Replace(mod.at("path"), "~arma", client->GetPath().string());
-            Mod m(full_path);
-            UiMod ui_mod{mod.at("enabled"), m.GetValueOrReturnDefault("name", "cannot read name"), mod.at("path")};
-            add_item(*ui->table_custom_mods, ui_mod);
+            Mod m = get_mod(path);
+            ui->table_mods->add_mod(UiMod{it->at("enabled"), m.GetName(), full_path_to_ui_path(it->at("path")), m.IsWorkshopMod(workshop_path)}, 0);
+            (*it)["done"] = true;
         }
-        catch (std::exception const &e)
-        {
-            failed_custom_mods.emplace_back(mod.at("path"), e.what());
+        catch (std::exception const& e) {
+            fmt::print(stderr, "Error parsing json mod \"{}\" ({}): {}\n", name, path, e.what());
+            failed_mods.push_back({path, name, e.what()});
         }
     }
 
-    if (failed_custom_mods.size() > 0)
+    if (failed_mods.size() > 0)
     {
-        std::string message = "Mod import ok, failed importing custom mods:\n";
-        for (auto const &failed_mod : failed_custom_mods)
-            message += fmt::format("\nmod: {}, reason: {}", failed_mod.first, failed_mod.second);
-        QMessageBox(QMessageBox::Icon::Warning, "Imported mod preset, issues found", QString::fromStdString(message)).exec();
+        std::string message = "Mod import ok, failed importing mods:\n";
+        std::string mod_list = "";
+        int mod_count = 0;
+        int mod_count_overload = 0;
+        constexpr int mod_count_max = 25;
+
+        if (mod_count >= mod_count_max)
+            mod_list += fmt::format("and {} more...\n", std::to_string(mod_count_overload));
+
+        std::vector<std::uint64_t> workshop_mods;
+
+        for (auto const &failed_mod : failed_mods) {
+            message += fmt::format("\nmod: \"{}\" ({}), reason: {}", failed_mod.name, failed_mod.path, failed_mod.reason);
+
+            char const* prefix = "Local";
+            if (is_workshop_mod(failed_mod.path)) {
+                prefix = "Steam";
+                workshop_mods.push_back(std::stoull(failed_mod.path));
+            }
+
+            if (mod_count >= mod_count_max)
+                mod_count_overload++;
+            else {
+                mod_count++;
+                mod_list += fmt::format("{}: \"{}\" ({})\n", prefix, failed_mod.name, failed_mod.path);
+            }
+        }
+
+        if (steam_integration->is_initialized())
+            propose_subscribing_to_mods(mod_list, workshop_mods);
+        else
+            QMessageBox(QMessageBox::Icon::Warning, "Imported mod preset, issues found", QString::fromStdString(message)).exec();
     }
 }
 
 void MainWindow::load_mods_from_html(std::string const &path)
 {
     auto const content = StdUtils::FileReadAllText(path);
-    auto const json = Html::Preset::Parser::html_to_json(content);
+    auto const mods = Html::Preset::Parser::html_to_json(content);
 
-    nlohmann::json existing_local_mods = nlohmann::json::array();
-    nlohmann::json existing_steam_mods = nlohmann::json::array();
+    nlohmann::json existing_mods = nlohmann::json::array();
     nlohmann::json not_existing_local_mods = nlohmann::json::array();
     nlohmann::json not_existing_steam_mods = nlohmann::json::array();
 
-    for (auto local_mod : json["local"])
+    for (auto mod : mods)
     {
         try
         {
-            auto &path = local_mod["path"];
-            if (!FilesystemUtils::Exists(path))
-                path = client->GetPath() / path;
-            Mod m(path);
-            existing_local_mods.push_back(local_mod);
+            get_mod(mod.at("path")); // will throw on failure
+            existing_mods.push_back(mod);
         }
         catch (std::exception const &e)
         {
             fmt::print(stderr, "Found not existing mod, error: {}\n", e.what());
-            not_existing_local_mods.push_back(local_mod);
+            if (is_workshop_mod(mod.at("path")))
+                not_existing_steam_mods.push_back(mod);
+            else
+                not_existing_local_mods.push_back(mod);
         }
     }
 
-    for (auto const &steam_mod : json["steam"])
+    auto contains_mod = [&](std::string const & path_or_workshop_id)
     {
-        if (FilesystemUtils::Exists(client->GetPathWorkshop() / steam_mod["workshopId"]))
-            existing_steam_mods.push_back(steam_mod);
-        else
-            not_existing_steam_mods.push_back(steam_mod);
-    }
-
-    auto contains_workshop_mod = [&](std::string const & workshop_id)
-    {
-        for (auto const &json_mod : existing_steam_mods)
-            if (json_mod["workshopId"] == workshop_id)
+        for (auto const &json_mod : existing_mods)
+            if (json_mod["path"] == ui_path_to_full_path(path_or_workshop_id))
                 return true;
         return false;
     };
-    for (int row = 0; row < ui->table_workshop_mods->rowCount(); ++row)
-    {
-        auto cell_widget = ui->table_workshop_mods->cellWidget(row, 0);
-        auto checkbox = cell_widget->findChild<QCheckBox *>();
-        std::string workshop_id = ui->table_workshop_mods->item(row, 2)->text().toStdString();
 
-        if (contains_workshop_mod(workshop_id))
-            checkbox->setCheckState(Qt::CheckState::Checked);
-        else
-            checkbox->setCheckState(Qt::CheckState::Unchecked);
+    for (int row = ui->table_mods->rowCount() - 1; row >= 0; --row)
+    {
+        auto const ui_mod = ui->table_mods->get_mod_at(row);
+        if (contains_mod(ui_mod.path_or_workshop_id))
+            ui->table_mods->removeRow(row);
     }
 
-    for (int row = 0; row < ui->table_custom_mods->rowCount(); ++row)
-    {
-        auto cell_widget = ui->table_custom_mods->cellWidget(row, 0);
-        auto checkbox = cell_widget->findChild<QCheckBox *>();
-        checkbox->setCheckState(Qt::CheckState::Unchecked);
-    }
+    for (auto it = existing_mods.crbegin(); it < existing_mods.crend(); ++it) {
+        try {
+            auto const path = it->at("path");
+            auto const full_path = ui_path_to_full_path(path);
 
-    auto find_local_mod_in_custom = [&](std::string const & path)->QCheckBox *
-    {
-        for (int row = 0; row < ui->table_custom_mods->rowCount(); ++row)
-        {
-            auto const mod_path = StringUtils::Replace(ui->table_custom_mods->item(row, 2)->text().toStdString(), "~arma",
-                    client->GetPath());
-            if (mod_path == path)
-            {
-                auto cell_widget = ui->table_custom_mods->cellWidget(row, 0);
-                return cell_widget->findChild<QCheckBox *>();
-            }
+            Mod m = get_mod(path);
+            ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())});
         }
-        return nullptr;
-    };
-    for (auto const &local_mod : existing_local_mods)
-    {
-        if (auto checkbox = find_local_mod_in_custom(local_mod["path"]); checkbox == nullptr)
-        {
-            Mod m(local_mod["path"]);
-            auto full_path = StringUtils::Replace(local_mod.at("path"), client->GetPath().string(), "~arma");
-            add_item(*ui->table_custom_mods, {true,
-                                              m.GetValueOrReturnDefault("name", "cannot read name"),
-                                              full_path
-                                             });
+        catch (std::exception const& e) {
+            fmt::print(stderr, "Failed adding apparently existing mod '{}', reason: {}\n", it->at("path"), e.what());
         }
-        else
-            checkbox->setCheckState(Qt::CheckState::Checked);
     }
 
     if (not_existing_local_mods.empty() && not_existing_steam_mods.empty())
@@ -761,55 +641,69 @@ void MainWindow::load_mods_from_html(std::string const &path)
     std::string mod_list;
     int mod_count = 0;
     int mod_count_overload = 0;
+    constexpr int mod_count_max = 25;
     for (auto const &json_mod : not_existing_steam_mods)
     {
-        if (mod_count >= 25)
+        if (mod_count >= mod_count_max)
             mod_count_overload++;
         else
         {
-            mod_list += fmt::format("Steam: {}\n", std::string(json_mod["displayName"]));
+            mod_list += fmt::format("Steam: {}\n", std::string(json_mod["name"]));
             mod_count++;
         }
     }
     for (auto const &json_mod : not_existing_local_mods)
     {
-        if (mod_count >= 25)
+        if (mod_count >= mod_count_max)
             mod_count_overload++;
         else
         {
-            mod_list += fmt::format("Local: {}\n", std::string(json_mod["displayName"]));
+            mod_list += fmt::format("Local: {}\n", std::string(json_mod["name"]));
             mod_count++;
         }
     }
 
-    if (mod_count >= 25)
+    if (mod_count >= mod_count_max)
         mod_list += fmt::format("and {} more...\n", std::to_string(mod_count_overload));
 
 
-    if (steam_integration->is_initialized())
+    if (steam_integration->is_initialized() && not_existing_steam_mods.size() > 0)
     {
-        auto const message =
-            fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to missing Steam mods now?",
-                        mod_list);
-        auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message),
-                                        QMessageBox::Yes | QMessageBox::No).exec();
-        if (result == QMessageBox::Yes)
+        std::vector<std::uint64_t> workshop_mods;
+        for (auto const &json_mod : not_existing_steam_mods)
         {
-            for (auto const &json_mod : not_existing_steam_mods)
-            {
-                if (json_mod["origin"] != "Steam")
-                    continue;
-                auto workshop_id = std::stoull(std::string(json_mod["path"]));
-                steam_integration->subscribe(workshop_id);
-                mods_to_enable.push_back(workshop_id);
-            }
+            if (json_mod["origin"] != "Steam")
+                continue;
+            auto workshop_id = std::stoull(std::string(json_mod["path"]));
+            workshop_mods.push_back(std::move(workshop_id));
         }
+        propose_subscribing_to_mods(mod_list, workshop_mods);
     }
     else
     {
-        auto const message = fmt::format("Following mods cannot be loaded (Steam integration is disabled):\n{}", mod_list);
+        char const* steam_integration_message = "(Steam integration is disabled)";
+        if (steam_integration->is_initialized())
+            steam_integration_message = "";
+        auto const message = fmt::format("Following mods cannot be loaded {}:\n{}", steam_integration_message, mod_list);
         QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message)).exec();
         return;
+    }
+}
+
+void MainWindow::propose_subscribing_to_mods(std::string const& mod_list_message, std::vector<std::uint64_t> const &workshop_mods)
+{
+    auto const message =
+        fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to missing Steam mods now?",
+                    mod_list_message);
+    auto const result = QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(message),
+                                    QMessageBox::Yes | QMessageBox::No).exec();
+    if (result != QMessageBox::Yes)
+        return;
+
+    for (auto const &workshop_id : workshop_mods)
+    {
+        steam_integration->subscribe(workshop_id);
+        mods_to_enable.push_back(workshop_id);
     }
 }
 
@@ -857,8 +751,8 @@ try
     put_mods_from_ui_to_manager_settings();
     std::string output;
 
-    for (auto const &mod : get_mods(*ui->table_workshop_mods))
-        if (mod.enabled)
+    for (auto const &mod : ui->table_mods->get_mods())
+        if (mod.enabled && mod.is_workshop_mod)
             output += fmt::format("{} - https://steamcommunity.com/sharedfiles/filedetails/?id={}\n", mod.name,
                                   mod.path_or_workshop_id);
     StdUtils::FileWriteAllText(filename_str, output);
@@ -870,25 +764,9 @@ catch (std::exception const &e)
     return;
 }
 
-void disable_all_mods(QTableWidget &table_mods)
+void MainWindow::on_mods_disable_all_mods()
 {
-    for (int row = 0; row < table_mods.rowCount(); ++row)
-    {
-        auto cell_widget = table_mods.cellWidget(row, 0);
-        auto checkbox = cell_widget->findChild<QCheckBox *>();
-        checkbox->setCheckState(Qt::CheckState::Unchecked);
-    }
-}
-
-void MainWindow::on_custom_mods_disable_all_mods()
-{
-    disable_all_mods(*ui->table_custom_mods);
-    put_mods_from_ui_to_manager_settings();
-}
-
-void MainWindow::on_workshop_mods_disable_all_mods()
-{
-    disable_all_mods(*ui->table_workshop_mods);
+    ui->table_mods->disable_all_mods();
     put_mods_from_ui_to_manager_settings();
 }
 
@@ -905,6 +783,34 @@ void MainWindow::initialize_theme_combobox()
         auto const theme_name = StringUtils::Replace(entry.toStdString(), ".stylesheet", "");
         theme_combobox->addItem(QString::fromStdString(theme_name));
     }
+}
+
+std::string MainWindow::ui_path_to_full_path(std::string ui_path) const {
+    return StringUtils::Replace(ui_path, "~arma", client->GetPath().string());
+}
+
+std::string MainWindow::full_path_to_ui_path(std::string ui_path) const {
+    return StringUtils::Replace(ui_path, client->GetPath().string(), "~arma");
+}
+
+bool MainWindow::is_workshop_mod(std::string const& path_or_workshop_id)
+try
+{
+    // if path exists, then is absolute and certainly is not workshop id
+    return std::stoull(path_or_workshop_id) > 0;
+}
+catch (...)
+{
+    return false;
+}
+
+Mod MainWindow::get_mod(std::string const& path_or_workshop_id)
+{
+    if (is_workshop_mod(path_or_workshop_id)) {
+        std::filesystem::path const workshop_mod_path = client->GetPathWorkshop() / path_or_workshop_id;
+        return Mod(workshop_mod_path);
+    }
+    return Mod(path_or_workshop_id);
 }
 
 void MainWindow::on_combobox_theme_currentTextChanged(QString const &combobox_theme)

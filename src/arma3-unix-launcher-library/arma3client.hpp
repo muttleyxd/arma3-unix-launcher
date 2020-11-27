@@ -38,8 +38,7 @@ namespace ARMA3
         public:
             Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path);
 
-            void CreateArmaCfg(std::vector<std::string> const &workshop_mod_ids,
-                               std::vector<std::filesystem::path> const &custom_mods, std::filesystem::path cfg_path = "");
+            void CreateArmaCfg(std::vector<std::filesystem::path> const &mod_paths, std::filesystem::path cfg_path = "");
             bool IsProton();
             void Start(std::string const &arguments, bool launch_directly = false, bool disable_esync = false);
 
