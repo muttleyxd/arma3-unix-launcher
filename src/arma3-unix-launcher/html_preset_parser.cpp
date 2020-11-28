@@ -86,28 +86,24 @@ namespace
     nlohmann::json mod_to_json(pugi::xpath_node const &mod)
     {
         nlohmann::json mod_json;
-        mod_json["displayName"] = get_name(mod);
+        mod_json["name"] = get_name(mod);
         auto const origin = get_origin(mod);
         mod_json["origin"] = origin;
         if (origin == "Local")
             mod_json["path"] = get_path_local(mod);
         else
-            mod_json["workshopId"] = get_workshop_id_steam(mod);
+            mod_json["path"] = get_workshop_id_steam(mod);
         return mod_json;
     }
 
     nlohmann::json get_mods(pugi::xpath_node_set const &mod_table)
     {
-        nlohmann::json mods{{"local", nlohmann::json::array()}, {"steam", nlohmann::json::array()}};
+        nlohmann::json mods = nlohmann::json::array();
         for (pugi::xpath_node const mod : mod_table)
         {
             try
             {
-                auto json_mod = mod_to_json(mod);
-                if (json_mod["origin"] == "Local")
-                    mods["local"].push_back(json_mod);
-                else
-                    mods["steam"].push_back(json_mod);
+                mods.push_back(mod_to_json(mod));
             }
             catch (std::exception const &e)
             {

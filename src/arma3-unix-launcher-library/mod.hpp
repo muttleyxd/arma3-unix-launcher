@@ -14,9 +14,10 @@ class Mod
         std::filesystem::path path_;
         std::map<std::string, std::string> KeyValue;
 
-        std::string GetName();
+        std::string GetName() const;
         void LoadAllCPP();
         void LoadFromText(std::string const &text, bool append = false);
+        bool IsWorkshopMod(std::filesystem::path const& workshop_path) const;
 
         std::string GetValueOrReturnDefault(std::string default_value) const
         {
@@ -51,6 +52,6 @@ class Mod
         }
 
     private:
-        std::string RemoveWhitespacesAndComments(const std::string &text);
-        void ParseCPP(const std::string &text);
+        std::string RemoveWhitespacesAndComments(std::string const &text);
+        void ParseCPP(std::string const &text);
 };

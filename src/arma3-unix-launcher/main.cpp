@@ -48,22 +48,20 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
     nlohmann::json preset = nlohmann::json::parse(StdUtils::FileReadAllText(valid_path));
     auto const &mods = preset.at("mods");
 
-    std::vector<std::filesystem::path> custom_mods;
-    std::vector<std::string> workshop_mods;
+    std::vector<std::filesystem::path> enabled_mods;
 
-    for (auto const &mod : mods["custom"])
+    for (auto const &mod : mods)
         if (mod["enabled"])
-            custom_mods.emplace_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
-    for (auto const &mod : mods["workshop"])
-        workshop_mods.push_back(mod["id"]);
+            enabled_mods.emplace_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
 
     fmt::print("Starting Arma with preset {}\n", preset_to_run);
-    client.CreateArmaCfg(workshop_mods, custom_mods);
+    client.CreateArmaCfg(enabled_mods);
     client.Start(arguments, false, disable_esync);
 }
 
 int main(int argc, char *argv[])
 {
+    fmt::print(stderr, "first line\n");
     try
     {
         QApplication a(argc, argv);

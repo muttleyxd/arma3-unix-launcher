@@ -19,10 +19,7 @@ namespace
 
         nlohmann::json json = nlohmann::json::parse(R"json(
                                                     {
-                                                        "mods": {
-                                                            "custom": [],
-                                                            "workshop": []
-                                                        },
+                                                        "mods": [],
                                                         "parameters": {
                                                             "checkSignatures": false,
                                                             "connect": null,
@@ -54,12 +51,30 @@ namespace
     }
 }
 
+nlohmann::json convert_old_mod_format_to_new_format(nlohmann::json const& mods) {
+    constexpr char const* name_placeholder = "mod_imported_from_old_preset";
+
+    nlohmann::json ret = nlohmann::json::array();
+    for (auto const& workshop_mod : mods.at("workshop"))
+        ret.push_back({{"path", workshop_mod.at("id")}, {"name", name_placeholder}, {"enabled", true}});
+    for (auto const& custom_mod : mods.at("custom"))
+        ret.push_back({{"path", custom_mod.at("path")}, {"name", name_placeholder}, {"enabled", custom_mod.at("enabled")}});
+    return ret;
+}
+
+bool is_old_mod_format(nlohmann::json const& mods) {
+    return !mods.is_array();
+}
+
 Settings::Settings(std::filesystem::path const config_file_path) : config_file(config_file_path)
 {
     create_default_config(config_file);
     try
     {
         settings = nlohmann::json::parse(StdUtils::FileReadAllText(config_file));
+
+        if (is_old_mod_format(settings.at("mods")))
+            settings["mods"] = convert_old_mod_format_to_new_format(settings["mods"]);
     }
     catch (std::exception const &ex)
     {

@@ -23,7 +23,7 @@ Mod::Mod(std::filesystem::path const &path) : path_(path)
         KeyValue["publishedid"] = path.filename();
 }
 
-std::string Mod::GetName()
+std::string Mod::GetName() const
 {
     return GetValueOrReturnDefault("name", "dir", "tooltip", "publishedid", path_.filename());
 }
@@ -40,6 +40,10 @@ void Mod::LoadFromText(std::string const &text, bool append)
     if (!append)
         KeyValue.clear();
     ParseCPP(RemoveWhitespacesAndComments(text));
+}
+
+bool Mod::IsWorkshopMod(std::filesystem::path const& workshop_path) const {
+    return path_.string().find(workshop_path) != std::string::npos;
 }
 
 std::string Mod::RemoveWhitespacesAndComments(std::string const &text)

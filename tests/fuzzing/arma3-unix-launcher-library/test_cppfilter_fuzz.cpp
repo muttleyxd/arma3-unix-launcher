@@ -1,6 +1,7 @@
 #include "cppfilter.hpp"
 
 #include <stdexcept>
+#include <vector>
 
 #include "exceptions/syntax_error.hpp"
 

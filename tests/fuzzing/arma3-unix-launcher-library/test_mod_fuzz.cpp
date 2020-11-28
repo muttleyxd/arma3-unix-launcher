@@ -1,5 +1,7 @@
 #include "mod.hpp"
 
+#include <vector>
+
 namespace FilesystemUtils
 {
     std::vector<std::string> Ls(std::filesystem::path const &, bool)
