@@ -42,7 +42,8 @@ void Mod::LoadFromText(std::string const &text, bool append)
     ParseCPP(RemoveWhitespacesAndComments(text));
 }
 
-bool Mod::IsWorkshopMod(std::filesystem::path const& workshop_path) const {
+bool Mod::IsWorkshopMod(std::filesystem::path const &workshop_path) const
+{
     return path_.string().find(workshop_path) != std::string::npos;
 }
 

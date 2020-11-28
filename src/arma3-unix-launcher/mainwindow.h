@@ -71,7 +71,7 @@ class MainWindow : public QMainWindow
 
         void load_mods_from_json(nlohmann::json preset);
         void load_mods_from_html(std::string const &path);
-        void propose_subscribing_to_mods(std::string const& mod_list_message, std::vector<std::uint64_t> const& workshop_mods);
+        void propose_subscribing_to_mods(std::string const &mod_list_message, std::vector<std::uint64_t> const &workshop_mods);
 
         std::vector<UiMod> get_mods(QTableWidget const &table_widget);
         void put_mods_from_ui_to_manager_settings();
@@ -87,6 +87,6 @@ class MainWindow : public QMainWindow
 
         std::string ui_path_to_full_path(std::string ui_path) const;
         std::string full_path_to_ui_path(std::string ui_path) const;
-        bool is_workshop_mod(std::string const& path_or_workshop_id);
-        Mod get_mod(std::string const& path_or_workshop_id);
+        bool is_workshop_mod(std::string const &path_or_workshop_id);
+        Mod get_mod(std::string const &path_or_workshop_id);
 };

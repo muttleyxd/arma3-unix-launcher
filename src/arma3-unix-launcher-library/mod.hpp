@@ -17,7 +17,7 @@ class Mod
         std::string GetName() const;
         void LoadAllCPP();
         void LoadFromText(std::string const &text, bool append = false);
-        bool IsWorkshopMod(std::filesystem::path const& workshop_path) const;
+        bool IsWorkshopMod(std::filesystem::path const &workshop_path) const;
 
         std::string GetValueOrReturnDefault(std::string default_value) const
         {

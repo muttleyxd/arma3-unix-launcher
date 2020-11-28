@@ -42,17 +42,22 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     manager(config_file_path)
 {
     ui->setupUi(this);
-    ui->table_mods->set_mod_counter_callback([&](int workshop_mod_count, int custom_mod_count) { this->update_mod_selection_counters(workshop_mod_count, custom_mod_count); });
+    ui->table_mods->set_mod_counter_callback([&](int workshop_mod_count, int custom_mod_count)
+    {
+        this->update_mod_selection_counters(workshop_mod_count, custom_mod_count);
+    });
 
     setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
 
     initialize_theme_combobox();
 
-    for (auto const &mod : manager.settings["mods"]) {
+    for (auto const &mod : manager.settings["mods"])
+    {
         auto const m = get_mod(mod["path"]);
         ui->table_mods->add_mod({mod["enabled"], m.GetName(), full_path_to_ui_path(mod["path"]), m.IsWorkshopMod(client->GetPathWorkshop())});
     }
-    for (auto const& mod : client->GetWorkshopMods()) {
+    for (auto const &mod : client->GetWorkshopMods())
+    {
         auto mod_id = mod.GetValueOrReturnDefault("publishedid", "cannot read id");
 
         if (!ui->table_mods->contains_mod(mod_id))
@@ -127,8 +132,10 @@ try
     }
 
     std::vector<std::filesystem::path> mods;
-    for (auto const &mod : get_mods(*ui->table_mods)) {
-        if (mod.enabled) {
+    for (auto const &mod : get_mods(*ui->table_mods))
+    {
+        if (mod.enabled)
+        {
             auto m = get_mod(ui_path_to_full_path(mod.path_or_workshop_id));
             mods.push_back(m.path_);
         }
@@ -160,7 +167,8 @@ void MainWindow::put_mods_from_ui_to_manager_settings()
 
 void MainWindow::update_mod_selection_counters(int workshop_mod_count, int custom_mod_count)
 {
-    auto text = fmt::format("Selected {} mods ({} from workshop, {} custom)", workshop_mod_count + custom_mod_count, workshop_mod_count,
+    auto text = fmt::format("Selected {} mods ({} from workshop, {} custom)", workshop_mod_count + custom_mod_count,
+                            workshop_mod_count,
                             custom_mod_count);
     ui->label_selected_mods->setText(QString::fromStdString(text));
 }
@@ -263,7 +271,8 @@ try
             continue;
         }
 
-        if (StdUtils::Contains(mod_dir, client->GetPathWorkshop())) {
+        if (StdUtils::Contains(mod_dir, client->GetPathWorkshop()))
+        {
             failed_mods += fmt::format("{} is a workshop mod.\n", mod_dir);
             continue;
         }
@@ -326,7 +335,8 @@ try
         return;
     }
 
-    for (auto it = selected_items.rbegin(); it != selected_items.rend(); ++it) {
+    for (auto it = selected_items.rbegin(); it != selected_items.rend(); ++it)
+    {
         auto const mod = ui->table_mods->get_mod_at(*it);
         if (mod.is_workshop_mod)
         {
@@ -494,7 +504,8 @@ catch (std::exception const &e)
     return;
 }
 
-struct FailedMod {
+struct FailedMod
+{
     std::string path;
     std::string name;
     std::string reason;
@@ -529,16 +540,19 @@ void MainWindow::load_mods_from_json(nlohmann::json preset)
 
     auto const workshop_path = client->GetPathWorkshop();
     std::vector<FailedMod> failed_mods;
-    for (auto it = mods.rbegin(); it < mods.rend(); ++it) {
+    for (auto it = mods.rbegin(); it < mods.rend(); ++it)
+    {
         std::string const name = it->at("name");
         std::string const path = it->at("path");
         try
         {
             Mod m = get_mod(path);
-            ui->table_mods->add_mod(UiMod{it->at("enabled"), m.GetName(), full_path_to_ui_path(it->at("path")), m.IsWorkshopMod(workshop_path)}, 0);
+            ui->table_mods->add_mod(UiMod{it->at("enabled"), m.GetName(), full_path_to_ui_path(it->at("path")), m.IsWorkshopMod(workshop_path)},
+                                    0);
             (*it)["done"] = true;
         }
-        catch (std::exception const& e) {
+        catch (std::exception const &e)
+        {
             fmt::print(stderr, "Error parsing json mod \"{}\" ({}): {}\n", name, path, e.what());
             failed_mods.push_back({path, name, e.what()});
         }
@@ -557,18 +571,21 @@ void MainWindow::load_mods_from_json(nlohmann::json preset)
 
         std::vector<std::uint64_t> workshop_mods;
 
-        for (auto const &failed_mod : failed_mods) {
+        for (auto const &failed_mod : failed_mods)
+        {
             message += fmt::format("\nmod: \"{}\" ({}), reason: {}", failed_mod.name, failed_mod.path, failed_mod.reason);
 
-            char const* prefix = "Local";
-            if (is_workshop_mod(failed_mod.path)) {
+            char const *prefix = "Local";
+            if (is_workshop_mod(failed_mod.path))
+            {
                 prefix = "Steam";
                 workshop_mods.push_back(std::stoull(failed_mod.path));
             }
 
             if (mod_count >= mod_count_max)
                 mod_count_overload++;
-            else {
+            else
+            {
                 mod_count++;
                 mod_list += fmt::format("{}: \"{}\" ({})\n", prefix, failed_mod.name, failed_mod.path);
             }
@@ -622,15 +639,18 @@ void MainWindow::load_mods_from_html(std::string const &path)
             ui->table_mods->removeRow(row);
     }
 
-    for (auto it = existing_mods.crbegin(); it < existing_mods.crend(); ++it) {
-        try {
+    for (auto it = existing_mods.crbegin(); it < existing_mods.crend(); ++it)
+    {
+        try
+        {
             auto const path = it->at("path");
             auto const full_path = ui_path_to_full_path(path);
 
             Mod m = get_mod(path);
             ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())});
         }
-        catch (std::exception const& e) {
+        catch (std::exception const &e)
+        {
             fmt::print(stderr, "Failed adding apparently existing mod '{}', reason: {}\n", it->at("path"), e.what());
         }
     }
@@ -681,7 +701,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
     }
     else
     {
-        char const* steam_integration_message = "(Steam integration is disabled)";
+        char const *steam_integration_message = "(Steam integration is disabled)";
         if (steam_integration->is_initialized())
             steam_integration_message = "";
         auto const message = fmt::format("Following mods cannot be loaded {}:\n{}", steam_integration_message, mod_list);
@@ -690,7 +710,8 @@ void MainWindow::load_mods_from_html(std::string const &path)
     }
 }
 
-void MainWindow::propose_subscribing_to_mods(std::string const& mod_list_message, std::vector<std::uint64_t> const &workshop_mods)
+void MainWindow::propose_subscribing_to_mods(std::string const &mod_list_message,
+        std::vector<std::uint64_t> const &workshop_mods)
 {
     auto const message =
         fmt::format("Following mods cannot be loaded now:\n{}\nDo you want to subscribe to missing Steam mods now?",
@@ -785,15 +806,17 @@ void MainWindow::initialize_theme_combobox()
     }
 }
 
-std::string MainWindow::ui_path_to_full_path(std::string ui_path) const {
+std::string MainWindow::ui_path_to_full_path(std::string ui_path) const
+{
     return StringUtils::Replace(ui_path, "~arma", client->GetPath().string());
 }
 
-std::string MainWindow::full_path_to_ui_path(std::string ui_path) const {
+std::string MainWindow::full_path_to_ui_path(std::string ui_path) const
+{
     return StringUtils::Replace(ui_path, client->GetPath().string(), "~arma");
 }
 
-bool MainWindow::is_workshop_mod(std::string const& path_or_workshop_id)
+bool MainWindow::is_workshop_mod(std::string const &path_or_workshop_id)
 try
 {
     // if path exists, then is absolute and certainly is not workshop id
@@ -804,9 +827,10 @@ catch (...)
     return false;
 }
 
-Mod MainWindow::get_mod(std::string const& path_or_workshop_id)
+Mod MainWindow::get_mod(std::string const &path_or_workshop_id)
 {
-    if (is_workshop_mod(path_or_workshop_id)) {
+    if (is_workshop_mod(path_or_workshop_id))
+    {
         std::filesystem::path const workshop_mod_path = client->GetPathWorkshop() / path_or_workshop_id;
         return Mod(workshop_mod_path);
     }

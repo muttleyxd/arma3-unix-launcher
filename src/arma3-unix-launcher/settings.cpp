@@ -51,18 +51,20 @@ namespace
     }
 }
 
-nlohmann::json convert_old_mod_format_to_new_format(nlohmann::json const& mods) {
-    constexpr char const* name_placeholder = "mod_imported_from_old_preset";
+nlohmann::json convert_old_mod_format_to_new_format(nlohmann::json const &mods)
+{
+    constexpr char const *name_placeholder = "mod_imported_from_old_preset";
 
     nlohmann::json ret = nlohmann::json::array();
-    for (auto const& workshop_mod : mods.at("workshop"))
+    for (auto const &workshop_mod : mods.at("workshop"))
         ret.push_back({{"path", workshop_mod.at("id")}, {"name", name_placeholder}, {"enabled", true}});
-    for (auto const& custom_mod : mods.at("custom"))
+    for (auto const &custom_mod : mods.at("custom"))
         ret.push_back({{"path", custom_mod.at("path")}, {"name", name_placeholder}, {"enabled", custom_mod.at("enabled")}});
     return ret;
 }
 
-bool is_old_mod_format(nlohmann::json const& mods) {
+bool is_old_mod_format(nlohmann::json const &mods)
+{
     return !mods.is_array();
 }
 
