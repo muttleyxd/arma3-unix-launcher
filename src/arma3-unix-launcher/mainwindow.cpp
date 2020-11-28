@@ -53,8 +53,15 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 
     for (auto const &mod : manager.settings["mods"])
     {
-        auto const m = get_mod(mod["path"]);
-        ui->table_mods->add_mod({mod["enabled"], m.GetName(), full_path_to_ui_path(mod["path"]), m.IsWorkshopMod(client->GetPathWorkshop())});
+        try
+        {
+            auto const m = get_mod(mod["path"]);
+            ui->table_mods->add_mod({mod["enabled"], m.GetName(), full_path_to_ui_path(mod["path"]), m.IsWorkshopMod(client->GetPathWorkshop())});
+        }
+        catch (std::exception const &e)
+        {
+            fmt::print(stderr, "Error loading mod from config:\n---\n{}\n--- Reason: {}\n", mod.dump(2), e.what());
+        }
     }
     for (auto const &mod : client->GetWorkshopMods())
     {
@@ -107,10 +114,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_button_start_clicked()
 try
 {
-    ui->table_mods->add_mod({false, "XD", "XD", false});
-    ui->table_mods->add_mod({false, "XD", "XD", true});
-    return;
-
     for (auto const &executable_name : ARMA3::Definitions::executable_names)
         if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
             throw std::runtime_error("Arma is already running");
@@ -132,13 +135,12 @@ try
     }
 
     std::vector<std::filesystem::path> mods;
-    for (auto const &mod : get_mods(*ui->table_mods))
+    for (auto const &mod : ui->table_mods->get_mods())
     {
-        if (mod.enabled)
-        {
-            auto m = get_mod(ui_path_to_full_path(mod.path_or_workshop_id));
-            mods.push_back(m.path_);
-        }
+        if (!mod.enabled)
+            continue;
+        auto m = get_mod(ui_path_to_full_path(mod.path_or_workshop_id));
+        mods.push_back(m.path_);
     }
 
     if (parameters["dlcContact"])

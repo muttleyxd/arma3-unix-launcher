@@ -73,7 +73,6 @@ class MainWindow : public QMainWindow
         void load_mods_from_html(std::string const &path);
         void propose_subscribing_to_mods(std::string const &mod_list_message, std::vector<std::uint64_t> const &workshop_mods);
 
-        std::vector<UiMod> get_mods(QTableWidget const &table_widget);
         void put_mods_from_ui_to_manager_settings();
 
         void update_mod_selection_counters(int workshop_mod_count, int custom_mod_count);
