@@ -28,6 +28,7 @@ namespace
                                                             "dlcContact": false,
                                                             "dlcGlobalMobilization": false,
                                                             "enableHT": false,
+                                                            "environmentVariables": null,
                                                             "exThreads": -1,
                                                             "filePatching": false,
                                                             "host": false,
@@ -136,6 +137,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("noPause", ui->checkbox_no_pause);
     read_setting("hugepages", ui->checkbox_hugepages);
     read_setting("customParameters", ui->checkbox_custom_parameters, ui->textbox_custom_parameters);
+    read_setting("environmentVariables", ui->checkbox_environment_variables, ui->textbox_environment_variables);
 
     auto &parameters = settings["parameters"];
     try
@@ -213,6 +215,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("noPause", ui->checkbox_no_pause);
     write_setting("hugepages", ui->checkbox_hugepages);
     write_setting("customParameters", ui->checkbox_custom_parameters, ui->textbox_custom_parameters);
+    write_setting("environmentVariables", ui->checkbox_environment_variables, ui->textbox_environment_variables);
 
     parameters["cpuCount"] = -1;
     if (ui->checkbox_cpu_count->isChecked())
@@ -258,7 +261,7 @@ void Settings::read_setting(char const *const setting_name, QCheckBox *checkbox,
     {
         if (textbox != nullptr)
         {
-            if (parameters[setting_name].is_null())
+            if (parameters.at(setting_name).is_null())
             {
                 checkbox->setChecked(false);
                 textbox->setText("");

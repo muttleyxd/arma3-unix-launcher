@@ -29,7 +29,8 @@ std::string read_argument(std::string const &argument_name, argparse::ArgumentPa
 }
 
 void start_arma(std::filesystem::path const &preset_to_run, std::string const &arguments,
-                std::filesystem::path const &config_file, ARMA3::Client &client, bool disable_esync)
+                std::filesystem::path const &config_file, ARMA3::Client &client, std::string const &user_environment_variables,
+                bool disable_esync)
 {
     auto get_valid_path = [](std::vector<std::filesystem::path> const & paths)
     {
@@ -56,12 +57,11 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
 
     fmt::print("Starting Arma with preset {}\n", preset_to_run);
     client.CreateArmaCfg(enabled_mods);
-    client.Start(arguments, false, disable_esync);
+    client.Start(arguments, user_environment_variables, false, disable_esync);
 }
 
 int main(int argc, char *argv[])
 {
-    fmt::print(stderr, "first line\n");
     try
     {
         QApplication a(argc, argv);
@@ -183,7 +183,12 @@ int main(int argc, char *argv[])
             if (!password.empty())
                 arguments += fmt::format(" -password={}", password);
 
-            start_arma(preset_to_run, arguments, config_file, *client, manager.settings["parameters"]["protonDisableEsync"]);
+            std::string environment_variables = "";
+            if (!manager.settings["environmentVariables"].is_null())
+                environment_variables = manager.settings["environmentVariables"];
+
+            start_arma(preset_to_run, arguments, config_file, *client, environment_variables,
+                       manager.settings["parameters"]["protonDisableEsync"]);
             return 0;
         }
 

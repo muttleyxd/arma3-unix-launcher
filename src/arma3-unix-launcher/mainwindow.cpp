@@ -143,13 +143,18 @@ try
         mods.push_back(m.path_);
     }
 
+    std::string environment_variables = "";
+
     if (parameters["dlcContact"])
         mods.push_back(client->GetPath() / "Contact");
     if (parameters["dlcGlobalMobilization"])
         mods.push_back(client->GetPath() / "GM");
+    if (!parameters["environmentVariables"].is_null())
+        environment_variables = parameters["environmentVariables"];
 
     client->CreateArmaCfg(mods);
-    client->Start(manager.get_launch_parameters(), steam_integration->is_initialized(), parameters["protonDisableEsync"]);
+    client->Start(manager.get_launch_parameters(), environment_variables, steam_integration->is_initialized(),
+                  parameters["protonDisableEsync"]);
 }
 catch (std::exception const &e)
 {
@@ -431,6 +436,11 @@ void MainWindow::on_checkbox_server_password_stateChanged(int arg1)
 void MainWindow::on_checkbox_profile_stateChanged(int arg1)
 {
     ui->textbox_profile->setEnabled(arg1 == Qt::CheckState::Checked);
+}
+
+void MainWindow::on_checkbox_environment_variables_stateChanged(int arg1)
+{
+    ui->textbox_environment_variables->setEnabled(arg1 == Qt::CheckState::Checked);
 }
 
 void MainWindow::on_button_parameter_file_open_clicked()

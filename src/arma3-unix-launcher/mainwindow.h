@@ -29,6 +29,11 @@ class MainWindow : public QMainWindow
         void on_button_start_clicked();
         void on_button_add_custom_mod_clicked();
         void on_button_remove_custom_mod_clicked();
+        void on_button_parameter_file_open_clicked();
+        void on_button_mod_preset_open_clicked();
+        void on_button_mod_preset_save_clicked();
+        void on_button_quit_clicked();
+        void on_button_export_workshop_to_txt_clicked();
 
         void on_checkbox_extra_threads_stateChanged(int arg1);
         void on_checkbox_cpu_count_stateChanged(int arg1);
@@ -38,24 +43,13 @@ class MainWindow : public QMainWindow
         void on_checkbox_server_address_stateChanged(int arg1);
         void on_checkbox_server_port_stateChanged(int arg1);
         void on_checkbox_server_password_stateChanged(int arg1);
+        void on_checkbox_profile_stateChanged(int arg1);
+        void on_checkbox_environment_variables_stateChanged(int arg1);
 
         void check_if_arma_is_running();
         void check_steam_api();
 
-        void on_checkbox_profile_stateChanged(int arg1);
-
-        void on_button_parameter_file_open_clicked();
-
-        void on_button_mod_preset_open_clicked();
-
-        void on_button_mod_preset_save_clicked();
-
-        void on_button_quit_clicked();
-
-        void on_button_export_workshop_to_txt_clicked();
-
         void on_combobox_theme_currentTextChanged(QString const &theme);
-
     private:
         Ui::MainWindow *ui;
         QTimer arma_status_checker;

@@ -56,11 +56,12 @@ namespace
     }
 
     void direct_launch(std::filesystem::path const &arma_path, std::filesystem::path const &executable_path,
-                       string const &arguments, bool is_proton, bool disable_esync)
+                       string const &arguments, bool is_proton, string const &user_environment_variables, bool disable_esync)
     {
         if (!is_proton)
         {
-            StdUtils::StartBackgroundProcess(fmt::format("{} {}", executable_path, arguments), arma_path.string());
+            StdUtils::StartBackgroundProcess(fmt::format("env {} {} {}", user_environment_variables, executable_path, arguments),
+                                             arma_path.string());
             return;
         }
 
@@ -79,7 +80,7 @@ namespace
 
             auto const environment = fmt::format(R"env({} SteamGameId={} LD_PRELOAD={} STEAM_COMPAT_DATA_PATH="{}")env",
                                                  get_esync_prefix(disable_esync), arma3_id, ld_preload_path, steam_compat_data_path.string());
-            auto const command = fmt::format(R"command(env {} {} {} {} "{}" {})command", environment,
+            auto const command = fmt::format(R"command(env {} {} {} {} {} "{}" {})command", environment, user_environment_variables,
                                              optional_steam_runtime(steam_utils), compatibility_tool.first,
                                              get_verb(compatibility_tool.second), executable_path.string(), arguments);
             fmt::print("Running Arma:\n{}\n", command);
@@ -91,33 +92,37 @@ namespace
         }
     }
 
-    void indirect_flatpak_launch(string const &arguments, bool is_proton, bool disable_esync)
+    void indirect_flatpak_launch(string const &arguments, bool is_proton, string const &user_environment_variables,
+                                 bool disable_esync)
     {
         if (is_proton)
             StdUtils::StartBackgroundProcess(
-                fmt::format("flatpak run --env=\"{}\" com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
-                            get_esync_prefix(disable_esync), arguments));
+                fmt::format("flatpak run --env=\"{} {}\" com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
+                            get_esync_prefix(disable_esync), user_environment_variables, arguments));
         else
             StdUtils::StartBackgroundProcess(fmt::format("flatpak run com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
                                              arguments));
     }
 
-    void indirect_launch(string const &arguments, bool is_proton, bool disable_esync)
+    void indirect_launch(string const &arguments, bool is_proton, string const &user_environment_variables,
+                         bool disable_esync)
     {
         if (is_proton)
-            StdUtils::StartBackgroundProcess(fmt::format("env {} steam -applaunch 107410 -nolauncher {}",
-                                             get_esync_prefix(disable_esync), arguments));
+            StdUtils::StartBackgroundProcess(fmt::format("env {} {} steam -applaunch 107410 -nolauncher {}",
+                                             get_esync_prefix(disable_esync), user_environment_variables, arguments));
         else
-            StdUtils::StartBackgroundProcess(fmt::format("steam -applaunch 107410 {}", arguments));
+            StdUtils::StartBackgroundProcess(fmt::format("env {} steam -applaunch 107410 {}", user_environment_variables,
+                                             arguments));
     }
 
-    void indirect_launch_through_steam(string const &arguments, bool is_proton, bool disable_esync, bool is_flatpak)
+    void indirect_launch_through_steam(string const &arguments, bool is_proton, string const &user_environment_variables,
+                                       bool disable_esync, bool is_flatpak)
     {
         std::string steam_executable = "steam";
         if (is_flatpak)
-            indirect_flatpak_launch(arguments, is_proton, disable_esync);
+            indirect_flatpak_launch(arguments, is_proton, user_environment_variables, disable_esync);
         else
-            indirect_launch(arguments, is_proton, disable_esync);
+            indirect_launch(arguments, is_proton, user_environment_variables, disable_esync);
     }
 }
 #endif
@@ -172,13 +177,13 @@ namespace ARMA3
         return path_executable_.filename() == "arma3_x64.exe";
     }
 
-    void Client::Start(string const &arguments, bool launch_directly, bool disable_esync)
+    void Client::Start(string const &arguments, string const& user_environment_variables, bool launch_directly, bool disable_esync)
     {
         #ifdef __linux
         if (launch_directly)
-            direct_launch(GetPath(), GetPathExecutable(), arguments, IsProton(), disable_esync);
+            direct_launch(GetPath(), GetPathExecutable(), arguments, IsProton(), user_environment_variables, disable_esync);
         else
-            indirect_launch_through_steam(arguments, IsProton(), disable_esync, IsFlatpak());
+            indirect_launch_through_steam(arguments, IsProton(), user_environment_variables, disable_esync, IsFlatpak());
         #else
         (void)disable_esync; // esync does not apply on Mac OS X
         if (launch_directly)
@@ -190,7 +195,7 @@ namespace ARMA3
                 if (char const *old_ld_preload = getenv("DYLD_INSERT_LIBRARIES"); old_ld_preload)
                     ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
                 auto const environment = fmt::format(R"env(DYLD_INSERT_LIBRARIES="{}")env", ld_preload_path);
-                auto const command = fmt::format(R"command(env {} "{}/Contents/MacOS/ArmA3" {})command", environment, GetPathExecutable().string(), arguments);
+                auto const command = fmt::format(R"command(env {} {} "{}/Contents/MacOS/ArmA3" {})command", environment, user_environment_variables, GetPathExecutable().string(), arguments);
                 fmt::print("Running Arma:\n{}\n", command);
                 StdUtils::StartBackgroundProcess(command, GetPath().string());
             }
@@ -201,7 +206,7 @@ namespace ARMA3
         }
         else
         {
-            std::string launch_command = "open steam://run/107410//" + StringUtils::Replace(arguments, " ", "%20");
+            std::string launch_command = fmt::format("env {} open steam://run/107410//" + StringUtils::Replace(arguments, " ", "%20"), user_environment_variables);
             StdUtils::StartBackgroundProcess(launch_command);
         }
         #endif
