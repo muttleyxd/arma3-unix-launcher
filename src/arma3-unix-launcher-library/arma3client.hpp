@@ -40,7 +40,8 @@ namespace ARMA3
 
             void CreateArmaCfg(std::vector<std::filesystem::path> const &mod_paths, std::filesystem::path cfg_path = "");
             bool IsProton();
-            void Start(std::string const &arguments, bool launch_directly = false, bool disable_esync = false);
+            void Start(std::string const &arguments, std::string const &user_environment_variables, bool launch_directly = false,
+                       bool disable_esync = false);
 
             std::vector<Mod> GetHomeMods();
             std::vector<Mod> GetWorkshopMods();

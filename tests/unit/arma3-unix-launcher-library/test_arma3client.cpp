@@ -344,25 +344,40 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
         WHEN("Arma path contains ARMA 3 Linux executable")
         {
             std::string const executable_path = arma_path / linux_executable_name;
-            std::string const launch_command = fmt::format("\"{}\" {}", executable_path, arguments);
 
             REQUIRE_CALL(filesystemUtilsMock, Exists(executable_path)).RETURN(true);
             ARMA3::Client a3c(arma_path, workshop_path);
 
-            REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
-
-            WHEN("esync is disabled")
+            WHEN("User environment variables are not specified")
             {
-                THEN("Arma is started with passed arguments")
+                std::string const launch_command = fmt::format("env  \"{}\" {}", executable_path, arguments);
+                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
+
+                WHEN("esync is disabled")
                 {
-                    a3c.Start(arguments, true, false);
+                    THEN("Arma is started with passed arguments")
+                    {
+                        a3c.Start(arguments, "", true, false);
+                    }
+                }
+                WHEN("esync is enabled")
+                {
+                    THEN("Arma is started with passed arguments, disable_esync parameter is discarded, since not using Proton")
+                    {
+                        a3c.Start(arguments, "", true, true);
+                    }
                 }
             }
-            WHEN("esync is enabled")
+
+            WHEN("User environment variables are specified")
             {
-                THEN("Arma is started with passed arguments, disable_esync parameter is discarded, since not using Proton")
+                std::string const user_environment_variables = "SOME_NICE_ENV_VAR=1";
+                std::string const launch_command = fmt::format("env {} \"{}\" {}", user_environment_variables, executable_path, arguments);
+                REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
+
+                THEN("Arma is started with passed arguments")
                 {
-                    a3c.Start(arguments, true, true);
+                    a3c.Start(arguments, user_environment_variables, true, false);
                 }
             }
         }
@@ -392,10 +407,10 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
             {
                 THEN("Arma is started with passed arguments")
                 {
-                    constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"  "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+                    constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
-                    a3c.Start(arguments, true, false);
+                    a3c.Start(arguments, "", true, false);
                 }
             }
 
@@ -403,10 +418,10 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
             {
                 THEN("Arma is started with passed arguments and PROTON_NO_ESYNC environment variable set to 1")
                 {
-                    constexpr char const* launch_command = R"command(env PROTON_NO_ESYNC=1 SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"  "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+                    constexpr char const* launch_command = R"command(env PROTON_NO_ESYNC=1 SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
-                    a3c.Start(arguments, true, true);
+                    a3c.Start(arguments, "", true, true);
                 }
             }
         }
@@ -431,20 +446,20 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_IndirectLaunchThroughSteam")
             {
                 THEN("Arma is started with passed arguments")
                 {
-                    std::string const launch_command = fmt::format("{} {}", steam_command, arguments);
+                    std::string const launch_command = fmt::format("env  {} {}", steam_command, arguments);
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
-                    a3c.Start(arguments, false, false);
+                    a3c.Start(arguments, "", false, false);
                 }
             }
             WHEN("esync is enabled")
             {
                 THEN("Arma is started with passed arguments, disable_esync parameter is discarded, since not using Proton")
                 {
-                    std::string const launch_command = fmt::format("{} {}", steam_command, arguments);
+                    std::string const launch_command = fmt::format("env  {} {}", steam_command, arguments);
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
-                    a3c.Start(arguments, false, true);
+                    a3c.Start(arguments, "", false, true);
                 }
             }
         }
@@ -457,20 +472,20 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_IndirectLaunchThroughSteam")
             {
                 THEN("Arma is started with passed arguments preceded by -nolauncher option")
                 {
-                    std::string const launch_command = fmt::format("env  {} -nolauncher {}", steam_command, arguments);
+                    std::string const launch_command = fmt::format("env   {} -nolauncher {}", steam_command, arguments);
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
-                    a3c.Start(arguments, false, false);
+                    a3c.Start(arguments, "", false, false);
                 }
             }
             WHEN("esync is enabled")
             {
                 THEN("Arma is started with passed arguments preceded by -nolauncher option and PROTON_NO_ESYNC environment variable set to 1")
                 {
-                    std::string const launch_command = fmt::format("env PROTON_NO_ESYNC=1 {} -nolauncher {}", steam_command, arguments);
+                    std::string const launch_command = fmt::format("env PROTON_NO_ESYNC=1  {} -nolauncher {}", steam_command, arguments);
 
                     REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
-                    a3c.Start(arguments, false, true);
+                    a3c.Start(arguments, "", false, true);
                 }
             }
         }
@@ -491,9 +506,9 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Mac_OS_X")
         ARMA3::Client a3c(arma_path, workshop_path);
         THEN("Arma is started with passed arguments")
         {
-            std::string const launch_command = fmt::format("{}{}", steam_command, arguments_whitespaces_replaced);
+            std::string const launch_command = fmt::format("env  {}{}", steam_command, arguments_whitespaces_replaced);
             REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, ANY(std::string_view)));
-            a3c.Start(arguments);
+            a3c.Start(arguments, "");
         }
     }
 }
