@@ -22,7 +22,7 @@ jobs:
     - name: make build directory
       run: mkdir build && cd build
     - name: cmake
-      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-10 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/usr/local/opt/qt' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libgcc" -DCMAKE_CXX_COMPILER=g++-10 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DSTEAMWORKS_SDK_PATH=/tmp/steamworks -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12
     - name: build
       run: cd build && make -j$(sysctl -n hw.ncpu)
     - name: run tests
