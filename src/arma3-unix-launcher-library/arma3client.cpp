@@ -73,7 +73,7 @@ namespace
 
             auto ld_preload_path = fmt::format("{}/ubuntu12_64/gameoverlayrenderer.so", steam_utils.GetSteamPath().string());
             if (char const *old_ld_preload = getenv("LD_PRELOAD"); old_ld_preload)
-                ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
+                ld_preload_path = fmt::format("{}:{}", ld_preload_path, old_ld_preload);
 
             auto const steam_compat_data_path = steam_utils.GetInstallPathFromGamePath(arma_path) / "steamapps/compatdata" /
                                                 ARMA3::Definitions::app_id;

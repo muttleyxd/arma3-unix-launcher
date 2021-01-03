@@ -401,21 +401,44 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "Start_Linux_DirectLaunch")
 
             REQUIRE_CALL(stdUtilsMock, IsLibraryAvailable(_)).RETURN(true);
 
-            TODO_BEFORE(01, 2021, "Verify LD_PRELOAD preservation");
-
             WHEN("esync is disabled")
             {
-                THEN("Arma is started with passed arguments")
-                {
-                    constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+                auto const ld_preload = getenv("LD_PRELOAD");
+                std::string const old_ld_preload = ld_preload ? ld_preload : "";
 
-                    REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
-                    a3c.Start(arguments, "", true, false);
+                WHEN("LD_PRELOAD is not set")
+                {
+                    unsetenv("LD_PRELOAD");
+                    THEN("Arma is started with passed arguments")
+                    {
+                        constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+
+                        REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
+                        a3c.Start(arguments, "", true, false);
+                    }
                 }
+
+                WHEN("LD_PRELOAD is set")
+                {
+                    setenv("LD_PRELOAD", "somelib.so", true);
+                    THEN("Arma is started with passed arguments and LD_PRELOAD value is preserved, along with gameoverlayrenderer.so")
+                    {
+                        constexpr char const* launch_command = R"command(env  SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so:somelib.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
+
+                        REQUIRE_CALL(stdUtilsMock, StartBackgroundProcess(launch_command, working_directory));
+                        a3c.Start(arguments, "", true, false);
+                    }
+                }
+
+                if (old_ld_preload.empty())
+                    unsetenv("LD_PRELOAD");
+                else
+                    setenv("LD_PRELOAD", old_ld_preload.c_str(), true);
             }
 
             WHEN("esync is enabled")
             {
+                // LD_PRELOAD preservation applies here, but no need to repeat the code
                 THEN("Arma is started with passed arguments and PROTON_NO_ESYNC environment variable set to 1")
                 {
                     constexpr char const* launch_command = R"command(env PROTON_NO_ESYNC=1 SteamGameId=107410 LD_PRELOAD=/steam_path/ubuntu12_64/gameoverlayrenderer.so STEAM_COMPAT_DATA_PATH="/steam_path/steamapps/compatdata/107410"   "/proton_dir/proton" run "/arma_path/arma3_x64.exe" some random arguments)command";
