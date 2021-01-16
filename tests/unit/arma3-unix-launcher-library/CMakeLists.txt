@@ -36,6 +36,18 @@ create_unit_test(TEST_GROUP library
                  LINK_LIBS  fmt::fmt-header-only
                  )
 
+ create_unit_test(TEST_GROUP library
+                  TEST_NAME  html_preset_export
+                  SOURCES    test_html_preset_export.cpp
+                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/html_preset_export.cpp
+                             ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/html_preset_export.hpp
+
+                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
+                             ${CMAKE_SOURCE_DIR}/src/common
+                  LINK_LIBS  fmt::fmt-header-only
+                  )
+
 create_unit_test(TEST_GROUP library
                  TEST_NAME  mod
                  SOURCES    test_mod.cpp

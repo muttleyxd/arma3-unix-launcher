@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMainWindow>
+#include <QMenu>
 #include <QTableWidgetItem>
 #include <QTimer>
 
@@ -50,8 +51,13 @@ class MainWindow : public QMainWindow
         void check_steam_api();
 
         void on_combobox_theme_currentTextChanged(QString const &theme);
+
+        void on_action_mods_save_json_triggered();
+        void on_action_mods_save_html_triggered();
+
     private:
         Ui::MainWindow *ui;
+        QMenu menu_button_save;
         QTimer arma_status_checker;
         QTimer steam_api_checker;
 

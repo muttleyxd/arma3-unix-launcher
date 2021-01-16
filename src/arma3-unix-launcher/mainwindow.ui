@@ -638,6 +638,19 @@
     <string>Disable all mods</string>
    </property>
   </action>
+  <action name="action_mods_save_json">
+   <property name="text">
+    <string>Save JSON preset</string>
+   </property>
+  </action>
+  <action name="action_mods_save_html">
+   <property name="text">
+    <string>Save HTML preset</string>
+   </property>
+   <property name="toolTip">
+    <string>Save HTML preset</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

@@ -21,9 +21,10 @@
 #include <fmt/ostream.h>
 
 #include "filesystem_utils.hpp"
+#include "html_preset_export.hpp"
 #include "string_utils.hpp"
-#include "ui_mod.hpp"
 #include "std_utils.hpp"
+#include "ui_mod.hpp"
 
 #include "exceptions/preset_loading_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
@@ -99,6 +100,10 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     ui->table_mods->setContextMenuPolicy(Qt::ContextMenuPolicy::ActionsContextMenu);
     connect(ui->action_mods_disable_all, &QAction::triggered, this,
             &MainWindow::on_mods_disable_all_mods);
+
+    menu_button_save.addAction(ui->action_mods_save_html);
+    menu_button_save.addAction(ui->action_mods_save_json);
+    ui->button_mod_preset_save->setMenu(&menu_button_save);
 }
 
 MainWindow::~MainWindow()
@@ -659,7 +664,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
             auto const full_path = ui_path_to_full_path(path);
 
             Mod m = get_mod(path);
-            ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())});
+            ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())}, 0);
         }
         catch (std::exception const &e)
         {
@@ -743,9 +748,21 @@ void MainWindow::propose_subscribing_to_mods(std::string const &mod_list_message
 void MainWindow::on_button_mod_preset_save_clicked()
 try
 {
-    auto config_dir = QString::fromStdString(config_file.parent_path().string());
-    auto filename = QFileDialog::getSaveFileName(this, tr("Save mod preset"), config_dir,
-                    tr("A3UL mod list | *.a3ulml (*.a3ulml)"));
+
+}
+catch (std::exception const &e)
+{
+    auto error_message = fmt::format("{}.", e.what());
+    QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
+    return;
+}
+
+void MainWindow::on_action_mods_save_json_triggered()
+try
+{
+    auto const config_dir = QString::fromStdString(config_file.parent_path().string());
+    auto const filename = QFileDialog::getSaveFileName(this, tr("Save mod preset"), config_dir,
+                          tr("A3UL mod list | *.a3ulml (*.a3ulml)"));
     if (filename.isEmpty())
         return;
     auto filename_str = filename.toStdString();
@@ -756,6 +773,45 @@ try
     nlohmann::json json;
     json["mods"] = manager.settings["mods"];
     StdUtils::FileWriteAllText(filename_str, json.dump(4));
+}
+catch (std::exception const &e)
+{
+    auto error_message = fmt::format("{}.", e.what());
+    QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
+    return;
+}
+
+void MainWindow::on_action_mods_save_html_triggered()
+try
+{
+    auto const config_dir = QString::fromStdString(config_file.parent_path().string());
+    auto const filename = QFileDialog::getSaveFileName(this, tr("Save mod preset"), config_dir,
+                          tr("HTML mod list | *.html (*.html)"));
+    if (filename.isEmpty())
+        return;
+    auto filename_str = filename.toStdString();
+    if (!StringUtils::EndsWith(filename_str, ".html"))
+        filename_str += ".html";
+
+    put_mods_from_ui_to_manager_settings();
+
+    std::vector<Mod> mods;
+    auto const workshop_path = client->GetPathWorkshop();
+
+    for (auto const &ui_mod : ui->table_mods->get_mods())
+    {
+        if (!ui_mod.enabled)
+            continue;
+
+        if (ui_mod.is_workshop_mod)
+            mods.push_back(Mod(workshop_path / ui_mod.path_or_workshop_id));
+        else
+            mods.push_back(Mod(ui_path_to_full_path(ui_mod.path_or_workshop_id)));
+    }
+
+    std::filesystem::path const filename_as_path = filename_str;
+    auto const preset = ARMA3::HtmlPresetExport::export_mods(filename_as_path.stem().string(), mods, workshop_path);
+    StdUtils::FileWriteAllText(filename_as_path, preset);
 }
 catch (std::exception const &e)
 {
