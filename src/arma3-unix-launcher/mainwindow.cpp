@@ -659,7 +659,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
             auto const full_path = ui_path_to_full_path(path);
 
             Mod m = get_mod(path);
-            ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())});
+            ui->table_mods->add_mod({true, m.GetName(), full_path, m.IsWorkshopMod(client->GetPathWorkshop())}, 0);
         }
         catch (std::exception const &e)
         {
