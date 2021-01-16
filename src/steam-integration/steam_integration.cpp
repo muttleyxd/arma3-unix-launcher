@@ -136,7 +136,7 @@ namespace Steam
         callback_catcher = std::make_unique<CallbackCatcher>();
         callback_catcher->workshop_name_callback = [&](auto const & info)
         {
-            std::unique_lock lock(title_cache_access);
+            std::scoped_lock lock(title_cache_access);
             title_cache[info.first] = info.second;
         };
     }
@@ -182,10 +182,12 @@ namespace Steam
         if (!is_initialized())
             throw SteamApiNotInitializedException();
 
-        std::unique_lock lock(title_cache_access);
+        {
+            std::scoped_lock lock(title_cache_access);
 
-        if (StdUtils::ContainsKey(title_cache, id))
-            return title_cache[id];
+            if (StdUtils::ContainsKey(title_cache, id))
+                return title_cache[id];
+        }
 
         uint64 internal_id = id;
         auto const handle = SteamUGC()->CreateQueryUGCDetailsRequest(&internal_id, 1);
