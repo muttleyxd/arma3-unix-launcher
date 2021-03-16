@@ -6,7 +6,7 @@
 class SteamApiFailedException : public std::exception
 {
     public:
-        explicit SteamApiFailedException(std::string const &path);
+        explicit SteamApiFailedException(std::string const &error);
 
         char const *what() const noexcept override;
 
