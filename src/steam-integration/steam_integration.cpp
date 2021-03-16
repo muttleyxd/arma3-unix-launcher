@@ -108,7 +108,10 @@ void CallbackCatcher::OnQueryCompleted(SteamUGCQueryCompleted_t *info, bool fail
 {
     auto steam_ugc = SteamUGC();
 
-    if (workshop_name_callback && !failure && info && info->m_eResult == EResult::k_EResultOK)
+    if (!info)
+        return;
+
+    if (workshop_name_callback && !failure && info->m_eResult == EResult::k_EResultOK)
     {
         for (size_t i = 0; i < info->m_unNumResultsReturned; ++i)
         {
@@ -118,7 +121,8 @@ void CallbackCatcher::OnQueryCompleted(SteamUGCQueryCompleted_t *info, bool fail
         }
     }
 
-    steam_ugc->ReleaseQueryUGCRequest(info->m_handle);
+    if (info->m_handle)
+        steam_ugc->ReleaseQueryUGCRequest(info->m_handle);
 }
 
 
