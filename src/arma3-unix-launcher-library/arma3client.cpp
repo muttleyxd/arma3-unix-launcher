@@ -261,6 +261,7 @@ namespace ARMA3
         path final_path = StringUtils::ToWindowsPath(mod_path_absolute, GetFakeDriveLetter());
         path dir = trim(mod_path_absolute.filename().string(), "\"");
         auto name = mod.GetValueOrReturnDefault(dir, "name", "dir", "tooltip", "name_read_failed");
+        name = StringUtils::Replace(name, "\"", "_");
 
         return fmt::format(mod_template, mod_index, dir.string(), name, final_path.string());
     }
