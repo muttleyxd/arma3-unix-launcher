@@ -154,7 +154,7 @@ try
         mods.push_back(client->GetPath() / "Contact");
     if (parameters["dlcGlobalMobilization"])
         mods.push_back(client->GetPath() / "GM");
-    if(parameters["dlcSogPrairieFire"])
+    if (parameters["dlcSogPrairieFire"])
         mods.push_back(client->GetPath() / "vn");
     if (!parameters["environmentVariables"].is_null())
         environment_variables = parameters["environmentVariables"];
