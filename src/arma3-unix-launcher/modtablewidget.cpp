@@ -1,4 +1,5 @@
 #include "modtablewidget.h"
+#include "tablewidgetcheckboxitem.h"
 
 #include <algorithm>
 #include <set>
@@ -19,6 +20,8 @@ namespace
         w.viewport()->setAcceptDrops(true);
         w.setDragDropOverwriteMode(false);
         w.setDropIndicatorShown(true);
+
+        w.setSortingEnabled(true);
 
         w.setSelectionMode(QAbstractItemView::ExtendedSelection);
         w.setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -146,11 +149,21 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
         checkbox->setCheckState(Qt::Unchecked);
 
     setCellWidget(index, 0, checkbox_widget);
+
+    //kinda hacky, but least code changes... (this is a hidden item)
+    auto checkbox_sort = new TableWidgetCheckboxItem(mod.enabled);
+    setItem(index, 0, checkbox_sort);
+
     setItem(index, 1, new QTableWidgetItem(mod.name.c_str()));
     setItem(index, 2, new QTableWidgetItem(mod.path_or_workshop_id.c_str()));
     setItem(index, 3, new QTableWidgetItem(mod.is_workshop_mod_to_string()));
 
     QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::update_mod_selection_counters);
+
+    //kinda hacky again, but QTableWidgetItem isn't a QObject, so we cannot connect to it
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, [=](int c){
+        checkbox_sort->setModEnabled(c);
+    });
 
     for (int i = 1; i < columnCount(); ++i)
     {
