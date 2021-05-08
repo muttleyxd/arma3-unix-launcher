@@ -243,6 +243,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_sog_prairie_fire">
+                  <property name="text">
+                   <string>Enable S.O.G. Prairie Fire DLC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="checkbox_disable_esync">
                   <property name="text">
                    <string>Proton: Disable esync</string>
