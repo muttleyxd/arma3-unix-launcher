@@ -250,6 +250,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_csla">
+                  <property name="text">
+                   <string>Enable CSLA Iron Curtain DLC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="checkbox_disable_esync">
                   <property name="text">
                    <string>Proton: Disable esync</string>

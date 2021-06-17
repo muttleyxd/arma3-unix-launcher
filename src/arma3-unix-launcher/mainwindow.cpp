@@ -156,6 +156,8 @@ try
         mods.push_back(client->GetPath() / "GM");
     if (parameters["dlcSogPrairieFire"])
         mods.push_back(client->GetPath() / "vn");
+    if (parameters["dlcCSLA"])
+        mods.push_back(client->GetPath() / "CSLA");
     if (!parameters["environmentVariables"].is_null())
         environment_variables = parameters["environmentVariables"];
 
