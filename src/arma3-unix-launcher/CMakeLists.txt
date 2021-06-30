@@ -17,6 +17,7 @@ target_link_libraries(arma3-unix-launcher PRIVATE
     fmt::fmt-header-only
     nlohmann::json
     pugixml::pugixml
+    rihab::scope_guard
     Qt5::Widgets
     Qt5::Svg
     )

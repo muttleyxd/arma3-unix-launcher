@@ -19,6 +19,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <scope_guard.hpp>
 
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
@@ -484,6 +485,10 @@ try
     if (filename.isEmpty())
         return;
 
+    ui->table_mods->setSortingEnabled(false); // todo: investigate why loading mods when sorting is enabled causes a crash
+    auto guard = sg::make_scope_guard([&]() {
+        ui->table_mods->setSortingEnabled(true);
+    });
     ui->table_mods->disable_all_mods();
 
     bool loaded = false;
