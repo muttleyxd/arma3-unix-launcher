@@ -36,6 +36,9 @@ Requirements:
 #### Arch based (Arch Linux, Manjaro)
     pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg
 
+#### Fedora
+    dnf install gcc gcc-c++ cmake qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel
+
 #### Mac OS X
     brew install gcc cmake qt
 
