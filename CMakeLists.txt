@@ -23,6 +23,7 @@ setup_argparse()
 setup_fmt()
 setup_pugixml()
 setup_nlohmann_json()
+setup_scope_guard()
 include(external/steamworks-sdk.cmake)
 
 add_subdirectory(src)

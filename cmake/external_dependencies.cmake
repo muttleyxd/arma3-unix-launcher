@@ -129,6 +129,10 @@ function(setup_pugixml)
     add_library(pugixml::pugixml ALIAS pugixml)
 endfunction()
 
+function(setup_scope_guard)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/external/scope_guard)
+endfunction()
+
 function(setup_trompeloeil)
     set(CHECK_SOURCE "#if __has_include(<doctest/trompeloeil.hpp>)
                       #else
