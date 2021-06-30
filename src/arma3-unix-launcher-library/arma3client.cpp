@@ -118,7 +118,6 @@ namespace
     void indirect_launch_through_steam(string const &arguments, bool is_proton, string const &user_environment_variables,
                                        bool disable_esync, bool is_flatpak)
     {
-        std::string steam_executable = "steam";
         if (is_flatpak)
             indirect_flatpak_launch(arguments, is_proton, user_environment_variables, disable_esync);
         else
