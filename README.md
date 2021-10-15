@@ -52,7 +52,7 @@ Requirements:
 
 After that you can launch with
 
-    ./src/arma3-unix-launcher
+    ./src/arma3-unix-launcher/arma3-unix-launcher
 
 ### Launch parameters
 
