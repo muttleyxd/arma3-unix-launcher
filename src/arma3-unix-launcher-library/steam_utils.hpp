@@ -25,6 +25,7 @@ class SteamUtils
 
         std::filesystem::path steam_path_;
         std::filesystem::path config_path_ = "config/config.vdf";
+        std::filesystem::path library_folders_path_ = "config/libraryfolders.vdf";
 
         std::filesystem::path get_user_compatibility_tool(const std::string &shortname) const;
 };

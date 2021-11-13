@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
@@ -33,6 +34,7 @@ SteamUtils::SteamUtils(std::vector<path> const &search_paths)
             break;
         }
     }
+    spdlog::info("Steam path: {}", steam_path_.string());
     if (steam_path_.empty())
         throw SteamInstallNotFoundException();
 }
@@ -48,10 +50,13 @@ std::vector<path> SteamUtils::GetInstallPaths() const
     ret.emplace_back(steam_path_);
 
     VDF vdf;
-    vdf.LoadFromText(StdUtils::FileReadAllText(steam_path_ / config_path_));
+    vdf.LoadFromText(StdUtils::FileReadAllText(steam_path_ / library_folders_path_));
 
-    for (auto const &key : vdf.GetValuesWithFilter("BaseInstallFolder"))
+    for (auto const &key : vdf.GetValuesWithFilter("path"))
+    {
+        spdlog::info("Install path: {}", key);
         ret.emplace_back(key);
+    }
 
     return ret;
 }
@@ -76,11 +81,13 @@ path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &ap
 
 std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id) const
 {
-    auto const config_vdf_path = steam_path_ / "config/config.vdf";
+    auto const config_vdf_path = steam_path_ / config_path_;
     auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
+    spdlog::trace("{}:{}", __FUNCTION__, __LINE__);
 
     VDF config_vdf;
     config_vdf.LoadFromText(StdUtils::FileReadAllText(config_vdf_path));
+    spdlog::trace("key to find '{}'", key);
     if (!StdUtils::ContainsKey(config_vdf.KeyValue, key))
         throw std::runtime_error("compatibility tool entry not found");
 
@@ -110,6 +117,15 @@ std::filesystem::path SteamUtils::GetInstallPathFromGamePath(std::filesystem::pa
 
 std::filesystem::path SteamUtils::get_compatibility_tool_path(std::string const &shortname) const
 {
+    try
+    {
+        return get_user_compatibility_tool(shortname);
+    }
+    catch (std::exception const &e)
+    {
+        spdlog::debug("failed to find user compatibility tool '{}'", shortname);
+    }
+
     auto const log_file_path = steam_path_ / "logs/compat_log.txt";
     auto const log_content = StdUtils::FileReadAllText(log_file_path);
 
@@ -124,18 +140,23 @@ std::filesystem::path SteamUtils::get_compatibility_tool_path(std::string const 
     auto const app_id_end = log_content.find_first_of("\r\n[", app_id_start);
     auto const app_id_str = log_content.substr(app_id_start, app_id_end - app_id_start);
 
-    if (app_id_str == "0") // custom compatibility tool installed in ~Steam/compatibilitytools.d/
-        return get_user_compatibility_tool(shortname);
-    else // compatibility tool provided by Steam
-        return get_builtin_compatibility_tool(shortname, app_id_str);
+    return get_builtin_compatibility_tool(shortname, app_id_str);
 }
 
 std::filesystem::path SteamUtils::get_user_compatibility_tool(std::string const &shortname) const
 {
-    auto compatibility_tool_path = GetSteamPath() / "compatibilitytools.d" / shortname;
-    if (!fs::Exists(compatibility_tool_path))
-        throw DirectoryNotFoundException(compatibility_tool_path);
-    return compatibility_tool_path;
+    spdlog::trace("{}:{} shortname: {}", __PRETTY_FUNCTION__, __LINE__, shortname);
+    auto compatibility_tool_path_steam = GetSteamPath() / "compatibilitytools.d" / shortname;
+    spdlog::trace("trying '{}'", compatibility_tool_path_steam.string());
+    if (fs::Exists(compatibility_tool_path_steam))
+        return compatibility_tool_path_steam;
+
+    auto compatibility_tool_path_system = std::filesystem::path("/usr/share/steam/compatibilitytools.d") / shortname;
+    spdlog::trace("trying '{}'", compatibility_tool_path_system.string());
+    if (fs::Exists(compatibility_tool_path_system))
+        return compatibility_tool_path_system;
+
+    throw DirectoryNotFoundException(compatibility_tool_path_steam);
 }
 
 std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string const &shortname,
