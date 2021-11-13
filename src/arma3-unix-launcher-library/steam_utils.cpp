@@ -82,16 +82,20 @@ path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &ap
 std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolForAppId(std::uint64_t const app_id) const
 {
     auto const config_vdf_path = steam_path_ / config_path_;
-    auto const key = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", app_id);
+    auto const filter = fmt::format("CompatToolMapping/{}/name", app_id);
     spdlog::trace("{}:{}", __FUNCTION__, __LINE__);
 
     VDF config_vdf;
     config_vdf.LoadFromText(StdUtils::FileReadAllText(config_vdf_path));
-    spdlog::trace("key to find '{}'", key);
-    if (!StdUtils::ContainsKey(config_vdf.KeyValue, key))
+    spdlog::trace("filtering by '{}'", filter);
+    auto const values = config_vdf.GetValuesWithFilter(filter);
+    for (auto const& value: values)
+        fmt::print(stderr, "found: {}\n", value);
+
+    if (values.empty())
         throw std::runtime_error("compatibility tool entry not found");
 
-    auto const compatibility_tool_path = get_compatibility_tool_path(config_vdf.KeyValue[key]);
+    auto const compatibility_tool_path = get_compatibility_tool_path(values[0]);
 
     std::string const command_line_key = "manifest/commandline";
     auto const tool_manifest = compatibility_tool_path / "toolmanifest.vdf";

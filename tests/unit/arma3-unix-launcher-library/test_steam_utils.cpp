@@ -232,10 +232,12 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
 
         auto const steam_compatibility_tool_dir = default_steam_path / "compatibilitytools.d/proton_316";
         auto const system_compatibility_tool_dir = "/usr/share/steam/compatibilitytools.d/proton_316";
+        auto const filter = fmt::format("CompatToolMapping/{}/name", appid);
+        REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _));
 
         WHEN("Config file does not contain key about compatibility tool for appid")
         {
-            REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _));
+            REQUIRE_CALL(vdfMock, GetValuesWithFilter(filter, _)).RETURN(std::vector<std::string>{});
             THEN("Exception is thrown")
             {
                 CHECK_THROWS_AS(steam.GetCompatibilityToolForAppId(appid), std::runtime_error);
@@ -246,11 +248,10 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetCompatibilityToolForAppId")
         {
             trompeloeil::sequence sequence;
 
-            auto const key_name = fmt::format("InstallConfigStore/Software/Valve/Steam/CompatToolMapping/{}/name", appid);
             auto const compatibility_tool_shortname = "proton_316";
             auto const log_file_path = default_steam_path / "logs/compat_log.txt";
 
-            REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _)).SIDE_EFFECT(_3.KeyValue[key_name] = compatibility_tool_shortname).IN_SEQUENCE(sequence);
+            REQUIRE_CALL(vdfMock, GetValuesWithFilter(filter, _)).RETURN(std::vector<std::string>{compatibility_tool_shortname});
 
             WHEN("Requested tool is user tool (exists in compatibilitytools.d)")
             {
