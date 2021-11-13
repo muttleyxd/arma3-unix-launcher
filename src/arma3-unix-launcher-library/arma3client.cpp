@@ -168,6 +168,8 @@ namespace ARMA3
 
         stripped_config += "};\n";
 
+        fmt::print(stderr, "Writing config to '{}':\n{}\n", cfg_path.string(), stripped_config);
+
         FileWriteAllText(cfg_path, stripped_config);
     }
 
