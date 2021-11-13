@@ -20,6 +20,7 @@ target_link_libraries(arma3-unix-launcher PRIVATE
     rihab::scope_guard
     Qt5::Widgets
     Qt5::Svg
+    spdlog::spdlog
     )
 install(TARGETS arma3-unix-launcher
         BUNDLE DESTINATION . COMPONENT Runtime

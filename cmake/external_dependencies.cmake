@@ -3,11 +3,12 @@ include(FetchContent)
 
 function(setup_library SOURCE_TO_TEST)
     set(boolArgs HEADER_ONLY)
-    set(oneValueArgs NAME GIT_REPOSITORY GIT_TAG TEST_LINK_LIBS)
+    set(oneValueArgs NAME GIT_REPOSITORY GIT_TAG TEST_DEFINITIONS TEST_LINK_LIBS)
     set(multiValueArgs WHEN)
     cmake_parse_arguments(LIB_SETUP "${boolArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(TEST_NAME "SYSTEM_${LIB_SETUP_NAME}_WORKS")
+    set(CMAKE_REQUIRED_DEFINITIONS "${LIB_SETUP_TEST_DEFINITIONS}")
     set(CMAKE_REQUIRED_LIBRARIES "${LIB_SETUP_TEST_LINK_LIBS}")
     check_cxx_source_compiles("${SOURCE_TO_TEST}" ${TEST_NAME})
 
@@ -70,15 +71,26 @@ endfunction()
 
 function(setup_fmt)
     set(CHECK_SOURCE "#include <fmt/format.h>
+        #include <string_view>
+
         int main()
         {
-          fmt::print(\"hello\");
+          std::string_view message = \"hello\";
+          fmt::print(\"{}\", message);
           return 0;
         }")
     setup_library("${CHECK_SOURCE}"
                   NAME fmt
                   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+                  TEST_LINK_LIBS fmt
                   )
+
+    if (NOT TARGET fmt::fmt)
+        add_library(fmt::fmt ALIAS fmt)
+    endif()
+    if (NOT TARGET fmt::fmt-header-only)
+        add_library(fmt::fmt-header-only ALIAS fmt::fmt)
+    endif()
 endfunction()
 
 function(setup_nlohmann_json)
@@ -131,6 +143,33 @@ endfunction()
 
 function(setup_scope_guard)
     add_subdirectory(${CMAKE_SOURCE_DIR}/external/scope_guard)
+endfunction()
+
+function(setup_spdlog)
+    if (NOT DEFINED SPDLOG_BUILD_SHARED)
+        set(SPDLOG_BUILD_SHARED ON)
+    endif()
+    set(SPDLOG_FMT_EXTERNAL OFF)
+    set(SPDLOG_FMT_EXTERNAL_HO ON)
+    set(CHECK_SOURCE "#include <spdlog/spdlog.h>
+        int main()
+        {
+            spdlog::info(\"hello\");
+            return 0;
+        }")
+
+    set(FMT_TARGET_NAME "fmt")
+    if (TARGET fmt-header-only)
+        set(FMT_TARGET_NAME "fmt-header-only")
+    endif()
+
+    setup_library("${CHECK_SOURCE}"
+                  NAME spdlog
+                  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+                  GIT_TAG v1.x
+                  TEST_DEFINITIONS -DSPDLOG_FMT_EXTERNAL
+                  TEST_LINK_LIBS ${FMT_TARGET_NAME}
+                  )
 endfunction()
 
 function(setup_trompeloeil)
