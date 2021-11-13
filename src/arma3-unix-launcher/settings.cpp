@@ -2,7 +2,9 @@
 
 #include <QCheckBox>
 #include <QLineEdit>
+
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 #include "std_utils.hpp"
 
@@ -83,7 +85,7 @@ Settings::Settings(std::filesystem::path const config_file_path) : config_file(c
     }
     catch (std::exception const &ex)
     {
-        fmt::print("Error loading settings from {}:\n{}\n", config_file.string(), ex.what());
+        spdlog::warn("Error loading settings from {}:\n{}", config_file.string(), ex.what());
     }
 }
 
@@ -160,7 +162,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while parsing settings[\"cpuCount\"]:\n{}\n", ex.what());
+        spdlog::warn("exception while parsing settings[\"cpuCount\"]:\n{}", ex.what());
     }
     try
     {
@@ -183,7 +185,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while parsing settings[\"exThreads\"]:\n{}\n", ex.what());
+        spdlog::warn("exception while parsing settings[\"exThreads\"]:\n{}", ex.what());
     }
 
     // client tab
@@ -256,7 +258,7 @@ void Settings::read_setting(char const *const setting_name, QComboBox *combobox)
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while parsing settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+        spdlog::warn("exception while parsing settings[\"{}\"]:\n{}", setting_name, ex.what());
     }
 }
 
@@ -284,7 +286,7 @@ void Settings::read_setting(char const *const setting_name, QCheckBox *checkbox,
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while parsing settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+        spdlog::warn("exception while parsing settings[\"{}\"]:\n{}", setting_name, ex.what());
     }
 }
 
@@ -297,7 +299,7 @@ void Settings::write_setting(char const *const setting_name, QComboBox *combobox
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while saving settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+        spdlog::warn("exception while saving settings[\"{}\"]:\n{}", setting_name, ex.what());
     }
 }
 
@@ -317,6 +319,6 @@ void Settings::write_setting(char const *const setting_name, QCheckBox *checkbox
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception while saving settings[\"{}\"]:\n{}\n", setting_name, ex.what());
+        spdlog::warn("exception while saving settings[\"{}\"]:\n{}", setting_name, ex.what());
     }
 }

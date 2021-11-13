@@ -3,6 +3,7 @@
 #include <pugixml.hpp>
 
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 #include "string_utils.hpp"
 #include "exceptions/html_parser.hpp"
@@ -107,7 +108,7 @@ namespace
             }
             catch (std::exception const &e)
             {
-                fmt::print(stderr, "HTML mod parsing failed: {}\n", e.what());
+                spdlog::warn("HTML mod parsing failed: {}", e.what());
             }
         }
 

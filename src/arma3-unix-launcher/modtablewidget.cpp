@@ -161,7 +161,8 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
     QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::update_mod_selection_counters);
 
     //kinda hacky again, but QTableWidgetItem isn't a QObject, so we cannot connect to it
-    QObject::connect(checkbox, &QCheckBox::stateChanged, this, [=](int c){
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, [ = ](int c)
+    {
         checkbox_sort->setModEnabled(c);
     });
 

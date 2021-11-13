@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 
 #include <steam_api.h>
 
@@ -41,7 +42,7 @@ namespace
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "is_steam_flatpak() exception, disabling SteamAPI integration");
+            spdlog::warn("is_steam_flatpak() exception, disabling SteamAPI integration");
             return true;
         }
     }
@@ -53,7 +54,7 @@ namespace
 
         if (is_steam_flatpak())
         {
-            fmt::print(stderr, "Steam initialization failed - Flatpak detected!\n");
+            spdlog::warn("Steam initialization failed - Flatpak detected!");
             return false;
         }
 
@@ -196,14 +197,13 @@ namespace Steam
         uint64 internal_id = id;
         auto const handle = SteamUGC()->CreateQueryUGCDetailsRequest(&internal_id, 1);
         if (handle == k_UGCQueryHandleInvalid)
-            fmt::print(stderr,
-                       "exception in get_item_title({}): SteamUGC()->CreateQueryUGCDetailsRequest returned invalid handle\n", id);
+            spdlog::warn("exception in get_item_title({}): SteamUGC()->CreateQueryUGCDetailsRequest returned invalid handle", id);
 
         auto const result = SteamUGC()->SendQueryUGCRequest(handle);
         if (result == k_uAPICallInvalid)
         {
             SteamUGC()->ReleaseQueryUGCRequest(handle);
-            fmt::print(stderr, "exception in get_item_title({}): SteamUGC()->SendQueryUGCRequest returned invalid call\n", id);
+            spdlog::warn("exception in get_item_title({}): SteamUGC()->SendQueryUGCRequest returned invalid call", id);
         }
         else
             callback_catcher->on_query_completed.Set(result, callback_catcher.get(), &CallbackCatcher::OnQueryCompleted);

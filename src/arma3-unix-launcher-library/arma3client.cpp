@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <spdlog/spdlog.h>
 
 #include <static_todo.hpp>
 
@@ -46,7 +47,7 @@ namespace
         auto const steam_runtime_path = steam_utils.GetSteamPath() / "ubuntu12_32/steam-runtime/run.sh";
         if (fs::Exists(steam_runtime_path))
             return steam_runtime_path;
-        fmt::print(stderr, "Did not find {} and libpng12.so is missing. Thermal optics will be broken!\n", steam_runtime_path);
+        spdlog::critical("Did not find {} and libpng12.so is missing. Thermal optics will be broken!", steam_runtime_path);
         return "";
     }
 
@@ -58,6 +59,9 @@ namespace
     void direct_launch(std::filesystem::path const &arma_path, std::filesystem::path const &executable_path,
                        string const &arguments, bool is_proton, string const &user_environment_variables, bool disable_esync)
     {
+        spdlog::trace("{}:{} arma path: '{}', executable path: '{}', arguments: {}, is_proton: {}, user_environment_variables: {}, disable_esync: {}",
+                      __PRETTY_FUNCTION__, __LINE__, arma_path, executable_path, arguments, is_proton, user_environment_variables,
+                      disable_esync);
         if (!is_proton)
         {
             StdUtils::StartBackgroundProcess(fmt::format("env {} {} {}", user_environment_variables, executable_path, arguments),
@@ -83,18 +87,19 @@ namespace
             auto const command = fmt::format(R"command(env {} {} {} {} {} "{}" {})command", environment, user_environment_variables,
                                              optional_steam_runtime(steam_utils), compatibility_tool.first,
                                              get_verb(compatibility_tool.second), executable_path.string(), arguments);
-            fmt::print("Running Arma:\n{}\n", command);
+            spdlog::info("Running Arma:\n{}\n", command);
             StdUtils::StartBackgroundProcess(command, arma_path.string());
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
+            spdlog::critical("Direct launch failed, exception: {}", e.what());
         }
     }
 
     void indirect_flatpak_launch(string const &arguments, bool is_proton, string const &user_environment_variables,
                                  bool disable_esync)
     {
+        spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
         if (is_proton)
             StdUtils::StartBackgroundProcess(
                 fmt::format("flatpak run --env=\"{} {}\" com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
@@ -107,6 +112,7 @@ namespace
     void indirect_launch(string const &arguments, bool is_proton, string const &user_environment_variables,
                          bool disable_esync)
     {
+        spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
         if (is_proton)
             StdUtils::StartBackgroundProcess(fmt::format("env {} {} steam -applaunch 107410 -nolauncher {}",
                                              get_esync_prefix(disable_esync), user_environment_variables, arguments));
@@ -118,6 +124,8 @@ namespace
     void indirect_launch_through_steam(string const &arguments, bool is_proton, string const &user_environment_variables,
                                        bool disable_esync, bool is_flatpak)
     {
+        spdlog::trace("{}:{} is_proton: {}, is_flatpak: {}",
+                      __PRETTY_FUNCTION__, __LINE__, is_proton, is_flatpak);
         if (is_flatpak)
             indirect_flatpak_launch(arguments, is_proton, user_environment_variables, disable_esync);
         else
@@ -168,7 +176,7 @@ namespace ARMA3
 
         stripped_config += "};\n";
 
-        fmt::print(stderr, "Writing config to '{}':\n{}\n", cfg_path.string(), stripped_config);
+        spdlog::debug("Writing config to '{}':\n{}", cfg_path.string(), stripped_config);
 
         FileWriteAllText(cfg_path, stripped_config);
     }
@@ -180,6 +188,8 @@ namespace ARMA3
 
     void Client::Start(string const &arguments, string const& user_environment_variables, bool launch_directly, bool disable_esync)
     {
+        spdlog::trace("{}:{} arguments: '{}', user_environment_variables: '{}', launch_directly: {}, disable_esync: {}",
+                      __PRETTY_FUNCTION__, __LINE__, arguments, user_environment_variables, launch_directly, disable_esync);
         #ifdef __linux
         if (launch_directly)
             direct_launch(GetPath(), GetPathExecutable(), arguments, IsProton(), user_environment_variables, disable_esync);
@@ -191,18 +201,19 @@ namespace ARMA3
         {
             try
             {
+                spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
                 SteamUtils steam_utils;
                 auto ld_preload_path = fmt::format("{}/Steam.AppBundle/Steam/Contents/MacOS/gameoverlayrenderer.dylib", steam_utils.GetSteamPath().string());
                 if (char const *old_ld_preload = getenv("DYLD_INSERT_LIBRARIES"); old_ld_preload)
                     ld_preload_path += fmt::format("{}:{}", ld_preload_path, old_ld_preload);
                 auto const environment = fmt::format(R"env(DYLD_INSERT_LIBRARIES="{}")env", ld_preload_path);
                 auto const command = fmt::format(R"command(env {} {} "{}/Contents/MacOS/ArmA3" {})command", environment, user_environment_variables, GetPathExecutable().string(), arguments);
-                fmt::print("Running Arma:\n{}\n", command);
+                spdlog::info("Running Arma:\n{}", command);
                 StdUtils::StartBackgroundProcess(command, GetPath().string());
             }
             catch (std::exception const& e)
             {
-                fmt::print(stderr, "Direct launch failed, exception: {}\n", e.what());
+                spdlog::critical("Direct launch failed, exception: {}", e.what());
             }
         }
         else
@@ -277,7 +288,7 @@ namespace ARMA3
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Exception trying to determine if Flatpak, exception text: {}\n", e.what());
+            spdlog::warn("Exception trying to determine if Flatpak, exception text: {}", e.what());
             return false;
         }
 #else
