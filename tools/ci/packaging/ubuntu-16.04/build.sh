@@ -32,7 +32,7 @@ pushd $BUILD_DIR
   mkdir cmake_build
 
   pushd cmake_build
-    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DCMAKE_PREFIX_PATH=/qt/5.14.2/gcc_64 $STEAMWORKS_PARAMETER
+    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 $STEAMWORKS_PARAMETER
     make -j4
     ctest --output-on-failure
     make install DESTDIR=$PKG_DIR
@@ -41,13 +41,13 @@ pushd $BUILD_DIR
   pushd $PKG_DIR
     mkdir opt/arma3-unix-launcher/lib
     pushd opt/arma3-unix-launcher/lib
-      cp -L /qt/5.14.2/gcc_64/lib/libQt5Widgets.so.5 ./
-      cp -L /qt/5.14.2/gcc_64/lib/libQt5Gui.so.5 ./
-      cp -L /qt/5.14.2/gcc_64/lib/libQt5Core.so.5 ./
-      cp -L /qt/5.14.2/gcc_64/lib/libicui18n.so.56 ./
-      cp -L /qt/5.14.2/gcc_64/lib/libicuuc.so.56 ./
-      cp -L /qt/5.14.2/gcc_64/lib/libicudata.so.56 ./
-      cp $A3UL_DIR/tools/ci/packaging/ubuntu-16.04/Qt-5.14.2-LICENSE.txt ./
+      cp -L /qt/5.15.2/gcc_64/lib/libQt5Widgets.so.5 ./
+      cp -L /qt/5.15.2/gcc_64/lib/libQt5Gui.so.5 ./
+      cp -L /qt/5.15.2/gcc_64/lib/libQt5Core.so.5 ./
+      cp -L /qt/5.15.2/gcc_64/lib/libicui18n.so.56 ./
+      cp -L /qt/5.15.2/gcc_64/lib/libicuuc.so.56 ./
+      cp -L /qt/5.15.2/gcc_64/lib/libicudata.so.56 ./
+      cp $A3UL_DIR/tools/ci/packaging/ubuntu-16.04/Qt-5.15.2-LICENSE.txt ./
     popd
     mkdir -p usr/bin
     cp $A3UL_DIR/tools/ci/packaging/ubuntu-16.04/launch-script.sh usr/bin/arma3-unix-launcher

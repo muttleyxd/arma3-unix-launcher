@@ -29,12 +29,12 @@ pushd $BUILD_DIR
   mkdir cmake_build
 
   pushd cmake_build
-    cmake $A3UL_DIR -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DCMAKE_PREFIX_PATH=/qt/5.14.2/gcc_64 $STEAMWORKS_PARAMETER
+    cmake $A3UL_DIR -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 $STEAMWORKS_PARAMETER
     make -j4
     ctest --output-on-failure
     make install DESTDIR=$PKG_DIR
   popd
 
-  QMAKE=/qt/5.14.2/gcc_64/bin/qmake LD_LIBRARY_PATH=/qt/5.14.2/gcc_64/lib:$PKG_DIR/usr/share/arma3-unix-launcher/lib linuxdeploy --appdir appimage/ --plugin qt --output appimage
+  QMAKE=/qt/5.15.2/gcc_64/bin/qmake LD_LIBRARY_PATH=/qt/5.15.2/gcc_64/lib:$PKG_DIR/usr/share/arma3-unix-launcher/lib linuxdeploy --appdir appimage/ --plugin qt --output appimage
   cp -n *.AppImage $OUTPUT_DIR || true # -n flag doesn't seem to work on Docker Ubuntu 16.04 at 24th of May, 2020
 popd

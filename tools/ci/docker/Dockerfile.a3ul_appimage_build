@@ -19,6 +19,9 @@ RUN /install-linuxdeploy-plugin-appimage.sh
 RUN /install-linuxdeploy-qt.sh
 RUN chmod +x /usr/local/bin/linuxdeploy-plugin-conda.sh
 
+# Qt appimage stuff
+RUN apt-get install -y libxcb-icccm4 libxcb-icccm4-dev libxcb-image0-dev libxcb-image0 libxcb-keysyms1 libxcb-keysyms1-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-xinerama0 libxcb-xinerama0-dev
+
 USER builduser
 
 ENTRYPOINT ["/entrypoint.sh"]
