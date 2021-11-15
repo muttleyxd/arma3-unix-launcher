@@ -6,20 +6,27 @@ RUN apt-get update && apt-get upgrade -y
 # Enable CMake PPA
 RUN apt-get install -y apt-transport-https ca-certificates gnupg software-properties-common wget
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ xenial main'
 
-# Add g++-8 PPA
+# Add g++-8 and python3.7 PPA
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+RUN add-apt-repository ppa:deadsnakes/ppa
 
 # Update apt
 RUN apt-get update
 
 # Install required dependencies
-RUN apt-get install -y build-essential devscripts cmake git g++-8 p7zip-full wget python3-requests python3-semantic-version python3-lxml
+RUN apt-get install -y build-essential devscripts cmake git g++-8 p7zip-full wget python3.7 python3-pip python3-requests python3-semantic-version
 
-# Install Qt 5.14.2
+# Make Python 3.7 default
+RUN rm /usr/bin/python3 && ln -s /usr/bin/python3.7 /usr/bin/python3
+
+# Install py7zr
+RUN pip3 install --upgrade pip && pip3 install py7zr && pip3 install lxml
+
+# Install Qt 5.15.2
 ADD https://raw.githubusercontent.com/engnr/qt-downloader/master/qt-downloader /qt/qt-downloader
-RUN chmod +x /qt/qt-downloader && cd qt && ./qt-downloader linux desktop 5.14.2 gcc_64
+RUN chmod +x /qt/qt-downloader && cd qt && ./qt-downloader linux desktop 5.15.2 gcc_64
 
 # Download nlohmann-json and doctest from GitHub
 ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp

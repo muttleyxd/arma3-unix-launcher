@@ -5,6 +5,9 @@
 #include <argparse.hpp>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/cfg/env.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "arma3client.hpp"
 #include "filesystem_utils.hpp"
@@ -55,7 +58,7 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
         if (mod["enabled"])
             enabled_mods.emplace_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
 
-    fmt::print("Starting Arma with preset {}\n", preset_to_run);
+    spdlog::info("Starting Arma with preset {}\n", preset_to_run);
     client.CreateArmaCfg(enabled_mods);
     client.Start(arguments, user_environment_variables, false, disable_esync);
 }
@@ -64,6 +67,10 @@ int main(int argc, char *argv[])
 {
     try
     {
+        spdlog::cfg::load_env_levels();
+        spdlog::set_default_logger(spdlog::stderr_color_st("stderr"));
+        spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+
         QApplication a(argc, argv);
         argparse::ArgumentParser parser("arma3-unix-launcher");
 
@@ -83,7 +90,7 @@ int main(int argc, char *argv[])
         }
         catch (const std::runtime_error &err)
         {
-            fmt::print("{}\n{}\n", err.what(), parser.help().str());
+            fmt::print(stderr, "{}\n{}\n", err.what(), parser.help().str());
             return 1;
         }
 
@@ -102,7 +109,10 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        fmt::print("conf file: {}\n", config_file);
+        if (parser.get<bool>("--verbose"))
+            spdlog::set_level(spdlog::level::trace);
+
+        spdlog::info("Started Arma 3 Unix Launcher, config file path: {}", config_file);
 
         Settings manager(config_file);
 
@@ -115,7 +125,7 @@ int main(int argc, char *argv[])
         }
         catch (std::exception const &ex)
         {
-            fmt::print("cannot read config file: {}\n", ex.what());
+            spdlog::warn("cannot read config file: {}\n", ex.what());
         }
 
         std::unique_ptr<ARMA3::Client> client;
@@ -132,7 +142,7 @@ int main(int argc, char *argv[])
                 {
                     try
                     {
-                        fmt::print("Install path: {}\n", path);
+                        spdlog::info("Install path: '{}'", path);
                         arma_path = steam.GetGamePathFromInstallPath(path, ARMA3::Definitions::app_id);
                         workshop_path = steam.GetWorkshopPath(path, ARMA3::Definitions::app_id);
                         client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
@@ -140,13 +150,13 @@ int main(int argc, char *argv[])
                     }
                     catch (std::exception const &e)
                     {
-                        fmt::print("Didn't find game at {}\nError: {}\n", path, e.what());
+                        spdlog::warn("Didn't find game at '{}', Error: '{}'", path, e.what());
                     }
                 }
             }
             catch (SteamInstallNotFoundException const &e)
             {
-                fmt::print(stderr, "Exception: {}\n", e.what());
+                spdlog::warn("Exception: {}", e.what());
             }
 
             if (arma_path.empty() || workshop_path.empty() || client == nullptr)
@@ -157,7 +167,7 @@ int main(int argc, char *argv[])
                 if (apcd.result() != QDialog::Accepted)
                     exit(0);
 
-                fmt::print("Arma3: {}\nWorkshop: {}\n", apcd.arma_path_, apcd.workshop_path_);
+                spdlog::info("Arma3: '{}' Workshop: '{}'", apcd.arma_path_, apcd.workshop_path_);
                 arma_path = apcd.arma_path_;
                 workshop_path = apcd.workshop_path_;
                 client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
@@ -167,6 +177,8 @@ int main(int argc, char *argv[])
         manager.settings["paths"]["arma"] = arma_path;
         manager.settings["paths"]["workshop"] = workshop_path;
         manager.save_settings_to_disk();
+
+        spdlog::debug("arma path: '{}', workshop path: '{}'", arma_path, workshop_path);
 
         auto preset_to_run = read_argument("--preset-to-run", parser);
         if (!preset_to_run.empty())
@@ -199,12 +211,12 @@ int main(int argc, char *argv[])
     }
     catch (std::exception const &ex)
     {
-        fmt::print("exception: {}\nshutting down\n", ex.what());
+        spdlog::critical("exception: {}\nshutting down", ex.what());
         return 1;
     }
     catch (...)
     {
-        fmt::print("unknown exception\n");
+        spdlog::critical("unknown exception");
         return 1;
     }
 }

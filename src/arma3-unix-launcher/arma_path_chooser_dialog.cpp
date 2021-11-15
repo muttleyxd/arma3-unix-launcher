@@ -3,6 +3,7 @@
 
 #include <fmt/ostream.h>
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
 #include <filesystem>
 #include <utility>
 
@@ -62,7 +63,7 @@ void ArmaPathChooserDialog::on_text_arma_path_textChanged(QString const &arg1)
     }
     catch (std::filesystem::filesystem_error &exception)
     {
-        fmt::print("{}\n", exception.what());
+        spdlog::warn("{}", exception.what());
     }
 }
 

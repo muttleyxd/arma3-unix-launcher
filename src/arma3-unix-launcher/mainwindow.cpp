@@ -20,6 +20,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <scope_guard.hpp>
+#include <spdlog/spdlog.h>
 
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
@@ -62,7 +63,7 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Error loading mod from config:\n---\n{}\n--- Reason: {}\n", mod.dump(2), e.what());
+            spdlog::warn("Error loading mod from config:\n---\n{}\n--- Reason: {}", mod.dump(2), e.what());
         }
     }
     for (auto const &mod : client->GetWorkshopMods())
@@ -120,6 +121,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_button_start_clicked()
 try
 {
+    spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
     for (auto const &executable_name : ARMA3::Definitions::executable_names)
         if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
             throw std::runtime_error("Arma is already running");
@@ -162,6 +164,9 @@ try
     if (!parameters["environmentVariables"].is_null())
         environment_variables = parameters["environmentVariables"];
 
+    spdlog::trace("Mod list: ");
+    for (auto const &mod : mods)
+        spdlog::trace("path: {}", mod.string());
     client->CreateArmaCfg(mods);
     client->Start(manager.get_launch_parameters(), environment_variables, steam_integration->is_initialized(),
                   parameters["protonDisableEsync"]);
@@ -233,7 +238,7 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
     if (std::to_string(info.app_id) != ARMA3::Definitions::app_id)
         return;
 
-    fmt::print("Workshop event - mod installed {}\n", info.workshop_id);
+    spdlog::debug("Workshop event - mod installed {}\n", info.workshop_id);
     try
     {
         auto const workshop_id = std::to_string(info.workshop_id);
@@ -247,7 +252,7 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
     }
     catch (std::exception const &e)
     {
-        fmt::print(stderr, "Received workshop mod install event, exception: {}\n", e.what());
+        spdlog::warn("Received workshop mod install event, exception: {}", e.what());
     }
 }
 
@@ -336,7 +341,7 @@ try
 }
 catch (std::exception const &ex)
 {
-    fmt::print("{}(): Uncaught exception: {}\n", __FUNCTION__, ex.what());
+    spdlog::critical("{}(): Uncaught exception: {}", __FUNCTION__, ex.what());
 }
 
 void MainWindow::on_button_remove_custom_mod_clicked()
@@ -382,7 +387,7 @@ try
 }
 catch (std::exception const &ex)
 {
-    fmt::print("{}(): Uncaught exception: {}\n", __FUNCTION__, ex.what());
+    spdlog::critical("{}(): Uncaught exception: {}", __FUNCTION__, ex.what());
 }
 
 void MainWindow::check_if_arma_is_running()
@@ -486,7 +491,8 @@ try
         return;
 
     ui->table_mods->setSortingEnabled(false); // todo: investigate why loading mods when sorting is enabled causes a crash
-    auto guard = sg::make_scope_guard([&]() {
+    auto guard = sg::make_scope_guard([&]()
+    {
         ui->table_mods->setSortingEnabled(true);
     });
     ui->table_mods->disable_all_mods();
@@ -579,7 +585,7 @@ void MainWindow::load_mods_from_json(nlohmann::json preset)
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Error parsing json mod \"{}\" ({}): {}\n", name, path, e.what());
+            spdlog::warn("Error parsing json mod \"{}\" ({}): {}", name, path, e.what());
             failed_mods.push_back({path, name, e.what()});
         }
     }
@@ -642,7 +648,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Found not existing mod, error: {}\n", e.what());
+            spdlog::info("Found not existing mod, error: {}", e.what());
             if (is_workshop_mod(mod.at("path")))
                 not_existing_steam_mods.push_back(mod);
             else
@@ -677,7 +683,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
         }
         catch (std::exception const &e)
         {
-            fmt::print(stderr, "Failed adding apparently existing mod '{}', reason: {}\n", it->at("path"), e.what());
+            spdlog::warn("Failed adding apparently existing mod '{}', reason: {}", it->at("path"), e.what());
         }
     }
 

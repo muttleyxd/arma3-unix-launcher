@@ -19,7 +19,7 @@ steps:
   image: muttleyxd/a3ul_ubuntu-16.04_build:latest
   commands:
     - mkdir /tmp/build && cd /tmp/build
-    - cmake /drone/src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libstdc++" -DCMAKE_CXX_COMPILER=g++-8 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_PREFIX_PATH=/qt/5.14.2/gcc_64
+    - cmake /drone/src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libstdc++" -DCMAKE_CXX_COMPILER=g++-8 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64
     - make -j$(nproc)
     - ctest -V
 
