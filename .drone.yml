@@ -62,7 +62,8 @@ steps:
   image: alpine/git
   commands:
   - git clone $DRONE_GIT_HTTP_URL .
-  - git checkout $DRONE_COMMIT
+  - git fetch origin $CI_COMMIT_REF
+  - git merge $DRONE_COMMIT
   - chmod 777 /tmp/build
   volumes:
   - name: package
@@ -117,7 +118,8 @@ steps:
   image: alpine/git
   commands:
   - git clone $DRONE_GIT_HTTP_URL .
-  - git checkout $DRONE_COMMIT
+  - git fetch origin $CI_COMMIT_REF
+  - git merge $DRONE_COMMIT
   - chmod 777 /tmp/build
   volumes:
   - name: package
@@ -171,7 +173,8 @@ steps:
   image: alpine/git
   commands:
   - git clone $DRONE_GIT_HTTP_URL .
-  - git checkout $DRONE_COMMIT
+  - git fetch origin $CI_COMMIT_REF
+  - git merge $DRONE_COMMIT
   - chmod 777 /tmp/build
   volumes:
   - name: package
@@ -225,7 +228,8 @@ steps:
   image: alpine/git
   commands:
   - git clone $DRONE_GIT_HTTP_URL .
-  - git checkout $DRONE_COMMIT
+  - git fetch origin $CI_COMMIT_REF
+  - git merge $DRONE_COMMIT
   - chmod 777 /tmp/build
   volumes:
   - name: package
