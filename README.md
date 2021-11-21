@@ -31,13 +31,13 @@ Requirements:
 * fmt (optional)
 
 #### Debian based (Debian, Ubuntu)
-    apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev
+    apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev libspdlog-dev
 
 #### Arch based (Arch Linux, Manjaro)
-    pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg
+    pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg spdlog
 
 #### Fedora
-    dnf install gcc gcc-c++ cmake qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel
+    dnf install gcc gcc-c++ cmake qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel spdlog-devel
 
 #### Mac OS X
     brew install gcc cmake qt
