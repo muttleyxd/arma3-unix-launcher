@@ -1,9 +1,10 @@
+
 include(CheckCXXSourceCompiles)
 include(FetchContent)
 
 function(setup_library SOURCE_TO_TEST)
     set(boolArgs HEADER_ONLY)
-    set(oneValueArgs NAME GIT_REPOSITORY GIT_TAG TEST_DEFINITIONS TEST_LINK_LIBS)
+    set(oneValueArgs NAME CXX_FLAGS GIT_REPOSITORY GIT_TAG TEST_DEFINITIONS TEST_LINK_LIBS)
     set(multiValueArgs WHEN)
     cmake_parse_arguments(LIB_SETUP "${boolArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -36,6 +37,7 @@ function(setup_library SOURCE_TO_TEST)
         set(SRCDIR "${LIB_SETUP_NAME}_SOURCE_DIR")
         set(BINDIR "${LIB_SETUP_NAME}_BINARY_DIR")
 
+        string(APPEND CMAKE_CXX_FLAGS " ${LIB_SETUP_CXX_FLAGS}")
         add_subdirectory(${${SRCDIR}} ${${BINDIR}} EXCLUDE_FROM_ALL)
         message("-- Using external ${LIB_SETUP_NAME}")
     endif()
@@ -72,6 +74,9 @@ endfunction()
 function(setup_fmt)
     set(CHECK_SOURCE "#include <fmt/format.h>
         #include <string_view>
+
+        template<typename... Args>
+        using format_string_t = fmt::format_string<Args...>; // required by spdlog
 
         int main()
         {
@@ -152,6 +157,9 @@ function(setup_spdlog)
     set(SPDLOG_FMT_EXTERNAL OFF)
     set(SPDLOG_FMT_EXTERNAL_HO ON)
     set(CHECK_SOURCE "#include <spdlog/spdlog.h>
+        #if !__has_include(<spdlog/cfg/env.h>) // required by verboseness level setting
+        #error libspdlog 1.9 or newer is required
+        #endif
         int main()
         {
             spdlog::info(\"hello\");
@@ -169,6 +177,7 @@ function(setup_spdlog)
                   GIT_TAG v1.x
                   TEST_DEFINITIONS -DSPDLOG_FMT_EXTERNAL
                   TEST_LINK_LIBS ${FMT_TARGET_NAME}
+                  CXX_FLAGS "-Wno-attributes"
                   )
 endfunction()
 
