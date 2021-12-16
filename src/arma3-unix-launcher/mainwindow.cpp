@@ -66,6 +66,8 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
             spdlog::warn("Error loading mod from config:\n---\n{}\n--- Reason: {}", mod.dump(2), e.what());
         }
     }
+
+    spdlog::trace("trying to get workshop mods");
     for (auto const &mod : client->GetWorkshopMods())
     {
         auto mod_id = mod.GetValueOrReturnDefault("publishedid", "cannot read id");
@@ -79,6 +81,11 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
         }
         catch (SteamApiNotInitializedException const &)
         {
+            spdlog::trace("exception SteamApiNotInitializedException while parsing mod {}", mod_id);
+        }
+        catch (std::exception const& e)
+        {
+            spdlog::debug("exception std::exception '{}' while parsing mod {}", e.what(), mod_id);
         }
     }
     for (auto const &i : client->GetHomeMods())

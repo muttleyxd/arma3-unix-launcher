@@ -97,7 +97,7 @@ std::string Settings::get_launch_parameters()
     {
         if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton"))
             continue;
-        else if (parameter.key() == "customParameters" && parameter.value().is_string())
+        else if ((parameter.key() == "customParameters" || parameter.key() == "environmentVariables") && parameter.value().is_string())
             ret += fmt::format(" {}", std::string(parameter.value()));
         else if (parameter.value().type() == nlohmann::json::value_t::boolean && parameter.value())
             ret += fmt::format(" -{}", parameter.key());
