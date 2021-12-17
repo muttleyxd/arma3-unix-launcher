@@ -95,9 +95,9 @@ std::string Settings::get_launch_parameters()
     std::string ret;
     for (auto const &parameter : settings["parameters"].items())
     {
-        if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton"))
+        if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton") || parameter.key() == "environmentVariables")
             continue;
-        else if ((parameter.key() == "customParameters" || parameter.key() == "environmentVariables") && parameter.value().is_string())
+        else if ((parameter.key() == "customParameters") && parameter.value().is_string())
             ret += fmt::format(" {}", std::string(parameter.value()));
         else if (parameter.value().type() == nlohmann::json::value_t::boolean && parameter.value())
             ret += fmt::format(" -{}", parameter.key());
