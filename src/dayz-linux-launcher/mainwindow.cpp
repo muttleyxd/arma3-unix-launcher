@@ -35,12 +35,12 @@
 
 namespace fs = FilesystemUtils;
 
-MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesystem::path const &config_file_path,
+MainWindow::MainWindow(std::unique_ptr<DayZ::Client> arma3_client, std::filesystem::path const &config_file_path,
                        QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     client(std::move(arma3_client)),
-    steam_integration(std::make_unique<Steam::Integration>(ARMA3::Definitions::app_id)),
+    steam_integration(std::make_unique<Steam::Integration>(DayZ::Definitions::app_id)),
     config_file(config_file_path),
     manager(config_file_path)
 {
@@ -49,8 +49,6 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     {
         this->update_mod_selection_counters(workshop_mod_count, custom_mod_count);
     });
-
-    setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
 
     initialize_theme_combobox();
 
@@ -129,9 +127,8 @@ void MainWindow::on_button_start_clicked()
 try
 {
     spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
-    for (auto const &executable_name : ARMA3::Definitions::executable_names)
-        if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
-            throw std::runtime_error("Arma is already running");
+    if (auto pid = StdUtils::IsProcessRunning(DayZ::Definitions::executable_name, true); pid != -1)
+        throw std::runtime_error("DayZ is already running");
 
     manager.save_settings_from_ui(ui);
 
@@ -160,24 +157,13 @@ try
 
     std::string environment_variables = "";
 
-    if (parameters["dlcContact"])
-        mods.push_back(client->GetPath() / "Contact");
-    if (parameters["dlcGlobalMobilization"])
-        mods.push_back(client->GetPath() / "GM");
-    if (parameters["dlcSogPrairieFire"])
-        mods.push_back(client->GetPath() / "vn");
-    if (parameters["dlcCSLA"])
-        mods.push_back(client->GetPath() / "CSLA");
-    if (parameters["dlcWesternSahara"])
-        mods.push_back(client->GetPath() / "WS");
     if (!parameters["environmentVariables"].is_null())
         environment_variables = parameters["environmentVariables"];
 
     spdlog::trace("Mod list: ");
     for (auto const &mod : mods)
         spdlog::trace("path: {}", mod.string());
-    client->CreateArmaCfg(mods);
-    client->Start(manager.get_launch_parameters(), environment_variables, steam_integration->is_initialized(),
+    client->Start(mods, manager.get_launch_parameters(), environment_variables, steam_integration->is_initialized(),
                   parameters["protonDisableEsync"]);
 }
 catch (std::exception const &e)
@@ -244,7 +230,7 @@ void MainWindow::check_steam_api()
 
 void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info)
 {
-    if (std::to_string(info.app_id) != ARMA3::Definitions::app_id)
+    if (std::to_string(info.app_id) != DayZ::Definitions::app_id)
         return;
 
     spdlog::debug("Workshop event - mod installed {}\n", info.workshop_id);
@@ -401,13 +387,9 @@ catch (std::exception const &ex)
 
 void MainWindow::check_if_arma_is_running()
 {
-    std::string text = "Status: Arma 3 is not running";
-    for (auto const &executable_name : ARMA3::Definitions::executable_names)
-        if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
-        {
-            text = fmt::format("Status: Arma 3 is running, PID: {}", pid);
-            break;
-        }
+    std::string text = "Status: DayZ is not running";
+    if (auto pid = StdUtils::IsProcessRunning(DayZ::Definitions::executable_name, true); pid != -1)
+        text = fmt::format("Status: DayZ is running, PID: {}", pid);
 
     ui->label_arma_status->setText(QString::fromStdString(text));
 }
@@ -495,7 +477,7 @@ try
     // todo: loading mod preset should order loaded mods next to each other, so original load order gets preserved
     auto config_dir = QString::fromStdString(config_file.parent_path().string());
     auto filename = QFileDialog::getOpenFileName(this, tr("Mod preset"), config_dir,
-                    tr("Mod preset files | *.a3ulml, *.html (*.a3ulml *.html);;A3UL mod list | *.a3ulml (*.a3ulml);;HTML preset | *.html (*.html)"));
+                    tr("Mod preset files | *.dzllml, *.html (*.dzllml *.html);;DZL mod list | *.dzllml (*.dzllml);;HTML preset | *.html (*.html)"));
     if (filename.isEmpty())
         return;
 
@@ -786,12 +768,12 @@ try
 {
     auto const config_dir = QString::fromStdString(config_file.parent_path().string());
     auto const filename = QFileDialog::getSaveFileName(this, tr("Save mod preset"), config_dir,
-                          tr("A3UL mod list | *.a3ulml (*.a3ulml)"));
+                          tr("A3UL mod list | *.dzllml (*.dzllml)"));
     if (filename.isEmpty())
         return;
     auto filename_str = filename.toStdString();
-    if (!StringUtils::EndsWith(filename_str, ".a3ulml"))
-        filename_str += ".a3ulml";
+    if (!StringUtils::EndsWith(filename_str, ".dzllml"))
+        filename_str += ".dzllml";
 
     put_mods_from_ui_to_manager_settings();
     nlohmann::json json;

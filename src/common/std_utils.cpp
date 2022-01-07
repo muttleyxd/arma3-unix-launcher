@@ -1,8 +1,10 @@
 #include "std_utils.hpp"
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <fstream>
 #include <filesystem>
+#include <spdlog/spdlog.h>
 
 extern "C" {
 #include <dlfcn.h>
@@ -134,16 +136,18 @@ namespace StdUtils
 
     void StartBackgroundProcess(std::string const &command, std::string_view const working_directory)
     {
-        system(fmt::format("bash -c 'cd \"{}\"; {} <&- &\'", working_directory, command).c_str());
+        auto full_command = fmt::format("bash -c 'cd \"{}\"; {} <&- &\'", working_directory, command);
+        spdlog::trace("{}:{} full command: {}", __PRETTY_FUNCTION__, __LINE__, full_command);
+        system(full_command.c_str());
     }
 
-    std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename)
+    std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename, std::string_view const appname)
     {
-        std::filesystem::path config_directory = fmt::format("{}/.config/a3unixlauncher", getenv("HOME"));
+        std::filesystem::path config_directory = fmt::format("{}/.config/{}", getenv("HOME"), appname);
 
         auto xdg_config_home = getenv("XDG_CONFIG_HOME");
         if (xdg_config_home)
-            config_directory = fmt::format("{}/a3unixlauncher", xdg_config_home);
+            config_directory = fmt::format("{}/{}", xdg_config_home, appname);
 
         return config_directory / config_filename;
     }

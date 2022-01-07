@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>open-iconic/check.svg</file>
+        <file>open-iconic/x.svg</file>
+        <file>open-iconic/minus.svg</file>
+        <file>open-iconic/plus.svg</file>
+        <file>open-iconic/envelope-closed.svg</file>
+        <file>open-iconic/envelope-open.svg</file>
+        <file>blagoicons/dayz.png</file>
+    </qresource>
+</RCC>

@@ -11,7 +11,7 @@ namespace Steam
         return false;
     }
 
-    Integration::Integration()
+    Integration::Integration(char const* const)
     {
     }
 

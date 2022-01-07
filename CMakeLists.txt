@@ -11,6 +11,7 @@ add_libraries_to_linker(COMPILER_ID GNU
                         WHEN ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 9
                         WARNING_MESSAGE "Applying workaround for GCC 8 and lower - linking stdc++fs")
 
+option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
 option(DEVELOPER_MODE "Enable developer checks" OFF)
 option(RUN_TESTS "Run tests with DocTest" OFF)
 

@@ -1,4 +1,10 @@
 add_subdirectory(common)
 add_subdirectory(steam-integration)
 add_subdirectory(arma3-unix-launcher-library)
-add_subdirectory(arma3-unix-launcher)
+
+if (BUILD_DAYZ_LAUNCHER)
+    add_subdirectory(dayz-linux-launcher-library)
+    add_subdirectory(dayz-linux-launcher)
+else()
+    add_subdirectory(arma3-unix-launcher)
+endif()
