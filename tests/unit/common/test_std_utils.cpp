@@ -56,11 +56,13 @@ TEST_CASE("GetConfigFilePath")
     {
         std::filesystem::path config_file = "a3unixlauncher.cfg";
 
+        constexpr char const* app_name = "a3unixlauncher";
+
         WHEN("XDG_CONFIG_HOME is not set")
         {
             REQUIRE_EQ(0, unsetenv("XDG_CONFIG_HOME"));
 
-            auto path = GetConfigFilePath(config_file);
+            auto path = GetConfigFilePath(config_file, app_name);
 
             THEN("$HOME/.config is used")
             CHECK_EQ(fmt::format("{}/.config/a3unixlauncher/{}", getenv("HOME"), config_file.string()), path);
@@ -71,7 +73,7 @@ TEST_CASE("GetConfigFilePath")
             std::filesystem::path xdg_config_home = "/configs";
             REQUIRE_EQ(0, setenv("XDG_CONFIG_HOME", xdg_config_home.string().c_str(), 1));
 
-            auto path = GetConfigFilePath(config_file);
+            auto path = GetConfigFilePath(config_file, app_name);
 
             THEN("XDG_CONFIG_HOME is used")
             CHECK_EQ(fmt::format("{}/a3unixlauncher/{}", xdg_config_home.string(), config_file.string()), path);

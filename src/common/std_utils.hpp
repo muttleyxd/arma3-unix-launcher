@@ -57,6 +57,6 @@ namespace StdUtils
     void FileWriteAllText(std::filesystem::path const &path, std::string const &text);
     pid_t IsProcessRunning(std::string const &name, bool case_insensitive = false);
     void StartBackgroundProcess(std::string const &command, std::string_view const working_directory = "");
-    std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename);
+    std::filesystem::path GetConfigFilePath(std::filesystem::path const &config_filename, std::string_view const appname);
     bool IsLibraryAvailable(char const *library_filename);
 }

@@ -41,7 +41,7 @@ namespace Steam
     class Integration
     {
         public:
-            Integration();
+            Integration(char const* const app_id);
             ~Integration();
 
             bool reinitialize();
@@ -66,5 +66,6 @@ namespace Steam
             std::unique_ptr<CallbackCatcher> callback_catcher;
             std::map<std::uint64_t, std::string> title_cache;
             std::mutex title_cache_access;
+            std::string app_id;
     };
 }

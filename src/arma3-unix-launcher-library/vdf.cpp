@@ -65,7 +65,10 @@ void VDF::ParseVDF(std::string const &text)
     value_ = "";
     hierarchy_.clear();
     for (auto c : text)
+    {
         ProcessChar(c);
+        previous_char = c;
+    }
 
     if (!hierarchy_.empty())
         throw SyntaxErrorException("Unclosed brackets in VDF");
@@ -115,7 +118,9 @@ void VDF::LookForValue(char c)
 
 void VDF::ReadKey(char c)
 {
-    if (c != '"')
+    if (c == '\\' && previous_char != '\\')
+        return;
+    else if (c != '"' || previous_char == '\\')
         key_ += c;
     else
         state_ = VDFState::LookingForValue;
@@ -123,7 +128,9 @@ void VDF::ReadKey(char c)
 
 void VDF::ReadValue(char c)
 {
-    if (c != '"')
+    if (c == '\\' && previous_char != '\\')
+        return;
+    else if (c != '"' || previous_char == '\\')
         value_ += c;
     else
     {

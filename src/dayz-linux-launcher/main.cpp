@@ -9,7 +9,7 @@
 #include <spdlog/cfg/env.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "arma3client.hpp"
+#include "dayzclient.hpp"
 #include "filesystem_utils.hpp"
 #include "steam_utils.hpp"
 #include "std_utils.hpp"
@@ -32,7 +32,7 @@ std::string read_argument(std::string const &argument_name, argparse::ArgumentPa
 }
 
 void start_arma(std::filesystem::path const &preset_to_run, std::string const &arguments,
-                std::filesystem::path const &config_file, ARMA3::Client &client, std::string const &user_environment_variables,
+                std::filesystem::path const &config_file, DayZ::Client &client, std::string const &user_environment_variables,
                 bool disable_esync)
 {
     auto get_valid_path = [](std::vector<std::filesystem::path> const & paths)
@@ -44,7 +44,7 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
     };
 
     std::filesystem::path const config_dir = config_file.parent_path();
-    std::filesystem::path const filename_with_extension = preset_to_run.string() + ".a3ulml";
+    std::filesystem::path const filename_with_extension = preset_to_run.string() + ".dzllml";
     auto valid_path = get_valid_path({preset_to_run, config_dir / preset_to_run, config_dir / filename_with_extension});
     if (valid_path.empty())
         throw FileNotFoundException(preset_to_run);
@@ -58,9 +58,8 @@ void start_arma(std::filesystem::path const &preset_to_run, std::string const &a
         if (mod["enabled"])
             enabled_mods.emplace_back(StringUtils::Replace(mod["path"], "~arma", client.GetPath()));
 
-    spdlog::info("Starting Arma with preset {}\n", preset_to_run);
-    client.CreateArmaCfg(enabled_mods);
-    client.Start(arguments, user_environment_variables, false, disable_esync);
+    spdlog::info("Starting DayZ with preset {}\n", preset_to_run);
+    client.Start(enabled_mods, arguments, user_environment_variables, false, disable_esync);
 }
 
 int main(int argc, char *argv[])
@@ -72,7 +71,7 @@ int main(int argc, char *argv[])
         spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
         QApplication a(argc, argv);
-        argparse::ArgumentParser parser("arma3-unix-launcher");
+        argparse::ArgumentParser parser("dayz-unix-launcher");
 
         parser.add_argument("-l", "--list-presets").help("list available mod presets").default_value(false).implicit_value(
             true);
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        auto config_file = StdUtils::GetConfigFilePath("launcher.conf", "a3unixlauncher");
+        auto config_file = StdUtils::GetConfigFilePath("launcher.conf", "dzlinuxlauncher");
 
         if (parser.get<bool>("--list-presets"))
         {
@@ -112,7 +111,7 @@ int main(int argc, char *argv[])
         if (parser.get<bool>("--verbose"))
             spdlog::set_level(spdlog::level::trace);
 
-        spdlog::info("Started Arma 3 Unix Launcher, config file path: {}", config_file);
+        spdlog::info("Started DayZ Unix Launcher, config file path: {}", config_file);
 
         Settings manager(config_file);
 
@@ -128,9 +127,9 @@ int main(int argc, char *argv[])
             spdlog::warn("cannot read config file: {}\n", ex.what());
         }
 
-        std::unique_ptr<ARMA3::Client> client;
+        std::unique_ptr<DayZ::Client> client;
         if (std::filesystem::exists(arma_path))
-            client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
+            client = std::make_unique<DayZ::Client>(arma_path, workshop_path);
 
         if (arma_path.empty() || !std::filesystem::exists(arma_path))
         {
@@ -143,9 +142,9 @@ int main(int argc, char *argv[])
                     try
                     {
                         spdlog::info("Install path: '{}'", path);
-                        arma_path = steam.GetGamePathFromInstallPath(path, ARMA3::Definitions::app_id);
-                        workshop_path = steam.GetWorkshopPath(path, ARMA3::Definitions::app_id);
-                        client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
+                        arma_path = steam.GetGamePathFromInstallPath(path, DayZ::Definitions::app_id);
+                        workshop_path = steam.GetWorkshopPath(path, DayZ::Definitions::app_id);
+                        client = std::make_unique<DayZ::Client>(arma_path, workshop_path);
                         break;
                     }
                     catch (std::exception const &e)
@@ -167,10 +166,10 @@ int main(int argc, char *argv[])
                 if (apcd.result() != QDialog::Accepted)
                     exit(0);
 
-                spdlog::info("Arma3: '{}' Workshop: '{}'", apcd.arma_path_, apcd.workshop_path_);
+                spdlog::info("DayZ: '{}' Workshop: '{}'", apcd.arma_path_, apcd.workshop_path_);
                 arma_path = apcd.arma_path_;
                 workshop_path = apcd.workshop_path_;
-                client = std::make_unique<ARMA3::Client>(arma_path, workshop_path);
+                client = std::make_unique<DayZ::Client>(arma_path, workshop_path);
             }
         }
 

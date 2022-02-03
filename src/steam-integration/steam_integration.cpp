@@ -134,7 +134,7 @@ namespace Steam
         return true;
     }
 
-    Integration::Integration()
+    Integration::Integration(char const* const app_id_) : app_id(app_id_)
     {
         ++steam_integration_counter;
         reinitialize();
@@ -154,7 +154,7 @@ namespace Steam
 
     bool Integration::reinitialize()
     {
-        return initialize_steam_api("107410");
+        return initialize_steam_api(app_id);
     }
 
     bool Integration::is_initialized() const

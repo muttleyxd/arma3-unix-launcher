@@ -111,6 +111,13 @@ constexpr std::string_view vdf_invalid_missing_brackets = R"vdf(
 		}
 )vdf";
 
+constexpr std::string_view vdf_with_escaped_quotes = R"vdf(
+"VDFTests"
+{
+    "Key\"123\"" "\"Value\""
+}
+)vdf";
+
 TEST_CASE("BasicFilter")
 {
     GIVEN("VDF filled with KeyX/ValueX pairs")
@@ -229,5 +236,17 @@ TEST_CASE("Exception when bracket is missing")
                 CHECK_THROWS_AS(vdf.LoadFromText(vdf_invalid_missing_brackets), SyntaxErrorException);
             }
         }
+    }
+}
+
+TEST_CASE("Escaped quotes in VDF key and value")
+{
+    GIVEN("VDF which contains escaped quotes in keys and values")
+    {
+        VDF vdf;
+
+        vdf.LoadFromText(vdf_with_escaped_quotes);
+        CHECK_EQ("\"Value\"", vdf.KeyValue["VDFTests/Key\"123\""]);
+        CHECK_EQ(static_cast<size_t>(1), vdf.KeyValue.size());
     }
 }

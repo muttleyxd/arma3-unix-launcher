@@ -163,6 +163,61 @@ volumes:
 
 ---
 kind: pipeline
+name: appimage-dayz-g++-8-package
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: alpine/git
+  commands:
+  - git clone $DRONE_GIT_HTTP_URL .
+  - git fetch origin $CI_COMMIT_REF
+  - git merge $DRONE_COMMIT
+  - chmod 777 /tmp/build
+  volumes:
+  - name: package
+    path: /tmp/build
+- name: build-test-makepkg
+  image: muttleyxd/a3ul_appimage_build:latest
+  volumes:
+  - name: package
+    path: /tmp/build
+  commands:
+    - export STEAMWORKS_SDK_PATH=""
+
+    # run these commands only if gpg decryption key is available
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
+    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
+
+    - tools/ci/packaging/appimage_dayz/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+  environment:
+    GPG_DECRYPTION_KEY_BASE64:
+      from_secret: gpg_decryption_key_base64
+- name: publish_release
+  image: muttleyxd/github-release
+  when:
+    event: [push, tag, deployment]
+    branch:
+    - master
+  environment:
+    GITHUB_PUBLISH_TOKEN:
+      from_secret: github_publish_key
+  commands:
+    - cd /tmp/build
+    - github-release --token $GITHUB_PUBLISH_TOKEN --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.AppImage"
+  volumes:
+  - name: package
+    path: /tmp/build
+
+volumes:
+- name: package
+  temp: {}
+
+---
+kind: pipeline
 name: ubuntu-16.04-g++-8-package
 
 clone:

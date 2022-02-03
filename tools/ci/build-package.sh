@@ -51,7 +51,7 @@ done
 if [ "$BUILD_TARGET" == "" ]; then
     print_help
 else
-    CONTAINER_NAME=`echo "a3ul_" "$BUILD_TARGET" "_build" | awk '{print $1$2$3}'`
+    CONTAINER_NAME=`echo "a3ul_" "$BUILD_TARGET" "_build" | awk '{print $1$2$3}' | sed 's/dayz_//g'`
 fi
 
 DOCKERFILE_EXISTS=`ls "docker/Dockerfile.$CONTAINER_NAME" 2>&1`
