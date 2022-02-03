@@ -56,7 +56,7 @@ MainWindow::MainWindow(std::unique_ptr<DayZ::Client> arma3_client, std::filesyst
     {
         try
         {
-            auto const m = get_mod(mod["path"]);
+            auto const m = get_mod(ui_path_to_full_path(mod["path"]));
             ui->table_mods->add_mod({mod["enabled"], m.GetName(), full_path_to_ui_path(mod["path"]), m.IsWorkshopMod(client->GetPathWorkshop())});
         }
         catch (std::exception const &e)
