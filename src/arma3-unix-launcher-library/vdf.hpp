@@ -39,4 +39,5 @@ class VDF
         std::string key_;
         std::string value_;
         std::vector<std::string> hierarchy_;
+        char previous_char = 0;
 };
