@@ -5,8 +5,13 @@
 #include <regex>
 #include <string_view>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <spdlog/spdlog.h>
+
 #include "exceptions/directory_not_found.hpp"
 
+#include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"
@@ -58,19 +63,26 @@ void Mod::ParseCPP(std::string const &text)
 {
     for (auto const &line : StringUtils::Split(text, ";"))
     {
-        size_t split_place = line.find('=');
-        if (split_place == std::string_view::npos)
-            continue;
+        try
+        {
+            size_t split_place = line.find('=');
+            if (split_place == std::string_view::npos)
+                continue;
 
-        size_t value_start = split_place + 1;
-        size_t value_end = line.length();
-        if (line[value_start] == '"') // Remove quotes
-            value_start++;
-        if (line[value_end - 1] == '"')
-            value_end--;
+            size_t value_start = split_place + 1;
+            size_t value_end = line.length();
+            if (line.at(value_start) == '"') // Remove quotes
+                value_start++;
+            if (line.at(value_end - 1) == '"')
+                value_end--;
 
-        std::string const key(StringUtils::trim(line.substr(0, split_place)));
-        std::string const value(StringUtils::trim(line.substr(value_start, value_end - value_start)));
-        KeyValue[key] = value;
+            std::string const key(StringUtils::trim(line.substr(0, split_place)));
+            std::string const value(StringUtils::trim(line.substr(value_start, value_end - value_start)));
+            KeyValue[key] = value;
+        }
+        catch (std::exception const& e)
+        {
+            spdlog::warn("exception while parsing mod '{}', line: '{}', exception message: '{}'", path_, line, e.what());
+        }
     }
 }

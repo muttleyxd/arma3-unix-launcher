@@ -23,6 +23,7 @@ create_fuzzing_test(TEST_GROUP library
                     INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
                                ${CMAKE_SOURCE_DIR}/src/common
                                ${CMAKE_SOURCE_DIR}/tests/unit
+                    LINK_LIBS  fmt::fmt-header-only spdlog::spdlog
                     )
 
 create_fuzzing_test(TEST_GROUP library

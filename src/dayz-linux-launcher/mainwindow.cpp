@@ -22,6 +22,7 @@
 #include <scope_guard.hpp>
 #include <spdlog/spdlog.h>
 
+#include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
 #include "string_utils.hpp"

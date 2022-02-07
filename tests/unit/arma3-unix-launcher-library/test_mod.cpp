@@ -165,7 +165,8 @@ TEST_CASE_FIXTURE(ModTests, "Bunch of nasty parse strings")
 {
     std::string const mod_cpp = R"cpp(name = "Remove\"Stamina";
   this_is_indented_with_few_spaces   = "Hey there";
-evenNewLineCapable=It can also load without quotes;)cpp";
+evenNewLineCapable=It can also load without quotes;
+anotherNastyCaseIsNoValueJustSemicolon= ;)cpp";
     std::map<std::string, std::string> const mod_map
     {
         {"evenNewLineCapable", "Itcanalsoloadwithoutquotes"},
