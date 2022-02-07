@@ -10,6 +10,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "dayzclient.hpp"
+#include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "steam_utils.hpp"
 #include "std_utils.hpp"

@@ -11,6 +11,7 @@
 
 #include "exceptions/directory_not_found.hpp"
 
+#include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
 #include "string_utils.hpp"

@@ -17,7 +17,7 @@ struct fmt::formatter<std::filesystem::path>
     auto format(std::filesystem::path const& path, FormatContext& context)
     {
         // replicate fmt 7.x behavior - '/path' gets formatted to '"/path"'
-        return format_to(context.begin(), "\"{}\"", path.string());
+        return format_to(context.out(), "\"{}\"", path.string());
     }
 };
 
