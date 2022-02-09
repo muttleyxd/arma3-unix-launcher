@@ -15,6 +15,7 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
       * [DayZ](#build-process-for-dayz)
 * [Launch parameters](#launch-parameters)
 * [Sceenshots](#screenshots)
+* [DayZ Installation Tips](#dayz-installation)
 
 ## Installing
 ### From package
@@ -119,3 +120,15 @@ arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 
 ## Screenshots
 
 <img src="https://i.imgur.com/t2HXjY5.png" width="400"><img src="https://i.imgur.com/sAetuqr.png" width="400">
+
+# DayZ Installation
+
+1) Install the game with "Force the use of a specific Steam Play compatibility tool" checked and set to "Proton Experimental."
+
+2) Install "Proton Battleye Runtime."
+
+3) Install the arma3-unix-launcher with the new DayZ SA option (here).
+
+4) In the DayZ Unix Launcher, go to Parameters. Check "Skip intro" and "Skip logos at startup." 
+
+5) Join a modded server in this way. First, subscribe to the required mods in the Steam Workshop. Second, if possible, ask the server administrator for a simple .html list that you can simply "open" to check the exact required set of mods at once in muttley's launcher. Third, directly connect to the server via muttley's launcher by entering the IP address, port, and password in Parameters -> Client. Fourth, click "Start."
