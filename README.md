@@ -19,7 +19,7 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 ## Installing
 ### From package
 
-For now, the default installation is for Arma 3. For DayZ, see [Build Process for DayZ)](#build-process-for-dayz).
+For now, all pre-compiled binaries are set for Arma 3. To use this launcher with DayZ stand-alone instead, see [Build Process for DayZ)](#build-process-for-dayz) for (easy) instructions to compile from source.
 
 For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
