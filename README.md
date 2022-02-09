@@ -92,7 +92,7 @@ Launch with
     
 You may wish to add a shell alias to .bashrc or similar. For example:
 
-    alias dayz="cd /home/corey/arma3-unix-launcher/build && ./src/dayz-linux-launcher/dayz-linux-launcher"
+    alias dayz="cd /home/[user]/arma3-unix-launcher/build && ./src/dayz-linux-launcher/dayz-linux-launcher"
 
 Then, you simply would type 'dayz' in order to open the launcher.
 
