@@ -1,9 +1,10 @@
-# ArmA 3 Unix Launcher
+# Arma 3 + DayZ SA Unix Launcher
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a144e12d9cc4cde90616f0e3f282322)](https://www.codacy.com/manual/muttleyxd/arma3-unix-launcher?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=muttleyxd/arma3-unix-launcher&amp;utm_campaign=Badge_Grade) [![Build Status](https://img.shields.io/drone/build/muttleyxd/arma3-unix-launcher?label=Linux%20build&logo=drone)](https://cloud.drone.io/muttleyxd/arma3-unix-launcher) [![Actions Status](https://img.shields.io/github/workflow/status/muttleyxd/arma3-unix-launcher/Mac%20OS%20X%20release%20deployment/master?label=Mac%20OS%20X%20build)](https://github.com/muttleyxd/arma3-unix-launcher/actions)
 
-ArmA 3 Launcher for Linux and Mac.
-Since Bohemia didn't port their launcher to Linux and Mac and existing launcher didn't satisfy my needs I decided to create my own.
+A clean, intuitive Arma 3 + DayZ SA Launcher for GNU/Linux and MacOS.
+
+Since Bohemia Interactive's developers have not ported the official Arma 3 and DayZ Launchers to GNU/Linux and MacOS, and the existing Steam Proton launch options did not satisfy the community's needs, I decided to create a new one. The Arma 3 + DayZ SA Unix Launcher is intuitive, working with all of Bohemia Interactive's launch parameters for each title and integrating neatly with mod subscriptions in the Steam Workshop.
 
 ## Table of contents
 
@@ -15,6 +16,8 @@ Since Bohemia didn't port their launcher to Linux and Mac and existing launcher 
 
 ## Installing
 ### From package
+
+For now, the default installation is for Arma 3. For DayZ, see [Build Process for DayZ)](#build-process-for-dayz).
 
 For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
@@ -42,7 +45,7 @@ Requirements:
 #### Mac OS X
     brew install gcc cmake qt
 
-#### Build process
+#### Build process for Arma 3
     git clone https://github.com/muttleyxd/arma3-unix-launcher.git
     cd arma3-unix-launcher
     mkdir build
@@ -50,9 +53,46 @@ Requirements:
     cmake ..
     make
 
-After that you can launch with
+Launch with
 
     ./src/arma3-unix-launcher/arma3-unix-launcher
+
+You may wish to add a shell alias to .bashrc or similar. For example:
+
+    alias arma="cd /home/[user]/arma3-unix-launcher/build && ./src/arma3-unix-launcher/arma3-unix-launcher"
+
+Then, you simply would type 'arma' in order to open the launcher.
+
+#### Build process for DayZ
+
+    git clone https://github.com/muttleyxd/arma3-unix-launcher.git
+    cd arma3-unix-launcher
+
+In CMakeLists.txt, change
+
+    option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
+
+to
+
+    option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" ON)
+   
+Exit the file, and return to the arma3-unix-launcher directory:
+
+    cd ..
+    mkdir build
+    cd build
+    cmake ..
+    make
+
+Launch with
+
+    ./src/dayz-linux-launcher/dayz-linux-launcher
+    
+You may wish to add a shell alias to .bashrc or similar. For example:
+
+    alias dayz="cd /home/corey/arma3-unix-launcher/build && ./src/dayz-linux-launcher/dayz-linux-launcher"
+
+Then, you simply would type 'dayz' in order to open the launcher.
 
 ### Launch parameters
 
