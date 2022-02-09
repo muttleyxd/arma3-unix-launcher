@@ -123,6 +123,10 @@ arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 
 
 # DayZ Installation
 
+Before trying to run DayZ via Steam Proton, be sure to increase the max_map_count:
+
+    sudo sysctl -w vm.max_map_count=1048576 
+
 1) Install the game with "Force the use of a specific Steam Play compatibility tool" checked and set to "Proton Experimental."
 
 2) Install "Proton Battleye Runtime."
