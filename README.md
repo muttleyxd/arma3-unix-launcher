@@ -11,6 +11,8 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 * [Installing](#installing)
     * [From package](#from-package)
     * [Building from source](#building-from-source)
+      * [Arma 3](#build-process-for-arma-3)
+      * [DayZ](#build-process-for-dayz)
 * [Launch parameters](#launch-parameters)
 * [Sceenshots](#screenshots)
 
