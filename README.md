@@ -20,11 +20,9 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 ## Installing
 ### From package
 
-For now, all pre-compiled binaries are set for Arma 3. To use this launcher with DayZ stand-alone instead, see [Build Process for DayZ)](#build-process-for-dayz) for (easy) instructions to compile from source.
+For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro), and MacOS there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
 
-For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro) and Mac OS X there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
-
-For Arch based distributions there's an AUR package available - it's called `arma3-unix-launcher-bin`
+For Arch based distributions there's an AUR package available (for Arma 3). It iss called `arma3-unix-launcher-bin`.
 
     yay -S arma3-unix-launcher-bin
 
@@ -121,7 +119,7 @@ arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 
 
 <img src="https://i.imgur.com/t2HXjY5.png" width="400"><img src="https://i.imgur.com/sAetuqr.png" width="400">
 
-# DayZ Installation
+## DayZ Installation
 
 Before trying to run DayZ via Steam Proton, be sure to increase the max_map_count:
 
