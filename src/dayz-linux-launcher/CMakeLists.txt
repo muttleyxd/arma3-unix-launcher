@@ -8,6 +8,7 @@ find_package(Qt5Svg CONFIG REQUIRED)
 file(GLOB_RECURSE SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 
 add_executable(dayz-linux-launcher ${SOURCES})
+target_compile_definitions(dayz-linux-launcher PRIVATE "-DREPOSITORY_VERSION=${COMMIT_COUNT}")
 target_include_directories(dayz-linux-launcher PRIVATE .)
 target_link_libraries(dayz-linux-launcher PRIVATE
     arma3-unix-launcher-library

@@ -32,7 +32,7 @@ pushd $BUILD_DIR
   mkdir cmake_build
 
   pushd cmake_build
-    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON $STEAMWORKS_PARAMETER
+    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON -DCOMMIT_COUNT=$COMMIT_COUNT $STEAMWORKS_PARAMETER
     make -j4
     ctest --output-on-failure
     make install DESTDIR=$PKG_DIR

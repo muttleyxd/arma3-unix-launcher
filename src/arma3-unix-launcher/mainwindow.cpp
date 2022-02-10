@@ -4,12 +4,14 @@
 #include <Qt>
 
 #include <QCheckBox>
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QListView>
 #include <QMessageBox>
 #include <QTabBar>
 #include <QTimer>
 #include <QTreeView>
+#include <QUrl>
 
 #include <QResizeEvent>
 
@@ -28,11 +30,16 @@
 #include "string_utils.hpp"
 #include "std_utils.hpp"
 #include "ui_mod.hpp"
+#include "update_checker.hpp"
 
 #include "exceptions/preset_loading_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
 #include "html_preset_parser.hpp"
 #include "arma_path_chooser_dialog.h"
+
+#ifndef REPOSITORY_VERSION
+#define REPOSITORY_VERSION 0
+#endif
 
 namespace fs = FilesystemUtils;
 
@@ -54,6 +61,29 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
 
     initialize_theme_combobox();
+
+    if (REPOSITORY_VERSION == 0)
+        manager.settings["settings"]["checkForUpdates"] = false;
+
+    if (manager.settings["settings"]["checkForUpdates"] == nullptr)
+    {
+        auto const message = R"(Do you want to check for update availability on launcher's start?
+
+If yes then launcher on every start will connect to api.github.com and check if there's a new version available.
+
+If there is an update, then you will get a notification, nothing will be downloaded or installed)";
+        auto const result = QMessageBox(QMessageBox::Icon::Question, "Update notifications", QString::fromStdString(message),
+                                        QMessageBox::Yes | QMessageBox::No).exec();
+        manager.settings["settings"]["checkForUpdates"] = result == QMessageBox::Yes;
+    }
+
+    if (manager.settings["settings"]["checkForUpdates"])
+    {
+        update_notification_thread = UpdateChecker::is_update_available([&](bool is_there_a_new_version)
+        {
+            QMetaObject::invokeMethod(this, "on_updateNotification", Qt::AutoConnection, Q_ARG(bool, is_there_a_new_version));
+        });
+    }
 
     for (auto const &mod : manager.settings["mods"])
     {
@@ -118,6 +148,8 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
 
 MainWindow::~MainWindow()
 {
+    if (update_notification_thread.joinable())
+        update_notification_thread.join();
     manager.save_settings_from_ui(ui);
 
     put_mods_from_ui_to_manager_settings();
@@ -843,6 +875,23 @@ catch (std::exception const &e)
     auto error_message = fmt::format("{}.", e.what());
     QMessageBox(QMessageBox::Icon::Critical, "Cannot save mod preset", QString::fromStdString(error_message)).exec();
     return;
+}
+
+void MainWindow::on_updateNotification(bool is_there_a_new_version)
+{
+    spdlog::info("{}:{} Update status - new version available: {}", __PRETTY_FUNCTION__, __LINE__, is_there_a_new_version);
+    if (is_there_a_new_version == false)
+        return;
+
+    auto const message_template = R"(There is a new version of arma3-unix-launcher available
+
+Do you want to open {}?)";
+    constexpr char const* url = "https://github.com/muttleyxd/arma3-unix-launcher/releases/latest";
+    auto const message = fmt::format(message_template, url);
+    auto const result = QMessageBox(QMessageBox::Icon::Question, "Update notification", QString::fromStdString(message),
+                                    QMessageBox::Yes | QMessageBox::No).exec();
+    if (result == QMessageBox::Yes)
+        QDesktopServices::openUrl(QUrl(url));
 }
 
 void MainWindow::on_button_quit_clicked()
