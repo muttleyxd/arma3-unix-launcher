@@ -2,6 +2,8 @@
 
 #include "ui_mainwindow.h"
 
+#include <thread>
+
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMainWindow>
@@ -11,8 +13,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <dayzclient.hpp>
-#include <steam_integration.hpp>
+#include "dayzclient.hpp"
+#include "steam_integration.hpp"
 
 #include "settings.hpp"
 #include "ui_mod.hpp"
@@ -55,6 +57,8 @@ class MainWindow : public QMainWindow
         void on_action_mods_save_json_triggered();
         void on_action_mods_save_html_triggered();
 
+        void on_updateNotification(bool is_there_a_new_version);
+
     private:
         Ui::MainWindow *ui;
         QMenu menu_button_save;
@@ -65,6 +69,7 @@ class MainWindow : public QMainWindow
         std::unique_ptr<Steam::Integration> steam_integration;
 
         std::filesystem::path config_file;
+        std::thread update_notification_thread;
         Settings manager;
 
         std::vector<std::uint64_t> mods_to_enable;

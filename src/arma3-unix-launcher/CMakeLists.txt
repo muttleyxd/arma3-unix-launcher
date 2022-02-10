@@ -8,6 +8,7 @@ find_package(Qt5Svg CONFIG REQUIRED)
 file(GLOB_RECURSE SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 
 add_executable(arma3-unix-launcher MACOSX_BUNDLE ${SOURCES})
+target_compile_definitions(arma3-unix-launcher PRIVATE "-DREPOSITORY_VERSION=${COMMIT_COUNT}")
 target_include_directories(arma3-unix-launcher PRIVATE .)
 target_link_libraries(arma3-unix-launcher PRIVATE
     arma3-unix-launcher-library

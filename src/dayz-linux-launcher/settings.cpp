@@ -45,6 +45,7 @@ namespace
                                                             "world": null
                                                         },
                                                         "settings": {
+                                                            "checkForUpdates": null,
                                                             "theme": "System"
                                                         }
                                                     })json");

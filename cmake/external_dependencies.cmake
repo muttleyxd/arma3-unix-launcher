@@ -98,6 +98,20 @@ function(setup_fmt)
     endif()
 endfunction()
 
+function(setup_httplib)
+    set(CHECK_SOURCE "#include <httplib.h>
+
+        int main()
+        {
+          httplib::Client cli(\"http://127.0.0.1\");
+          return 0;
+        }")
+    setup_library("${CHECK_SOURCE}"
+                  NAME httplib
+                  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+                  )
+endfunction()
+
 function(setup_nlohmann_json)
     set(CHECK_SOURCE "#include <nlohmann/json.hpp>
         int main()

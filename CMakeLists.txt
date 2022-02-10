@@ -15,9 +15,13 @@ option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
 option(DEVELOPER_MODE "Enable developer checks" OFF)
 option(RUN_TESTS "Run tests with DocTest" OFF)
 
+if (NOT DEFINED COMMIT_COUNT)
+    set(COMMIT_COUNT 0) # used for update notifications
+endif()
+
 if (DEVELOPER_MODE)
     add_definitions(-DSTATIC_TODO_ENABLED)
-endif ()
+endif()
 
 include_directories(external/static-todo)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -25,6 +29,7 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 setup_argparse()
 setup_fmt()
+setup_httplib()
 setup_pugixml()
 setup_nlohmann_json()
 setup_scope_guard()
