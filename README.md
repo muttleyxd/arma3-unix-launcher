@@ -20,7 +20,7 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 ## Installing
 ### From package
 
-For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro), and MacOS there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases)
+For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro), and MacOS there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases). Choose either Arma 3 or DayZ.
 
 For Arch based distributions there's an AUR package available (for Arma 3). It iss called `arma3-unix-launcher-bin`.
 
