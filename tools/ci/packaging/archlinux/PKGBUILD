@@ -27,7 +27,10 @@ build()
   if [ -d "/tmp/steamworks" ]; then
     STEAMWORKS_PARAMETER="-DSTEAMWORKS_SDK_PATH=/tmp/steamworks"
   fi
-  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON $STEAMWORKS_PARAMETER
+  pushd "/A3ULPATH"
+    COMMIT_COUNT=`git rev-list HEAD --count`
+  popd
+  cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DRUN_TESTS=ON $STEAMWORKS_PARAMETER -DCOMMIT_COUNT=$COMMIT_COUNT
   make
 }
 

@@ -32,7 +32,7 @@ pushd $BUILD_DIR
   mkdir cmake_build
 
   pushd cmake_build
-    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 $STEAMWORKS_PARAMETER
+    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 -DCOMMIT_COUNT=$COMMIT_COUNT $STEAMWORKS_PARAMETER
     make -j4
     ctest --output-on-failure
     make install DESTDIR=$PKG_DIR
