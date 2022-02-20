@@ -43,6 +43,8 @@
 
 namespace fs = FilesystemUtils;
 
+Q_DECLARE_METATYPE(std::string)
+
 MainWindow::MainWindow(std::unique_ptr<DayZ::Client> arma3_client, std::filesystem::path const &config_file_path,
                        QWidget *parent) :
     QMainWindow(parent),
@@ -52,6 +54,8 @@ MainWindow::MainWindow(std::unique_ptr<DayZ::Client> arma3_client, std::filesyst
     config_file(config_file_path),
     manager(config_file_path)
 {
+    qRegisterMetaType<std::string>("std::string");
+
     ui->setupUi(this);
     ui->table_mods->set_mod_counter_callback([&](int workshop_mod_count, int custom_mod_count)
     {
@@ -77,9 +81,9 @@ If there is an update, then you will get a notification, nothing will be downloa
 
     if (manager.settings["settings"]["checkForUpdates"])
     {
-        update_notification_thread = UpdateChecker::is_update_available([&](bool is_there_a_new_version)
+        update_notification_thread = UpdateChecker::is_update_available([&](bool is_there_a_new_version, std::string content)
         {
-            QMetaObject::invokeMethod(this, "on_updateNotification", Qt::AutoConnection, Q_ARG(bool, is_there_a_new_version));
+            QMetaObject::invokeMethod(this, "on_updateNotification", Qt::AutoConnection, Q_ARG(bool, is_there_a_new_version), Q_ARG(std::string, content));
         });
     }
 
@@ -861,17 +865,20 @@ catch (std::exception const &e)
     return;
 }
 
-void MainWindow::on_updateNotification(bool is_there_a_new_version)
+void MainWindow::on_updateNotification(bool is_there_a_new_version, std::string content)
 {
     spdlog::info("{}:{} Update status - new version available: {}", __PRETTY_FUNCTION__, __LINE__, is_there_a_new_version);
     if (is_there_a_new_version == false)
         return;
 
-    auto const message_template = R"(There is a new version of arma3-unix-launcher available
+    auto const message_template = R"(There is a new version of dayz-linux-launcher available
 
-Do you want to open {}?)";
+Do you want to open {}?
+
+Changelog:
+{})";
     constexpr char const* url = "https://github.com/muttleyxd/arma3-unix-launcher/releases/latest";
-    auto const message = fmt::format(message_template, url);
+    auto const message = fmt::format(message_template, url, content);
     auto const result = QMessageBox(QMessageBox::Icon::Question, "Update notification", QString::fromStdString(message),
                                     QMessageBox::Yes | QMessageBox::No).exec();
     if (result == QMessageBox::Yes)

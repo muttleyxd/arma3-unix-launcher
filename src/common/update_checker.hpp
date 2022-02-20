@@ -5,5 +5,5 @@
 
 namespace UpdateChecker
 {
-    std::thread is_update_available(std::function<void(bool)>&& callback);
+    std::thread is_update_available(std::function<void(bool, std::string)>&& callback);
 }
