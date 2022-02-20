@@ -22,6 +22,14 @@ using std::filesystem::path;
 
 namespace fs = FilesystemUtils;
 
+namespace
+{
+    std::filesystem::path get_install_path_from_vdf(std::filesystem::path const& install_path, VDF const& vdf)
+    {
+        return install_path / "steamapps/common" / vdf.KeyValue.at("AppState/installdir");
+    }
+}
+
 SteamUtils::SteamUtils(std::vector<path> const &search_paths)
 {
     for (auto const &search_path : search_paths)
@@ -47,7 +55,6 @@ path const &SteamUtils::GetSteamPath() const noexcept
 std::vector<path> SteamUtils::GetInstallPaths() const
 {
     std::vector<std::filesystem::path> ret;
-    ret.emplace_back(steam_path_);
 
     VDF vdf;
     vdf.LoadFromText(StdUtils::FileReadAllText(steam_path_ / library_folders_path_));
@@ -58,16 +65,27 @@ std::vector<path> SteamUtils::GetInstallPaths() const
         ret.emplace_back(key);
     }
 
+    if (ret.size() == 0 || ret[0] != steam_path_)
+        ret.emplace_back(steam_path_);
+
     return ret;
 }
 
 path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::string_view const appid) const
 {
-    std::filesystem::path manifest_file = install_path / "steamapps" / fmt::format("appmanifest_{}.acf", appid.data());
+    try
+    {
+        std::filesystem::path manifest_file = install_path / "steamapps" / fmt::format("appmanifest_{}.acf", appid.data());
 
-    VDF vdf;
-    vdf.LoadFromText(StdUtils::FileReadAllText(manifest_file));
-    return install_path / "steamapps/common" / vdf.KeyValue.at("AppState/installdir");
+        VDF vdf;
+        vdf.LoadFromText(StdUtils::FileReadAllText(manifest_file));
+        return get_install_path_from_vdf(install_path, vdf);
+    }
+    catch (std::exception const& e)
+    {
+        spdlog::warn("{}:{} exception: {}", __PRETTY_FUNCTION__, __LINE__, e.what());
+        throw;
+    }
 }
 
 path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &appid) const
@@ -130,21 +148,7 @@ std::filesystem::path SteamUtils::get_compatibility_tool_path(std::string const 
         spdlog::debug("failed to find user compatibility tool '{}'", shortname);
     }
 
-    auto const log_file_path = steam_path_ / "logs/compat_log.txt";
-    auto const log_content = StdUtils::FileReadAllText(log_file_path);
-
-    // we need to scan compat_log.txt for something like "proton_5" and get its appid
-    auto const text_to_look_for = fmt::format("Registering tool {}, AppID ", shortname);
-    auto const position = log_content.rfind(text_to_look_for);
-    if (position == std::string::npos)
-        throw std::runtime_error(fmt::format("cannot find entry for '{}' compatibility tool", shortname));
-
-    // expecting something like "Registering tool proton_5, AppID 12345678\n<nextlogline>"
-    auto const app_id_start = position + text_to_look_for.length();
-    auto const app_id_end = log_content.find_first_of("\r\n[", app_id_start);
-    auto const app_id_str = log_content.substr(app_id_start, app_id_end - app_id_start);
-
-    return get_builtin_compatibility_tool(shortname, app_id_str);
+    return get_builtin_compatibility_tool(shortname);
 }
 
 std::filesystem::path SteamUtils::get_user_compatibility_tool(std::string const &shortname) const
@@ -163,21 +167,37 @@ std::filesystem::path SteamUtils::get_user_compatibility_tool(std::string const 
     throw DirectoryNotFoundException(compatibility_tool_path_steam);
 }
 
-std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string const &shortname,
-        std::string_view const app_id_str) const
+std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string const &shortname) const
 {
     for (auto const &install_path : GetInstallPaths())
     {
-        try
+        auto const steamapps_path = install_path / "steamapps";
+        for (auto const& file : FilesystemUtils::Ls(steamapps_path))
         {
-            return GetGamePathFromInstallPath(install_path, app_id_str);
-        }
-        catch (std::exception const &)
-        {
+            try
+            {
+                if (StringUtils::StartsWith(file, "appmanifest_") == false)
+                    continue;
+
+                auto const file_content = StdUtils::FileReadAllText(steamapps_path / file);
+                VDF v;
+                v.LoadFromText(file_content);
+                auto const name_manifest = v.KeyValue.at("AppState/name");
+                auto const shortname_manifest = StringUtils::Lowercase(
+                                                    StringUtils::Replace(
+                                                        StringUtils::Replace(name_manifest, ".", "")
+                                                        , " ", "_")
+                                                );
+                if (shortname_manifest == shortname)
+                    return get_install_path_from_vdf(install_path, v);
+            }
+            catch (std::exception const& e)
+            {
+                spdlog::debug("{}:{} exception: {}", __PRETTY_FUNCTION__, __LINE__, e.what());
+            }
         }
     }
-    throw std::runtime_error(fmt::format("cannot find tool with appid '{}', name '{}'. Is it installed in Steam?",
-                                         app_id_str.data(), shortname));
+    throw std::runtime_error(fmt::format("cannot find tool named '{}'. Is it installed in Steam?", shortname));
 }
 
 bool SteamUtils::IsFlatpak() const
