@@ -57,7 +57,7 @@ class MainWindow : public QMainWindow
         void on_action_mods_save_json_triggered();
         void on_action_mods_save_html_triggered();
 
-        void on_updateNotification(bool is_there_a_new_version);
+        void on_updateNotification(bool is_there_a_new_version, std::string content);
 
     private:
         Ui::MainWindow *ui;

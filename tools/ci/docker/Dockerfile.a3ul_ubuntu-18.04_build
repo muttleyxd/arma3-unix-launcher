@@ -11,6 +11,10 @@ RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && apt-
 # Install required dependencies
 RUN apt-get install -y build-essential devscripts cmake g++-8 qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev p7zip-full wget
 
+# OpenSSL 1.1.1m
+RUN wget https://www.openssl.org/source/openssl-1.1.1m.tar.gz && tar xf openssl-1.1.1m.tar.gz
+RUN export CC=gcc-8; export CXX=gcc-8; cd openssl-1.1.1m; ./config --static -static && make -j$(nproc) && make install_sw
+
 # Download nlohmann-json and doctest from GitHub
 ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/include/nlohmann/json.hpp
 ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h

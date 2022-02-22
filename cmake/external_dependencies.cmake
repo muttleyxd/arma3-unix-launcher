@@ -106,6 +106,7 @@ function(setup_httplib)
           httplib::Client cli(\"http://127.0.0.1\");
           return 0;
         }")
+    set(HTTPLIB_REQUIRE_OPENSSL ON)
     setup_library("${CHECK_SOURCE}"
                   NAME httplib
                   GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git

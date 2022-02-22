@@ -20,12 +20,10 @@ class SteamUtils
 
     private:
         std::filesystem::path get_compatibility_tool_path(std::string const &shortname) const;
-        std::filesystem::path get_builtin_compatibility_tool(std::string const &shortname,
-                std::string_view const app_id_str) const;
+        std::filesystem::path get_builtin_compatibility_tool(std::string const &shortname) const;
+        std::filesystem::path get_user_compatibility_tool(std::string const &shortname) const;
 
         std::filesystem::path steam_path_;
         std::filesystem::path config_path_ = "config/config.vdf";
         std::filesystem::path library_folders_path_ = "config/libraryfolders.vdf";
-
-        std::filesystem::path get_user_compatibility_tool(const std::string &shortname) const;
 };
