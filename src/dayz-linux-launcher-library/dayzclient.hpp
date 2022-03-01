@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include <static_todo.hpp>
-
 #include "mod.hpp"
 
 namespace DayZ::Definitions
@@ -15,7 +13,7 @@ namespace DayZ::Definitions
     static constexpr char const *app_id = "221100";
 
     static const std::array<char const *, 6> exclusions{"Addons", "BattlEye", "EmptySteamDepot", "Launcher", "bliss", "dta"};
-    TODO_BEFORE(3, 2022, "Use dta/product.bin for exclusion list");
+    // TODO: Use dta/product.bin for exclusion list
 
     static constexpr char const *executable_name = "DayZ_x64.exe";
     static constexpr char const *local_share_prefix = ".local/share";
@@ -24,7 +22,7 @@ namespace DayZ::Definitions
     static constexpr char const *flatpak_prefix = ".var/app/com.valvesoftware.Steam";
 }
 
-TODO_BEFORE(6, 2022, "Commonize code between this and a3ul-library");
+//TODO: Commonize code between this and a3ul-library
 namespace DayZ
 {
     class Client

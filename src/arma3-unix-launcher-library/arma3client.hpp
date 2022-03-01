@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include <static_todo.hpp>
-
 #include "mod.hpp"
 
 namespace ARMA3::Definitions
@@ -15,7 +13,7 @@ namespace ARMA3::Definitions
     static constexpr char const *app_id = "107410";
 
     static const std::array<char const *, 28> exclusions{"Addons", "AoW", "Argo", "BattlEye", "Contact", "Curator", "Dll", "Dta", "Enoch", "Expansion", "fontconfig", "GM", "CSLA", "Heli", "Jets", "Kart", "Keys", "Launcher", "MPMissions", "Mark", "Missions", "Orange", "Tacops", "Tank", "vn", "WS", "legal", "steam_shader_cache"};
-    TODO_BEFORE(3, 2022, "Use dta/product.bin for exclusion list");
+    //TODO: Use dta/product.bin for exclusion list
 
     #ifdef __linux
     static constexpr std::array<char const *, 2> const executable_names {"arma3.x86_64", "arma3_x64.exe"};

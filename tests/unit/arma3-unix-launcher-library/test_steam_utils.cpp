@@ -22,8 +22,6 @@
 #include "exceptions/steam_install_not_found.hpp"
 #include "exceptions/steam_workshop_directory_not_found.hpp"
 
-#include "static_todo.hpp"
-
 namespace doctest
 {
     template<> struct StringMaker<std::vector<std::string>>

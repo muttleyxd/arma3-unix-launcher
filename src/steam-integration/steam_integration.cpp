@@ -15,8 +15,6 @@
 #include "exceptions/steam_api_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
 
-#include "static_todo.hpp"
-
 namespace fs = FilesystemUtils;
 
 namespace

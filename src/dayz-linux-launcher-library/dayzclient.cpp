@@ -8,8 +8,6 @@
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
-#include <static_todo.hpp>
-
 #include "cppfilter.hpp"
 #include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
