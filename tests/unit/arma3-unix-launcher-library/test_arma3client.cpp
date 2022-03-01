@@ -6,7 +6,6 @@
 
 #include "arma3client.hpp"
 #include "exceptions/file_not_found.hpp"
-#include "static_todo.hpp"
 
 #include "cppfilter.hpp"
 #include "filesystem_utils.hpp"

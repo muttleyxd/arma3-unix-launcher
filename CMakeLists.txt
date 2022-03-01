@@ -23,7 +23,6 @@ if (DEVELOPER_MODE)
     add_definitions(-DSTATIC_TODO_ENABLED)
 endif()
 
-include_directories(external/static-todo)
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)

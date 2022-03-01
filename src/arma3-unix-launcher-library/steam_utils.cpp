@@ -188,7 +188,7 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
                                                         StringUtils::Replace(name_manifest, ".", "")
                                                         , " ", "_")
                                                 );
-                if (shortname_manifest == shortname)
+                if (StringUtils::StartsWith(shortname_manifest, shortname))
                     return get_install_path_from_vdf(install_path, v);
             }
             catch (std::exception const& e)
