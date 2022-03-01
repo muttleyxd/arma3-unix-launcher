@@ -236,8 +236,8 @@ public:
     std::uint64_t const appid = 107410;
     std::unique_ptr<SteamUtils> steam;
 
-    std::filesystem::path const steam_compatibility_tool_dir = default_steam_path / "compatibilitytools.d/proton_316";
-    std::filesystem::path const system_compatibility_tool_dir = "/usr/share/steam/compatibilitytools.d/proton_316";
+    std::filesystem::path const steam_compatibility_tool_dir = default_steam_path / "compatibilitytools.d/proton_7";
+    std::filesystem::path const system_compatibility_tool_dir = "/usr/share/steam/compatibilitytools.d/proton_7";
 
     std::string const filter = fmt::format("CompatToolMapping/{}/name", appid);
 
@@ -261,7 +261,7 @@ public:
 
     trompeloeil::sequence sequence;
 
-    static constexpr char const* compatibility_tool_shortname = "proton_316";
+    static constexpr char const* compatibility_tool_shortname = "proton_7";
 };
 
 TEST_CASE_FIXTURE(ConfigFileContainsKeyAboutCompatibilityToolForAppid, "Requested tool is user tool (exists in compatibilitytools.d)")
@@ -290,7 +290,7 @@ TEST_CASE_FIXTURE(ConfigFileContainsKeyAboutCompatibilityToolForAppid, "Requeste
         THEN("Valid compatibility tool path & argument pair is returned")
         {
             auto const compatibility_tool = steam->GetCompatibilityToolForAppId(appid);
-            CHECK_EQ("/somewhere/steam/compatibilitytools.d/proton_316/proton", compatibility_tool.first);
+            CHECK_EQ("/somewhere/steam/compatibilitytools.d/proton_7/proton", compatibility_tool.first);
             CHECK_EQ("run", compatibility_tool.second);
         }
     }
@@ -318,10 +318,10 @@ public:
     std::filesystem::path const steamapps_path = default_steam_path / "steamapps";
     std::filesystem::path const tool_appmanifest_file = steamapps_path / appmanifest_file;
     static constexpr char const* install_dir_key = "AppState/installdir";
-    static constexpr char const* install_dir = "Proton 3.16";
+    static constexpr char const* install_dir = "Proton 7.0";
     static constexpr char const* app_name_key = "AppState/name";
     static constexpr char const* app_name_value = install_dir;
-    std::filesystem::path const manifest_file = default_steam_path / "steamapps/common/Proton 3.16/toolmanifest.vdf";
+    std::filesystem::path const manifest_file = default_steam_path / "steamapps/common/Proton 7.0/toolmanifest.vdf";
     static constexpr char const* manifest_commandline_key = "manifest/commandline";
     static constexpr char const* manifest_commandline = "/proton run";
 };
@@ -378,7 +378,7 @@ TEST_CASE_FIXTURE(VDFToolAppmanifestContainsAppStateInstalldirKey, "Manifest fil
     THEN("Valid compatibility tool path & argument pair is returned")
     {
         auto const compatibility_tool = steam->GetCompatibilityToolForAppId(appid);
-        CHECK_EQ("/somewhere/steam/steamapps/common/Proton 3.16/proton", compatibility_tool.first);
+        CHECK_EQ("/somewhere/steam/steamapps/common/Proton 7.0/proton", compatibility_tool.first);
         CHECK_EQ("run", compatibility_tool.second);
     }
 }
