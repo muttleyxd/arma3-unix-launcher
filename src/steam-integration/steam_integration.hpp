@@ -41,7 +41,7 @@ namespace Steam
     class Integration
     {
         public:
-            Integration(char const* const app_id);
+            Integration(char const *const app_id);
             ~Integration();
 
             bool reinitialize();

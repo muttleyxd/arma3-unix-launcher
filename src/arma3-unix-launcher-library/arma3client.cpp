@@ -99,13 +99,20 @@ namespace
                                  bool disable_esync)
     {
         spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
+
+        auto const environment_variables = StringUtils::trim(fmt::format("{} {}", get_esync_prefix(disable_esync),
+                                           user_environment_variables));
+        std::string envvar_parameter = "";
+        if (environment_variables.empty() == false)
+            envvar_parameter = fmt::format("--env\"{}\"", environment_variables);
+
         if (is_proton)
             StdUtils::StartBackgroundProcess(
-                fmt::format("flatpak run --env=\"{} {}\" com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
-                            get_esync_prefix(disable_esync), user_environment_variables, arguments));
+                fmt::format("flatpak run {} com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
+                            envvar_parameter, arguments));
         else
-            StdUtils::StartBackgroundProcess(fmt::format("flatpak run com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
-                                             arguments));
+            StdUtils::StartBackgroundProcess(fmt::format("flatpak run {} com.valvesoftware.Steam -applaunch 107410 -nolauncher {}",
+                                             envvar_parameter, arguments));
     }
 
     void indirect_launch(string const &arguments, bool is_proton, string const &user_environment_variables,

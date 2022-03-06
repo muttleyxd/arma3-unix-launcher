@@ -93,8 +93,8 @@ namespace
     {
         spdlog::trace("{}:{}", __PRETTY_FUNCTION__, __LINE__);
         StdUtils::StartBackgroundProcess(
-                fmt::format("flatpak run --env=\"{} {}\" com.valvesoftware.Steam -applaunch 221100 -nolauncher {}",
-                            get_esync_prefix(disable_esync), user_environment_variables, arguments));
+            fmt::format("flatpak run --env=\"{} {}\" com.valvesoftware.Steam -applaunch 221100 -nolauncher {}",
+                        get_esync_prefix(disable_esync), user_environment_variables, arguments));
     }
 
     void indirect_launch(string const &arguments, string const &user_environment_variables,
@@ -132,7 +132,8 @@ namespace DayZ
         path_workshop_target_ = target_workshop_path;
     }
 
-    void Client::Start(std::vector<std::filesystem::path> const &mod_paths, std::string const &arguments, std::string const& user_environment_variables, bool launch_directly, bool disable_esync)
+    void Client::Start(std::vector<std::filesystem::path> const &mod_paths, std::string const &arguments,
+                       std::string const &user_environment_variables, bool launch_directly, bool disable_esync)
     {
         spdlog::trace("{}:{} arguments: '{}', user_environment_variables: '{}', launch_directly: {}, disable_esync: {}",
                       __PRETTY_FUNCTION__, __LINE__, arguments, user_environment_variables, launch_directly, disable_esync);
@@ -142,7 +143,7 @@ namespace DayZ
 
         if (FilesystemUtils::Exists(local_mod_dir))
         {
-            for (auto const& entry : FilesystemUtils::Ls(local_mod_dir))
+            for (auto const &entry : FilesystemUtils::Ls(local_mod_dir))
                 std::filesystem::remove(local_mod_dir / entry);
         }
         else
@@ -181,7 +182,7 @@ namespace DayZ
 
     bool Client::IsFlatpak()
     {
-#ifdef __linux
+        #ifdef __linux
         try
         {
             SteamUtils steam_utils;
@@ -192,9 +193,9 @@ namespace DayZ
             spdlog::warn("Exception trying to determine if Flatpak, exception text: {}", e.what());
             return false;
         }
-#else
+        #else
         return false;
-#endif
+        #endif
     }
 
     std::string Client::GetModParameter(std::size_t count)
@@ -204,9 +205,10 @@ namespace DayZ
 
         std::string argument = " -mod=";
 
-        for (std::size_t i = 0; i < count; ++i) {
+        for (std::size_t i = 0; i < count; ++i)
+        {
             argument += fmt::format("@dzmods\\\\{}", i);
-            if (i < count -1)
+            if (i < count - 1)
                 argument += "\\;";
         }
 
@@ -248,7 +250,8 @@ namespace DayZ
 
         std::sort(ret.begin(), ret.end(), [](Mod const & m1, Mod const & m2)
         {
-            return m1.GetValueOrReturnDefault("name", "dir", StringUtils::Lowercase(m1.path_)) < m2.GetValueOrReturnDefault("name", "dir", StringUtils::Lowercase(m2.path_));
+            return m1.GetValueOrReturnDefault("name", "dir", StringUtils::Lowercase(m1.path_)) < m2.GetValueOrReturnDefault("name",
+                    "dir", StringUtils::Lowercase(m2.path_));
         });
 
         return ret;

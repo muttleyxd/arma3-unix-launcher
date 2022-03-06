@@ -5,12 +5,12 @@
 #include <spdlog/spdlog.h>
 
 #ifndef REPOSITORY_VERSION
-#define REPOSITORY_VERSION 0
+    #define REPOSITORY_VERSION 0
 #endif
 
 namespace UpdateChecker
 {
-    std::thread is_update_available(std::function<void(bool, std::string)>&& callback)
+    std::thread is_update_available(std::function<void(bool, std::string)> &&callback)
     {
         return std::thread([callback = std::move(callback)]()
         {
@@ -33,14 +33,15 @@ namespace UpdateChecker
 
                 auto const tag_name = response.at(0).at("tag_name");
                 auto const current_tag_name = fmt::format("commit-{}", REPOSITORY_VERSION);
-                spdlog::trace("{}:{} newest tag name: '{}', current tag name: '{}'", __PRETTY_FUNCTION__, __LINE__, tag_name, current_tag_name);
+                spdlog::trace("{}:{} newest tag name: '{}', current tag name: '{}'", __PRETTY_FUNCTION__, __LINE__, tag_name,
+                              current_tag_name);
 
                 auto const content = response.at(0).at("body");
 
                 callback(tag_name != current_tag_name, content);
                 return;
             }
-            catch (std::exception const& e)
+            catch (std::exception const &e)
             {
                 spdlog::warn("{}:{} Failed to check for updates: {}\n", __PRETTY_FUNCTION__, __LINE__, e.what());
                 callback(false, "");

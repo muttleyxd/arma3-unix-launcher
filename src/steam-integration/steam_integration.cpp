@@ -132,7 +132,7 @@ namespace Steam
         return true;
     }
 
-    Integration::Integration(char const* const app_id_) : app_id(app_id_)
+    Integration::Integration(char const *const app_id_) : app_id(app_id_)
     {
         ++steam_integration_counter;
         reinitialize();

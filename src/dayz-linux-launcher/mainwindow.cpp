@@ -38,7 +38,7 @@
 #include "arma_path_chooser_dialog.h"
 
 #ifndef REPOSITORY_VERSION
-#define REPOSITORY_VERSION 0
+    #define REPOSITORY_VERSION 0
 #endif
 
 namespace fs = FilesystemUtils;
@@ -83,7 +83,8 @@ If there is an update, then you will get a notification, nothing will be downloa
     {
         update_notification_thread = UpdateChecker::is_update_available([&](bool is_there_a_new_version, std::string content)
         {
-            QMetaObject::invokeMethod(this, "on_updateNotification", Qt::AutoConnection, Q_ARG(bool, is_there_a_new_version), Q_ARG(std::string, content));
+            QMetaObject::invokeMethod(this, "on_updateNotification", Qt::AutoConnection, Q_ARG(bool, is_there_a_new_version),
+                                      Q_ARG(std::string, content));
         });
     }
 
@@ -117,7 +118,7 @@ If there is an update, then you will get a notification, nothing will be downloa
         {
             spdlog::trace("exception SteamApiNotInitializedException while parsing mod {}", mod_id);
         }
-        catch (std::exception const& e)
+        catch (std::exception const &e)
         {
             spdlog::debug("exception std::exception '{}' while parsing mod {}", e.what(), mod_id);
         }
@@ -877,7 +878,7 @@ Do you want to open {}?
 
 Changelog:
 {})";
-    constexpr char const* url = "https://github.com/muttleyxd/arma3-unix-launcher/releases/latest";
+    constexpr char const *url = "https://github.com/muttleyxd/arma3-unix-launcher/releases/latest";
     auto const message = fmt::format(message_template, url, content);
     auto const result = QMessageBox(QMessageBox::Icon::Question, "Update notification", QString::fromStdString(message),
                                     QMessageBox::Yes | QMessageBox::No).exec();
