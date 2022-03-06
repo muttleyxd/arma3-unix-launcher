@@ -20,9 +20,14 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 ## Installing
 ### From package
 
-For Debian based distributions (Debian, Ubuntu), Arch based distributions (Arch, Manjaro), and MacOS there are packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases). Choose either Arma 3 or DayZ.
+There are GNU/Linux and MacOS packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases).
+For GNU/Linux, the following package types are available:
+- pkg.tar.xz package (for Arch-based distributions) (arma3-unix-launcher)
+- deb package for Ubuntu 16.04 and 18.04 (arma3-unix-launcher)
+- dmg package for MacOS (arma3-unix-launcher)
+- AppImage packages for any GNU/Linux distribution running glibc 2.23 or newer (both arma3-unix-launcher and dayz-linux-launcher)
 
-For Arch based distributions there's an AUR package available (for Arma 3). It iss called `arma3-unix-launcher-bin`.
+For Arch-based distributions, there is also an AUR package available (for Arma 3). It is called `arma3-unix-launcher-bin`.
 
     yay -S arma3-unix-launcher-bin
 
@@ -34,16 +39,16 @@ Requirements:
 * Qt5 with SVG support, version 5.9 or later
 * fmt (optional)
 
-#### Debian based (Debian, Ubuntu)
+#### Debian-based (Debian, Ubuntu)
     apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev libspdlog-dev
 
-#### Arch based (Arch Linux, Manjaro)
+#### Arch-based (Arch Linux, Manjaro)
     pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg spdlog
 
 #### Fedora
     dnf install gcc gcc-c++ cmake qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel spdlog-devel
 
-#### Mac OS X
+#### MacOS
     brew install gcc cmake qt
 
 #### Build process for Arma 3
@@ -58,9 +63,9 @@ Launch with
 
     ./src/arma3-unix-launcher/arma3-unix-launcher
 
-You may wish to add a shell alias to .bashrc or similar. For example:
+You may wish to add a shell alias to .bashrc or similar, such as:
 
-    alias arma="cd /home/[user]/arma3-unix-launcher/build && ./src/arma3-unix-launcher/arma3-unix-launcher"
+    alias arma="$HOME/arma3-unix-launcher/build/src/arma3-unix-launcher/arma3-unix-launcher"
 
 Then, you simply would type 'arma' in order to open the launcher.
 
@@ -68,30 +73,19 @@ Then, you simply would type 'arma' in order to open the launcher.
 
     git clone https://github.com/muttleyxd/arma3-unix-launcher.git
     cd arma3-unix-launcher
-
-In CMakeLists.txt, change
-
-    option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
-
-to
-
-    option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" ON)
-   
-Exit the file, and return to the arma3-unix-launcher directory:
-
     cd ..
     mkdir build
     cd build
-    cmake ..
+    cmake .. -DBUILD_DAYZ_LAUNCHER=ON
     make
 
 Launch with
 
     ./src/dayz-linux-launcher/dayz-linux-launcher
     
-You may wish to add a shell alias to .bashrc or similar. For example:
+You may wish to add a shell alias to .bashrc or similar, such as:
 
-    alias dayz="cd /home/[user]/arma3-unix-launcher/build && ./src/dayz-linux-launcher/dayz-linux-launcher"
+    alias dayz="$HOME/arma3-unix-launcher/build/src/dayz-linux-launcher/dayz-linux-launcher"
 
 Then, you simply would type 'dayz' in order to open the launcher.
 
@@ -133,4 +127,4 @@ Before trying to run DayZ via Steam Proton, be sure to increase the max_map_coun
 
 4) In the DayZ Unix Launcher, go to Parameters. Check "Skip intro" and "Skip logos at startup." 
 
-5) Join a modded server in this way. First, subscribe to the required mods in the Steam Workshop. Second, if possible, ask the server administrator for a simple .html list that you can simply "open" to check the exact required set of mods at once in muttley's launcher. Third, directly connect to the server via muttley's launcher by entering the IP address, port, and password in Parameters -> Client. Fourth, click "Start."
+5) Join a modded server in this way. First, subscribe to the required mods in the Steam Workshop. Second, if possible, ask the server administrator for an .html list that you can simply "open" to check the exact required set of mods at once in muttley's launcher. Third, directly connect to the server via muttley's launcher by entering the IP address, port, and password in Parameters -> Client. Fourth, click "Start."
