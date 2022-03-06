@@ -56,7 +56,7 @@ TEST_CASE("GetConfigFilePath")
     {
         std::filesystem::path config_file = "a3unixlauncher.cfg";
 
-        constexpr char const* app_name = "a3unixlauncher";
+        constexpr char const *app_name = "a3unixlauncher";
 
         WHEN("XDG_CONFIG_HOME is not set")
         {

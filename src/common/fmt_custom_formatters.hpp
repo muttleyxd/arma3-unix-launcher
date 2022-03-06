@@ -8,13 +8,13 @@ template<>
 struct fmt::formatter<std::filesystem::path>
 {
     template<typename ParseContext>
-    constexpr auto parse(ParseContext& context)
+    constexpr auto parse(ParseContext &context)
     {
         return context.begin();
     }
 
     template<typename FormatContext>
-    auto format(std::filesystem::path const& path, FormatContext& context)
+    auto format(std::filesystem::path const &path, FormatContext &context)
     {
         // replicate fmt 7.x behavior - '/path' gets formatted to '"/path"'
         return format_to(context.out(), "\"{}\"", path.string());

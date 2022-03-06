@@ -96,7 +96,8 @@ std::string Settings::get_launch_parameters()
     std::string ret;
     for (auto const &parameter : settings["parameters"].items())
     {
-        if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton") || parameter.key() == "environmentVariables")
+        if (StringUtils::StartsWith(parameter.key(), "dlc") || StringUtils::StartsWith(parameter.key(), "proton")
+                || parameter.key() == "environmentVariables")
             continue;
         else if ((parameter.key() == "customParameters") && parameter.value().is_string())
             ret += fmt::format(" {}", std::string(parameter.value()));

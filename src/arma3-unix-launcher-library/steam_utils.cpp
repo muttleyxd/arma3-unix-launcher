@@ -24,7 +24,7 @@ namespace fs = FilesystemUtils;
 
 namespace
 {
-    std::filesystem::path get_install_path_from_vdf(std::filesystem::path const& install_path, VDF const& vdf)
+    std::filesystem::path get_install_path_from_vdf(std::filesystem::path const &install_path, VDF const &vdf)
     {
         return install_path / "steamapps/common" / vdf.KeyValue.at("AppState/installdir");
     }
@@ -81,7 +81,7 @@ path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::strin
         vdf.LoadFromText(StdUtils::FileReadAllText(manifest_file));
         return get_install_path_from_vdf(install_path, vdf);
     }
-    catch (std::exception const& e)
+    catch (std::exception const &e)
     {
         spdlog::warn("{}:{} exception: {}", __PRETTY_FUNCTION__, __LINE__, e.what());
         throw;
@@ -107,7 +107,7 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
     config_vdf.LoadFromText(StdUtils::FileReadAllText(config_vdf_path));
     spdlog::trace("filtering by '{}'", filter);
     auto const values = config_vdf.GetValuesWithFilter(filter);
-    for (auto const& value: values)
+    for (auto const &value : values)
         fmt::print(stderr, "found: {}\n", value);
 
     if (values.empty())
@@ -172,7 +172,7 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
     for (auto const &install_path : GetInstallPaths())
     {
         auto const steamapps_path = install_path / "steamapps";
-        for (auto const& file : FilesystemUtils::Ls(steamapps_path))
+        for (auto const &file : FilesystemUtils::Ls(steamapps_path))
         {
             try
             {
@@ -191,7 +191,7 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
                 if (StringUtils::StartsWith(shortname_manifest, shortname))
                     return get_install_path_from_vdf(install_path, v);
             }
-            catch (std::exception const& e)
+            catch (std::exception const &e)
             {
                 spdlog::debug("{}:{} exception: {}", __PRETTY_FUNCTION__, __LINE__, e.what());
             }

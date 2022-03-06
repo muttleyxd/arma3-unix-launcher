@@ -80,7 +80,7 @@ void Mod::ParseCPP(std::string const &text)
             std::string const value(StringUtils::trim(line.substr(value_start, value_end - value_start)));
             KeyValue[key] = value;
         }
-        catch (std::exception const& e)
+        catch (std::exception const &e)
         {
             spdlog::warn("exception while parsing mod '{}', line: '{}', exception message: '{}'", path_, line, e.what());
         }

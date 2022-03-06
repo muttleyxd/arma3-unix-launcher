@@ -18,7 +18,8 @@ namespace DayZ::Definitions
     static constexpr char const *executable_name = "DayZ_x64.exe";
     static constexpr char const *local_share_prefix = ".local/share";
     static constexpr char const *bohemia_interactive_prefix = "bohemiainteractive/arma3";
-    static constexpr char const *game_config_path = "../../compatdata/221100/pfx/drive_c/users/steamuser/My Documents/DayZ/DayZ.cfg";
+    static constexpr char const *game_config_path =
+        "../../compatdata/221100/pfx/drive_c/users/steamuser/My Documents/DayZ/DayZ.cfg";
     static constexpr char const *flatpak_prefix = ".var/app/com.valvesoftware.Steam";
 }
 
@@ -30,7 +31,8 @@ namespace DayZ
         public:
             Client(std::filesystem::path const &arma_path, std::filesystem::path const &target_workshop_path);
 
-            void Start(std::vector<std::filesystem::path> const &mod_paths, std::string const &arguments, std::string const &user_environment_variables,
+            void Start(std::vector<std::filesystem::path> const &mod_paths, std::string const &arguments,
+                       std::string const &user_environment_variables,
                        bool launch_directly = false, bool disable_esync = false);
 
             std::vector<Mod> GetHomeMods();
