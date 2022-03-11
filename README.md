@@ -20,12 +20,13 @@ Since Bohemia Interactive's developers have not ported the official Arma 3 and D
 ## Installing
 ### From package
 
-There are GNU/Linux and MacOS packages available in [releases tab!](https://github.com/muttleyxd/arma3-unix-launcher/releases).
-For GNU/Linux, the following package types are available:
-- pkg.tar.xz package (for Arch-based distributions) (arma3-unix-launcher)
-- deb package for Ubuntu 16.04 and 18.04 (arma3-unix-launcher)
-- dmg package for MacOS (arma3-unix-launcher)
-- AppImage packages for any GNU/Linux distribution running glibc 2.23 or newer (both arma3-unix-launcher and dayz-linux-launcher)
+There are GNU/Linux and MacOS packages available in the [releases tab](https://github.com/muttleyxd/arma3-unix-launcher/releases)!
+
+The following package types are available:
+- `pkg.tar.xz` (for Arch-based distributions) (arma3-unix-launcher)
+- `deb` for Ubuntu 16.04 and 18.04 (arma3-unix-launcher)
+- `dmg` for MacOS (arma3-unix-launcher)
+- `AppImage` for any GNU/Linux distribution running `glibc 2.23` or newer (both arma3-unix-launcher and dayz-linux-launcher)
 
 For Arch-based distributions, there is also an AUR package available (for Arma 3). It is called `arma3-unix-launcher-bin`.
 
@@ -67,7 +68,7 @@ You may wish to add a shell alias to .bashrc or similar, such as:
 
     alias arma="$HOME/arma3-unix-launcher/build/src/arma3-unix-launcher/arma3-unix-launcher"
 
-Then, you simply would type 'arma' in order to open the launcher.
+Then, you simply would type `arma` in order to open the launcher.
 
 #### Build process for DayZ
 
@@ -87,7 +88,7 @@ You may wish to add a shell alias to .bashrc or similar, such as:
 
     alias dayz="$HOME/arma3-unix-launcher/build/src/dayz-linux-launcher/dayz-linux-launcher"
 
-Then, you simply would type 'dayz' in order to open the launcher.
+Then, you simply would type `dayz` in order to open the launcher.
 
 ### Launch parameters
 
@@ -123,7 +124,7 @@ Before trying to run DayZ via Steam Proton, be sure to increase the max_map_coun
 
 2) Install "Proton Battleye Runtime."
 
-3) Install the arma3-unix-launcher with the new DayZ SA option (here).
+3) Install the arma3-unix-launcher with the new DayZ SA option ([here](https://github.com/muttleyxd/arma3-unix-launcher/edit/master/README.md#build-process-for-dayz)).
 
 4) In the DayZ Unix Launcher, go to Parameters. Check "Skip intro" and "Skip logos at startup." 
 
