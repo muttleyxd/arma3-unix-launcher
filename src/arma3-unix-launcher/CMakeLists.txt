@@ -57,13 +57,11 @@ if (APPLE)
 
     set_target_properties(arma3-unix-launcher PROPERTIES OUTPUT_NAME "Arma 3 Unix Launcher")
 
-    if (STEAMWORKS_SDK_DETECTED)
-        add_custom_command(TARGET arma3-unix-launcher POST_BUILD
-                          COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
-                          COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt" "$<TARGET_FILE_DIR:arma3-unix-launcher>/steamworks-LICENSE.txt"
-                          COMMENT "Copying Steamworks SDK")
-   endif()
-elseif (STEAMWORKS_SDK_DETECTED)
+    add_custom_command(TARGET arma3-unix-launcher POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
+                       COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt" "$<TARGET_FILE_DIR:arma3-unix-launcher>/steamworks-LICENSE.txt"
+                       COMMENT "Copying Steamworks SDK")
+else()
     install(FILES "${STEAMWORKS_LIB_PATH}"
                   "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
             DESTINATION share/arma3-unix-launcher/lib)

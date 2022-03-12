@@ -196,6 +196,40 @@ function(setup_spdlog)
                   )
 endfunction()
 
+function(setup_steamworkssdk)
+    FetchContent_Declare(steamworkssdk
+        URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
+        URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        )
+    FetchContent_MakeAvailable(steamworkssdk)
+
+
+    add_library(steamworks_sdk SHARED IMPORTED GLOBAL)
+    target_include_directories(steamworks_sdk SYSTEM INTERFACE ${steamworkssdk_SOURCE_DIR}/include)
+
+    if (APPLE)
+        set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/lib/steam/libsteam_api.dylib" PARENT_SCOPE)
+        set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/lib/steam/libsteam_api.dylib")
+    else()
+        set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/arma3-unix-launcher/lib")
+        set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/bin/steam/libsteam_api.so" PARENT_SCOPE)
+        set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/bin/steam/libsteam_api.so")
+    endif()
+    set_property(TARGET steamworks_sdk PROPERTY IMPORTED_LOCATION "${STEAMWORKS_LIB_PATH}")
+
+    # Steamworks SDK headers contain a bunch of macros ending with additional ';'
+    target_compile_options(steamworks_sdk INTERFACE "-Wno-pedantic")
+
+    add_compile_options_to_target(COMPILER_ID Clang
+                                  COMPILE_OPTIONS "-Wno-gnu-zero-variadic-macro-arguments"
+                                  TARGET steamworks_sdk
+                                  WARNING_MESSAGE "Applying workaround for Clang and Steamworks SDK - -Wno-gnu-zero-variadic-macro-arguments")
+
+    add_library(steamworks::sdk ALIAS steamworks_sdk)
+endfunction()
+
 function(setup_trompeloeil)
     set(CHECK_SOURCE "#if __has_include(<doctest/trompeloeil.hpp>)
                       #else

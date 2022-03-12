@@ -27,6 +27,7 @@
 #include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
+#include "steam_integration_impl.hpp"
 #include "string_utils.hpp"
 #include "std_utils.hpp"
 #include "ui_mod.hpp"
@@ -46,14 +47,18 @@ namespace fs = FilesystemUtils;
 Q_DECLARE_METATYPE(std::string)
 
 MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesystem::path const &config_file_path,
-                       QWidget *parent) :
+                       bool use_steam_integration, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     client(std::move(arma3_client)),
-    steam_integration(std::make_unique<Steam::Integration>(ARMA3::Definitions::app_id)),
     config_file(config_file_path),
     manager(config_file_path)
 {
+    if (use_steam_integration)
+        steam_integration = std::make_unique<Steam::SteamIntegration>(ARMA3::Definitions::app_id);
+    else
+        steam_integration = std::make_unique<Steam::IntegrationStub>(ARMA3::Definitions::app_id);
+
     qRegisterMetaType<std::string>("std::string");
 
     ui->setupUi(this);

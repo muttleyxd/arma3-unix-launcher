@@ -1,4 +1,4 @@
-#include "steam_integration.hpp"
+#include "steam_integration_stub.hpp"
 
 class CallbackCatcher
 {
@@ -6,72 +6,63 @@ class CallbackCatcher
 
 namespace Steam
 {
-    bool integration_support_enabled()
+    IntegrationStub::IntegrationStub(char const *const)
+    {
+    }
+
+    bool IntegrationStub::reinitialize()
     {
         return false;
     }
 
-    Integration::Integration(char const *const)
-    {
-    }
-
-    Integration::~Integration()
-    {
-    }
-
-    bool Integration::reinitialize()
+    bool IntegrationStub::is_initialized() const
     {
         return false;
     }
 
-    bool Integration::is_initialized() const
+    bool IntegrationStub::is_running() const
     {
         return false;
     }
 
-    bool Integration::is_running() const
-    {
-        return false;
-    }
-
-    Structs::DownloadInfo Integration::get_download_info(uint64_t const) const
+    Structs::DownloadInfo IntegrationStub::get_download_info(uint64_t const) const
     {
         return {};
     }
 
-    std::string Integration::get_item_title(std::uint64_t const)
+    std::string IntegrationStub::get_item_title(std::uint64_t const)
     {
         return "";
     }
 
-    Structs::SubscriptionInfo Integration::get_mod_status(std::uint64_t const) const
+    Structs::SubscriptionInfo IntegrationStub::get_mod_status(std::uint64_t const) const
     {
         return {};
     }
 
-    std::vector<std::uint64_t> Integration::get_subscribed_items() const
+    std::vector<std::uint64_t> IntegrationStub::get_subscribed_items() const
     {
         return {};
     }
 
-    bool Integration::subscribe(std::uint64_t const) const
+    bool IntegrationStub::subscribe(std::uint64_t const) const
     {
         return false;
     }
 
-    void Integration::resume_downloads() const
+    void IntegrationStub::resume_downloads() const
     {
     }
 
-    void Integration::suspend_downloads() const
+    void IntegrationStub::suspend_downloads() const
     {
     }
 
-    void Integration::poll_events() const
+    void IntegrationStub::poll_events() const
     {
     }
 
-    void Integration::set_item_downloaded_callback(std::function<void (Structs::ItemDownloadedInfo)> &&)
+    void IntegrationStub::set_item_downloaded_callback(std::function<void (Structs::ItemDownloadedInfo)> &&)
     {
     }
 }

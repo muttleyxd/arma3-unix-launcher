@@ -32,8 +32,8 @@ setup_httplib()
 setup_pugixml()
 setup_nlohmann_json()
 setup_scope_guard()
+setup_steamworkssdk()
 setup_spdlog()
-include(external/steamworks-sdk.cmake)
 
 add_subdirectory(src)
 

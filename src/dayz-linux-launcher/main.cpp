@@ -74,6 +74,8 @@ int main(int argc, char *argv[])
         QApplication a(argc, argv);
         argparse::ArgumentParser parser("dayz-unix-launcher");
 
+        parser.add_argument("-d", "--disable-steam-integration").help("disable Steamworks SDK integration").default_value(
+            true).implicit_value(false);
         parser.add_argument("-l", "--list-presets").help("list available mod presets").default_value(false).implicit_value(
             true);
         parser.add_argument("-p",
@@ -204,7 +206,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        MainWindow w(std::move(client), config_file);
+        MainWindow w(std::move(client), config_file, parser.get<bool>("--disable-steam-integration"));
         w.show();
 
         return a.exec();

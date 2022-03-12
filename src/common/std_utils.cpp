@@ -1,9 +1,12 @@
 #include "std_utils.hpp"
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+#include <array>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
 extern "C" {

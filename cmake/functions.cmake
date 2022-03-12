@@ -120,3 +120,17 @@ function(add_libraries_to_linker)
         link_libraries(${ADD_LIBRARIES_LIBS})
     endif()
 endfunction()
+
+function(add_compile_options_to_target)
+    set(oneValueArgs COMPILER_ID TARGET WARNING_MESSAGE)
+    set(multiValueArgs COMPILE_OPTIONS)
+    cmake_parse_arguments(ACO "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if (NOT "${ACO_WARNING_MESSAGE}" STREQUAL "")
+        message(WARNING "Warning: ${ACO_WARNING_MESSAGE}")
+    endif()
+
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "${ACO_COMPILER_ID}")
+        target_compile_options(${ACO_TARGET} INTERFACE ${ACO_COMPILE_OPTIONS})
+    endif()
+endfunction()

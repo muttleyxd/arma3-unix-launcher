@@ -32,9 +32,6 @@ install(FILES blagoicons/dayz.png
         RENAME dayz-linux-launcher.png)
 install(FILES dayz-linux-launcher.desktop
         DESTINATION share/applications)
-
-if (STEAMWORKS_SDK_DETECTED)
-    install(FILES "${STEAMWORKS_LIB_PATH}"
-                  "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
-            DESTINATION share/dayz-linux-launcher/lib)
-endif()
+install(FILES "${STEAMWORKS_LIB_PATH}"
+              "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
+        DESTINATION share/dayz-linux-launcher/lib)
