@@ -21,7 +21,7 @@ namespace
             if (!data_type.empty())
                 return child.text().get();
         }
-        throw "cannot get name";
+        throw std::runtime_error("cannot get name");
     }
 
     std::string get_origin(pugi::xpath_node const &mod)
@@ -39,7 +39,7 @@ namespace
             if (!origin.empty())
                 return origin.text().get();
         }
-        throw "cannot get origin";
+        throw std::runtime_error("cannot get origin");
     }
 
     std::string get_path_local(pugi::xpath_node const &mod)
@@ -60,7 +60,7 @@ namespace
                 return std::string(StringUtils::Split(data_meta, "|").at(1));
             }
         }
-        throw "cannot get path";
+        throw std::runtime_error("cannot get path");
     }
 
     std::string get_workshop_id_steam(pugi::xpath_node const &mod)
@@ -81,7 +81,7 @@ namespace
                 return std::string(link.substr(link.find('=') + 1));
             }
         }
-        throw "cannot get path";
+        throw std::runtime_error("cannot get path");
     }
 
     nlohmann::json mod_to_json(pugi::xpath_node const &mod)
