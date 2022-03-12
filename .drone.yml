@@ -74,14 +74,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - export STEAMWORKS_SDK_PATH=""
-
-    # run these commands only if gpg decryption key is available
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
-
-    - tools/ci/packaging/archlinux/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+    - tools/ci/packaging/archlinux/build.sh /drone/src /tmp/build /tmp/build
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -130,14 +123,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - export STEAMWORKS_SDK_PATH=""
-
-    # run these commands only if gpg decryption key is available
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
-
-    - tools/ci/packaging/appimage/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+    - tools/ci/packaging/appimage/build.sh /drone/src /tmp/build /tmp/build
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -185,14 +171,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - export STEAMWORKS_SDK_PATH=""
-
-    # run these commands only if gpg decryption key is available
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
-
-    - tools/ci/packaging/appimage_dayz/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+    - tools/ci/packaging/appimage_dayz/build.sh /drone/src /tmp/build /tmp/build
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -240,14 +219,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - export STEAMWORKS_SDK_PATH=""
-
-    # run these commands only if gpg decryption key is available
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
-
-    - tools/ci/packaging/ubuntu-16.04/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+    - tools/ci/packaging/ubuntu-16.04/build.sh /drone/src /tmp/build /tmp/build
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64
@@ -295,14 +267,7 @@ steps:
   - name: package
     path: /tmp/build
   commands:
-    - export STEAMWORKS_SDK_PATH=""
-
-    # run these commands only if gpg decryption key is available
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && echo $GPG_DECRYPTION_KEY_BASE64 | base64 -d >/tmp/key.gpg
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && tools/ci/obtain-steamworks.sh
-    - test ! -z "$GPG_DECRYPTION_KEY_BASE64" && export STEAMWORKS_SDK_PATH=/tmp/steamworks
-
-    - tools/ci/packaging/ubuntu-18.04/build.sh /drone/src /tmp/build /tmp/build $STEAMWORKS_SDK_PATH
+    - tools/ci/packaging/ubuntu-18.04/build.sh /drone/src /tmp/build /tmp/build
   environment:
     GPG_DECRYPTION_KEY_BASE64:
       from_secret: gpg_decryption_key_base64

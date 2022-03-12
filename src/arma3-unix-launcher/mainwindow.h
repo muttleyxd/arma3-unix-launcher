@@ -14,7 +14,7 @@
 #include <nlohmann/json.hpp>
 
 #include <arma3client.hpp>
-#include <steam_integration.hpp>
+#include <steam_integration_stub.hpp>
 
 #include "settings.hpp"
 #include "ui_mod.hpp"
@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
 
     public:
         explicit MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesystem::path const &config_file_path,
-                            QWidget *parent = nullptr);
+                            bool use_steam_integration, QWidget *parent = nullptr);
         ~MainWindow();
 
     private slots:
@@ -66,7 +66,7 @@ class MainWindow : public QMainWindow
         QTimer steam_api_checker;
 
         std::unique_ptr<ARMA3::Client> client;
-        std::unique_ptr<Steam::Integration> steam_integration;
+        std::unique_ptr<Steam::IntegrationStub> steam_integration;
 
         std::filesystem::path config_file;
         std::thread update_notification_thread;

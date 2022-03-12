@@ -1,4 +1,4 @@
-#include "steam_integration.hpp"
+#include "steam_integration_impl.hpp"
 
 #include <atomic>
 #include <filesystem>
@@ -7,7 +7,7 @@
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
-#include <steam_api.h>
+#include <steam/steam_api.h>
 
 #include "filesystem_utils.hpp"
 #include "std_utils.hpp"
@@ -40,7 +40,7 @@ namespace
         }
         catch (std::exception const &e)
         {
-            spdlog::warn("is_steam_flatpak() exception, disabling SteamAPI integration");
+            spdlog::warn("is_steam_flatpak() exception, disabling SteamAPI SteamIntegration");
             return true;
         }
     }
@@ -127,15 +127,10 @@ void CallbackCatcher::OnQueryCompleted(SteamUGCQueryCompleted_t *info, bool fail
 
 namespace Steam
 {
-    bool integration_support_enabled()
-    {
-        return true;
-    }
-
-    Integration::Integration(char const *const app_id_) : app_id(app_id_)
+    SteamIntegration::SteamIntegration(char const *const app_id_) : IntegrationStub(app_id_), app_id(app_id_)
     {
         ++steam_integration_counter;
-        reinitialize();
+        SteamIntegration::reinitialize();
         callback_catcher = std::make_unique<CallbackCatcher>();
         callback_catcher->workshop_name_callback = [&](auto const & info)
         {
@@ -144,28 +139,28 @@ namespace Steam
         };
     }
 
-    Integration::~Integration()
+    SteamIntegration::~SteamIntegration()
     {
         --steam_integration_counter;
         deinitialize_steam_api();
     }
 
-    bool Integration::reinitialize()
+    bool SteamIntegration::reinitialize()
     {
         return initialize_steam_api(app_id);
     }
 
-    bool Integration::is_initialized() const
+    bool SteamIntegration::is_initialized() const
     {
         return initialized;
     }
 
-    bool Integration::is_running() const
+    bool SteamIntegration::is_running() const
     {
         return SteamAPI_IsSteamRunning();
     }
 
-    Structs::DownloadInfo Integration::get_download_info(uint64_t const id) const
+    Structs::DownloadInfo SteamIntegration::get_download_info(uint64_t const id) const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -180,7 +175,7 @@ namespace Steam
         return ret;
     }
 
-    std::string Integration::get_item_title(std::uint64_t const id)
+    std::string SteamIntegration::get_item_title(std::uint64_t const id)
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -209,7 +204,7 @@ namespace Steam
         return std::to_string(id);
     }
 
-    Structs::SubscriptionInfo Integration::get_mod_status(std::uint64_t const id) const
+    Structs::SubscriptionInfo SteamIntegration::get_mod_status(std::uint64_t const id) const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -226,7 +221,7 @@ namespace Steam
         };
     }
 
-    std::vector<uint64_t> Integration::get_subscribed_items() const
+    std::vector<uint64_t> SteamIntegration::get_subscribed_items() const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -253,7 +248,7 @@ namespace Steam
         return ret;
     }
 
-    bool Integration::subscribe(std::uint64_t const id) const
+    bool SteamIntegration::subscribe(std::uint64_t const id) const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -261,7 +256,7 @@ namespace Steam
         return SteamUGC()->SubscribeItem(id);
     }
 
-    void Integration::resume_downloads() const
+    void SteamIntegration::resume_downloads() const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -269,7 +264,7 @@ namespace Steam
         SteamUGC()->SuspendDownloads(false);
     }
 
-    void Integration::suspend_downloads() const
+    void SteamIntegration::suspend_downloads() const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -277,7 +272,7 @@ namespace Steam
         SteamUGC()->SuspendDownloads(true);
     }
 
-    void Integration::poll_events() const
+    void SteamIntegration::poll_events() const
     {
         if (!is_initialized())
             throw SteamApiNotInitializedException();
@@ -285,7 +280,7 @@ namespace Steam
         SteamAPI_RunCallbacks();
     }
 
-    void Integration::set_item_downloaded_callback(std::function<void (Structs::ItemDownloadedInfo)> &&callback)
+    void SteamIntegration::set_item_downloaded_callback(std::function<void (Structs::ItemDownloadedInfo)> &&callback)
     {
         callback_catcher->item_installed_callback = std::move(callback);
     }
