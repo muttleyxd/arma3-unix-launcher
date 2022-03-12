@@ -7,12 +7,6 @@ cd "$SELF_PATH"
 A3UL_DIR="${1:-/arma3-unix-launcher}"
 BUILD_DIR="${2:-/tmp/build}"
 OUTPUT_DIR="${3:-/build}"
-STEAMWORKS_SDK_PATH="${4:-}"
-
-STEAMWORKS_PARAMETER=""
-if [ "$STEAMWORKS_SDK_PATH" != "" ]; then
-  STEAMWORKS_PARAMETER="-DSTEAMWORKS_SDK_PATH=$STEAMWORKS_SDK_PATH"
-fi
 
 source /etc/lsb-release
 source /etc/os-release
@@ -32,7 +26,7 @@ pushd $BUILD_DIR
   mkdir cmake_build
 
   pushd cmake_build
-    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 -DCOMMIT_COUNT=$COMMIT_COUNT $STEAMWORKS_PARAMETER
+    cmake $A3UL_DIR -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_INSTALL_PREFIX=/opt/arma3-unix-launcher -DCMAKE_CXX_FLAGS="-static-libstdc++" -DRUN_TESTS=ON -DSPDLOG_BUILD_SHARED=OFF -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64 -DCOMMIT_COUNT=$COMMIT_COUNT
     make -j4
     ctest --output-on-failure
     make install DESTDIR=$PKG_DIR
