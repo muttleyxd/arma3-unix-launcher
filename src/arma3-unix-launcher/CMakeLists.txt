@@ -1,6 +1,9 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+if (NOT APPLE)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/arma3-unix-launcher/lib" PARENT_SCOPE)
+endif()
 
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Svg CONFIG REQUIRED)

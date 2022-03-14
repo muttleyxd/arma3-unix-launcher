@@ -1,6 +1,7 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/dayz-linux-launcher/lib" PARENT_SCOPE)
 
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Svg CONFIG REQUIRED)
