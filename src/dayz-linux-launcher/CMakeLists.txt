@@ -1,6 +1,7 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/dayz-linux-launcher/lib" PARENT_SCOPE)
 
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Svg CONFIG REQUIRED)
@@ -33,5 +34,8 @@ install(FILES blagoicons/dayz.png
 install(FILES dayz-linux-launcher.desktop
         DESTINATION share/applications)
 install(FILES "${STEAMWORKS_LIB_PATH}"
+              "${CURLPP_LIB_PATH1}"
+              "${CURLPP_LIB_PATH2}"
+              "${CURLPP_LIB_PATH3}"
               "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
         DESTINATION share/dayz-linux-launcher/lib)

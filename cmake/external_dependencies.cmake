@@ -60,6 +60,20 @@ function(setup_argparse)
     endif()
 endfunction()
 
+function(setup_curlpp)
+    set(CHECK_SOURCE "#error unimplemented}")
+    setup_library("${CHECK_SOURCE}"
+                  NAME curlpp
+                  GIT_REPOSITORY https://github.com/jpbarrette/curlpp.git
+                  )
+    if (NOT APPLE)
+        set(CURLPP_LIB_PATH1 "${curlpp_BINARY_DIR}/libcurlpp.so" PARENT_SCOPE)
+        set(CURLPP_LIB_PATH2 "${curlpp_BINARY_DIR}/libcurlpp.so.1" PARENT_SCOPE)
+        set(CURLPP_LIB_PATH3 "${curlpp_BINARY_DIR}/libcurlpp.so.1.0.0" PARENT_SCOPE)
+    endif()
+    add_library(curlpp::curlpp ALIAS curlpp)
+endfunction()
+
 function(setup_doctest)
     set(CHECK_SOURCE "#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
                       #include <doctest/doctest.h>")
@@ -96,21 +110,6 @@ function(setup_fmt)
     if (NOT TARGET fmt::fmt-header-only)
         add_library(fmt::fmt-header-only ALIAS fmt::fmt)
     endif()
-endfunction()
-
-function(setup_httplib)
-    set(CHECK_SOURCE "#include <httplib.h>
-
-        int main()
-        {
-          httplib::Client cli(\"http://127.0.0.1\");
-          return 0;
-        }")
-    set(HTTPLIB_REQUIRE_OPENSSL ON)
-    setup_library("${CHECK_SOURCE}"
-                  NAME httplib
-                  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-                  )
 endfunction()
 
 function(setup_nlohmann_json)
@@ -213,7 +212,6 @@ function(setup_steamworkssdk)
         set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/lib/steam/libsteam_api.dylib" PARENT_SCOPE)
         set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/lib/steam/libsteam_api.dylib")
     else()
-        set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/arma3-unix-launcher/lib")
         set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/bin/steam/libsteam_api.so" PARENT_SCOPE)
         set(STEAMWORKS_LIB_PATH "${steamworkssdk_SOURCE_DIR}/bin/steam/libsteam_api.so")
     endif()

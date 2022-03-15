@@ -1,6 +1,9 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+if (NOT APPLE)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/arma3-unix-launcher/lib" PARENT_SCOPE)
+endif()
 
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Svg CONFIG REQUIRED)
@@ -63,6 +66,9 @@ if (APPLE)
                        COMMENT "Copying Steamworks SDK")
 else()
     install(FILES "${STEAMWORKS_LIB_PATH}"
+                  "${CURLPP_LIB_PATH1}"
+                  "${CURLPP_LIB_PATH2}"
+                  "${CURLPP_LIB_PATH3}"
                   "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
             DESTINATION share/arma3-unix-launcher/lib)
 endif()
