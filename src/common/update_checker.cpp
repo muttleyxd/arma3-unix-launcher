@@ -1,12 +1,31 @@
 #include "update_checker.hpp"
 
-#include <httplib.h>
+#include <sstream>
+
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+
+#include <curlpp/cURLpp.hpp>
+#include <curlpp/Easy.hpp>
+#include <curlpp/Options.hpp>
+
+#include "filesystem_utils.hpp"
 
 #ifndef REPOSITORY_VERSION
     #define REPOSITORY_VERSION 0
 #endif
+
+namespace
+{
+    std::filesystem::path get_ca_bundle_path()
+    {
+        if (FilesystemUtils::Exists("/etc/ssl/certs/ca-certificates.crt"))
+            return "/etc/ssl/certs/ca-certificates.crt";
+        if (FilesystemUtils::Exists("/etc/ssl/certs/ca-bundle.crt"))
+            return "/etc/ssl/certs/ca-bundle.crt";
+        throw std::runtime_error("not able to find ca bundle file");
+    }
+}
 
 namespace UpdateChecker
 {
@@ -22,12 +41,19 @@ namespace UpdateChecker
 
             try
             {
-                httplib::Client cli("https://api.github.com");
-                auto res = cli.Get("/repos/muttleyxd/arma3-unix-launcher/releases");
-                if (res->status != 200)
-                    throw std::runtime_error(fmt::format("HTTP request returned: {}\n{}", res->status, res->body));
+                curlpp::Cleanup curl_cleanup;
+                curlpp::Easy curl_request;
+                curl_request.setOpt<curlpp::options::CaInfo>(get_ca_bundle_path().string());
+                curl_request.setOpt<curlpp::options::Url>("https://api.github.com/repos/muttleyxd/arma3-unix-launcher/releases");
+                curl_request.setOpt<curlpp::options::UserAgent>("curl/12.3.4.5");
 
-                auto const response = nlohmann::json::parse(res->body);
+                std::ostringstream output_stream;
+                curlpp::options::WriteStream write_stream(&output_stream);
+                curl_request.setOpt(write_stream);
+                curl_request.perform();
+
+                auto const response_body = output_stream.str();
+                auto const response = nlohmann::json::parse(response_body);
                 if (!response.is_array())
                     throw std::runtime_error("Response is not JSON array");
 

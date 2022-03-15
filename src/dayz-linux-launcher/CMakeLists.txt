@@ -34,5 +34,8 @@ install(FILES blagoicons/dayz.png
 install(FILES dayz-linux-launcher.desktop
         DESTINATION share/applications)
 install(FILES "${STEAMWORKS_LIB_PATH}"
+              "${CURLPP_LIB_PATH1}"
+              "${CURLPP_LIB_PATH2}"
+              "${CURLPP_LIB_PATH3}"
               "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
         DESTINATION share/dayz-linux-launcher/lib)
