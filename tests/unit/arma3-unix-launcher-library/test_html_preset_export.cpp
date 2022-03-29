@@ -93,7 +93,7 @@ a:hover {
     <div class="mod-list">
       <table>
         <tr data-type="ModContainer">
-          <td data-type="DisplayName">1234 mod</td>
+          <td data-type="DisplayName">1234 mod &amp; special character</td>
           <td>
             <span class="from-steam">Steam</span>
           </td>
@@ -122,7 +122,7 @@ a:hover {
     };
 
     REQUIRE_CALL(mod_mock, IsWorkshopMod(workshop_path, _)).RETURN(true);
-    REQUIRE_CALL(mod_mock, GetName(_)).RETURN("1234 mod");
+    REQUIRE_CALL(mod_mock, GetName(_)).RETURN("1234 mod & special character");
     auto const preset = export_mods("test preset", mod_list, workshop_path);
     CHECK_EQ(expected_preset, preset);
 }

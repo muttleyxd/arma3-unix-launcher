@@ -42,6 +42,9 @@ create_unit_test(TEST_GROUP library
                              ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/html_preset_export.cpp
                              ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library/html_preset_export.hpp
 
+                             ${CMAKE_SOURCE_DIR}/src/common/string_utils.cpp
+                             ${CMAKE_SOURCE_DIR}/src/common/string_utils.hpp
+
                              ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                   INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher-library
                              ${CMAKE_SOURCE_DIR}/src/common
