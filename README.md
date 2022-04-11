@@ -74,7 +74,6 @@ Then, you simply would type `arma` in order to open the launcher.
 
     git clone https://github.com/muttleyxd/arma3-unix-launcher.git
     cd arma3-unix-launcher
-    cd ..
     mkdir build
     cd build
     cmake .. -DBUILD_DAYZ_LAUNCHER=ON
