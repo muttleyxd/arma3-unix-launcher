@@ -15,6 +15,7 @@ sed -i "s|/A3ULPATH|$A3UL_DIR|g" PKGBUILD
 
 mkdir src
 cp -RL /$A3UL_DIR/* ./src
+chown -R builduser:builduser .
 rm -rf ./src/build*
 makepkg
 cp -n /tmp/build/*.tar.* $OUTPUT_DIR
