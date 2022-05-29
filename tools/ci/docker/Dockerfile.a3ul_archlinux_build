@@ -21,7 +21,7 @@ RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
 RUN sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$(nproc)"/g' /etc/makepkg.conf
 
 # Patch glibc so makepkg works on drone.io - https://stackoverflow.com/a/66184907
-RUN patched_glibc=glibc-linux4-2.33-4-x86_64.pkg.tar.zst && \
+RUN patched_glibc=glibc-linux4-2.35-2-x86_64.pkg.tar.zst && \
     curl -LO "https://repo.archlinuxcn.org/x86_64/$patched_glibc" && \
     bsdtar -C / -xvf "$patched_glibc"
 
