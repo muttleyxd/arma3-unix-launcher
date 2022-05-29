@@ -191,7 +191,7 @@ function(setup_spdlog)
                   GIT_TAG v1.x
                   TEST_DEFINITIONS -DSPDLOG_FMT_EXTERNAL
                   TEST_LINK_LIBS ${FMT_TARGET_NAME}
-                  CXX_FLAGS "-Wno-attributes -Wno-reorder"
+                  CXX_FLAGS "-Wno-attributes -Wno-reorder -Wno-redundant-move"
                   )
 endfunction()
 
