@@ -42,6 +42,9 @@ Requirements:
 
 #### Debian-based (Debian, Ubuntu)
     apt install cmake qt5-default libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev libspdlog-dev
+    
+Package qt5-default is not available?
+    apt install cmake qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5widgets5 libqt5svg5 libqt5svg5-dev libfmt-dev libspdlog-dev
 
 #### Arch-based (Arch Linux, Manjaro)
     pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg spdlog
