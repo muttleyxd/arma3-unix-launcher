@@ -1,7 +1,7 @@
 FROM archlinux:latest
 
 # Use faster server (for me, may be worse for you)
-RUN echo 'Server = http://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch' >/etc/pacman.d/mirrorlist
+RUN echo 'Server = http://mirror.metalgamer.eu/archlinux/$repo/os/$arch' >/etc/pacman.d/mirrorlist
 
 # Update image
 RUN pacman -Syu --noconfirm
