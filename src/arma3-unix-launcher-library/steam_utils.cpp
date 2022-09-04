@@ -124,8 +124,8 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
 
     auto const tool_name = tool_manifest_vdf.KeyValue.at("manifest/commandline");
     auto const separator = tool_name.find(' ');
-    auto const tool_args = StringUtils::trim(tool_name.substr(separator));
-    auto const tool_path = StringUtils::trim(tool_name.substr(0, separator));
+    auto const tool_args = std::string(StringUtils::trim(tool_name.substr(separator)));
+    auto const tool_path = std::string(StringUtils::trim(tool_name.substr(0, separator)));
     auto full_path = compatibility_tool_path;
     full_path += tool_path;
     return std::pair<std::filesystem::path, std::string>(full_path, tool_args);
