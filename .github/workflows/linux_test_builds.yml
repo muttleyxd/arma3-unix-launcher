@@ -1,0 +1,67 @@
+name: Linux test builds
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  archlinux-gcc:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      with:
+        image: muttleyxd/a3ul_archlinux_build:latest
+        options: -v ${{ github.workspace }}:/github/workspace
+        run: |
+             set -euxo pipefail
+             mkdir /tmp/build && cd /tmp/build
+             cmake /github/workspace -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+             make -j$(nproc)
+             ctest -V
+  ubuntu-1604-gcc:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      with:
+        image: muttleyxd/a3ul_ubuntu-16.04_build:latest
+        options: -v ${{ github.workspace }}:/github/workspace
+        run: |
+             set -eux
+             mkdir /tmp/build && cd /tmp/build
+             cmake /github/workspace -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libstdc++" -DCMAKE_CXX_COMPILER=g++-8 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_PREFIX_PATH=/qt/5.15.2/gcc_64
+             make -j$(nproc)
+             ctest -V
+  ubuntu-1804-gcc:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      with:
+        image: muttleyxd/a3ul_ubuntu-18.04_build:latest
+        options: -v ${{ github.workspace }}:/github/workspace
+        run: |
+             set -eux
+             mkdir /tmp/build && cd /tmp/build
+             cmake /github/workspace -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_CXX_COMPILER=g++-8 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON
+             make -j$(nproc)
+             ctest -V
+  archlinux-clang-fuzzing-tests:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      with:
+        image: muttleyxd/a3ul_archlinux_build:latest
+        options: -v ${{ github.workspace }}:/github/workspace
+        run: |
+             set -euxo pipefail
+             mkdir /tmp/build && cd /tmp/build
+             cmake /github/workspace -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-Werror" -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DRUN_TESTS_FUZZING=ON -DRUN_TESTS_UNIT=OFF
+             make -j$(nproc)
+             ctest --output-on-failure || ls | grep crash | xargs -n1 cat
