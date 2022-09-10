@@ -1,13 +1,13 @@
 FROM archlinux:latest
 
 # Use faster server (for me, may be worse for you)
-RUN echo 'Server = http://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch' >/etc/pacman.d/mirrorlist
+RUN echo 'Server = http://mirror.metalgamer.eu/archlinux/$repo/os/$arch' >/etc/pacman.d/mirrorlist
 
 # Update image
 RUN pacman -Syu --noconfirm
 
 # Install required dependencies
-RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg fmt wget p7zip pugixml spdlog
+RUN pacman -S --noconfirm base-devel cmake clang make gcc git qt5-base qt5-svg fmt wget p7zip pugixml python3 python-pip spdlog
 
 # Cleanup
 RUN rm -rf /var/cache/pacman/pkg/*
@@ -20,10 +20,12 @@ RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
 # Enable parallel builds
 RUN sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$(nproc)"/g' /etc/makepkg.conf
 
-# Patch glibc so makepkg works on drone.io - https://stackoverflow.com/a/66184907
-RUN patched_glibc=glibc-linux4-2.35-2-x86_64.pkg.tar.zst && \
-    curl -LO "https://repo.archlinuxcn.org/x86_64/$patched_glibc" && \
-    bsdtar -C / -xvf "$patched_glibc"
+# Install pygithub, used for release script
+RUN pip3 install pygithub
+
+# Install release script
+ADD https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py /usr/bin/github-release
+RUN chmod 755 /usr/bin/github-release
 
 # We cannot run makepkg as root, so we need a builduser
 RUN useradd -m builduser && passwd -d builduser

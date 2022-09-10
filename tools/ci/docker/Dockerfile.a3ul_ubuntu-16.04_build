@@ -44,6 +44,11 @@ ADD https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp /usr/incl
 ADD https://raw.githubusercontent.com/onqtam/doctest/2.3.6/doctest/doctest.h /usr/include/doctest/doctest.h
 RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
 
+# Install release script
+ADD https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py /usr/bin/github-release
+RUN chmod 755 /usr/bin/github-release
+RUN pip3.7 install pygithub
+
 # Add mesa
 RUN apt-get install -y mesa-common-dev libglu1-mesa-dev
 
