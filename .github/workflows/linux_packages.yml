@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Set permissions
+      run: chmod 777 ${{ github.workspace }}
     - name: Run the build process with Docker
       uses: addnab/docker-run-action@v3
       with:
@@ -24,14 +26,23 @@ jobs:
              cd /github/workspace
              tools/ci/packaging/archlinux/build.sh /github/workspace /tmp/build /tmp/build
              ls /tmp/build
-             cd /tmp/build
-             (test "${{ github.ref }}" == "refs/heads/master" && github-release --token ${{ secrets.actionrelease }} --repository muttleyxd/arma3-unix-launcher --file-glob "*.pkg.tar*") || true
+             cp /tmp/build/*.pkg.tar* /github/workspace
+    - name: draft release
+      if: github.ref == 'refs/heads/master'
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.actionrelease }}
+      with:
+        file: "*.pkg.tar.*"
+        draft: true
   appimage-gcc-8:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Set permissions
+      run: chmod 777 ${{ github.workspace }}
     - name: Run the build process with Docker
       uses: addnab/docker-run-action@v3
       with:
@@ -41,5 +52,12 @@ jobs:
              set -eux
              cd /github/workspace
              tools/ci/packaging/appimage/build.sh /github/workspace /tmp/build /tmp/build
-             ls /tmp/build
-             (test "${{ github.ref }}" == "refs/heads/master" && github-release --token ${{ secrets.actionrelease }} --repository muttleyxd/arma3-unix-launcher --file-glob "/tmp/build/*.AppImage") || true
+             cp /tmp/build/*.AppImage /github/workspace
+    - name: draft release
+      if: github.ref == 'refs/heads/master'
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.actionrelease }}
+      with:
+        file: "*.AppImage"
+        draft: true
