@@ -123,7 +123,7 @@ Before trying to run DayZ via Steam Proton, be sure to increase the max_map_coun
 
 2) Install "Proton Battleye Runtime."
 
-3) Install the arma3-unix-launcher with the new DayZ SA option ([here](https://github.com/muttleyxd/arma3-unix-launcher/edit/master/README.md#build-process-for-dayz)).
+3) Install the arma3-unix-launcher with the new DayZ SA option ([here](#build-process-for-dayz)).
 
 4) In the DayZ Unix Launcher, go to Parameters. Check "Skip intro" and "Skip logos at startup." 
 
