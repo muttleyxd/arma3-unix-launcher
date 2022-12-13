@@ -91,7 +91,7 @@ path SteamUtils::GetGamePathFromInstallPath(path const &install_path, std::strin
 path SteamUtils::GetWorkshopPath(path const &install_path, std::string const &appid) const
 {
     path proposed_path = install_path / "steamapps/workshop/content" / appid;
-    if (fs::Exists(proposed_path))
+    if (fs::Exists(proposed_path.parent_path()))
         return proposed_path;
 
     throw SteamWorkshopDirectoryNotFoundException(appid);

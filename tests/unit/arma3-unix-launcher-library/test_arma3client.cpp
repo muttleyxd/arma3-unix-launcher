@@ -204,44 +204,57 @@ TEST_CASE_FIXTURE(ARMA3ClientTests, "GetWorkshopMods")
     {
         REQUIRE_CALL(filesystemUtilsMock, Exists(get_executable_path())).RETURN(true);
         ARMA3::Client a3c(arma_path, workshop_path);
-        WHEN("Workshop directory does not contain mods")
+        WHEN("Workshop directory does not exist")
         {
-            REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {});
+            REQUIRE_CALL(filesystemUtilsMock, Exists(workshop_path)).RETURN(false);
+            REQUIRE_CALL(filesystemUtilsMock, Exists(workshop_path.parent_path())).RETURN(true);
             THEN("Returned vector is empty")
             {
                 CHECK(a3c.GetWorkshopMods().empty());
             }
         }
-        WHEN("Workshop directory contains only two directories with useless files inside")
+        WHEN("Workshop directory exists")
         {
-            std::array<std::string, 2> const mod_names{"123", "456"};
-            std::array<std::filesystem::path, 2> const mod_paths{workshop_path / mod_names[0], workshop_path / mod_names[1]};
-            REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {mod_paths[0], mod_paths[1]});
-            REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[0])).RETURN(true);
-            REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[0], _)).RETURN(std::vector<std::string> {"useless.bin"});
-            REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[1])).RETURN(true);
-            REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[1], _)).RETURN(std::vector<std::string> {"useless.bin"});
-            THEN("Returned vector is empty")
+            REQUIRE_CALL(filesystemUtilsMock, Exists(workshop_path)).RETURN(true);
+            WHEN("Workshop directory does not contain mods")
             {
-                CHECK(a3c.GetWorkshopMods().empty());
+                REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {});
+                THEN("Returned vector is empty")
+                {
+                    CHECK(a3c.GetWorkshopMods().empty());
+                }
             }
-        }
-        WHEN("Workshop directory contains two directories with workshop mods inside")
-        {
-            std::array<std::string, 2> const mod_names{"123", "456"};
-            std::array<std::filesystem::path, 2> const mod_paths{workshop_path / mod_names[0], workshop_path / mod_names[1]};
-            REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {mod_paths[0], mod_paths[1]});
-            REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[0])).RETURN(true);
-            REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[0], _)).RETURN(std::vector<std::string> {"addons"});
-            REQUIRE_CALL(modMock, Constructor(mod_paths[0], _));
-            REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[1])).RETURN(true);
-            REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[1], _)).RETURN(std::vector<std::string> {"addons"});
-            REQUIRE_CALL(modMock, Constructor(mod_paths[1], _));
-            THEN("Returned vector is empty")
+            WHEN("Workshop directory contains only two directories with useless files inside")
             {
-                auto mods = a3c.GetWorkshopMods();
-                CHECK_EQ(mod_paths[0], mods[0].path_);
-                CHECK_EQ(mod_paths[1], mods[1].path_);
+                std::array<std::string, 2> const mod_names{"123", "456"};
+                std::array<std::filesystem::path, 2> const mod_paths{workshop_path / mod_names[0], workshop_path / mod_names[1]};
+                REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {mod_paths[0], mod_paths[1]});
+                REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[0])).RETURN(true);
+                REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[0], _)).RETURN(std::vector<std::string> {"useless.bin"});
+                REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[1])).RETURN(true);
+                REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[1], _)).RETURN(std::vector<std::string> {"useless.bin"});
+                THEN("Returned vector is empty")
+                {
+                    CHECK(a3c.GetWorkshopMods().empty());
+                }
+            }
+            WHEN("Workshop directory contains two directories with workshop mods inside")
+            {
+                std::array<std::string, 2> const mod_names{"123", "456"};
+                std::array<std::filesystem::path, 2> const mod_paths{workshop_path / mod_names[0], workshop_path / mod_names[1]};
+                REQUIRE_CALL(filesystemUtilsMock, Ls(workshop_path, _)).RETURN(std::vector<std::string> {mod_paths[0], mod_paths[1]});
+                REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[0])).RETURN(true);
+                REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[0], _)).RETURN(std::vector<std::string> {"addons"});
+                REQUIRE_CALL(modMock, Constructor(mod_paths[0], _));
+                REQUIRE_CALL(filesystemUtilsMock, IsDirectory(mod_paths[1])).RETURN(true);
+                REQUIRE_CALL(filesystemUtilsMock, Ls(mod_paths[1], _)).RETURN(std::vector<std::string> {"addons"});
+                REQUIRE_CALL(modMock, Constructor(mod_paths[1], _));
+                THEN("Returned vector is empty")
+                {
+                    auto mods = a3c.GetWorkshopMods();
+                    CHECK_EQ(mod_paths[0], mods[0].path_);
+                    CHECK_EQ(mod_paths[1], mods[1].path_);
+                }
             }
         }
     }
