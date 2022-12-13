@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        MainWindow w(std::move(client), config_file, parser.get<bool>("--disable-steam-integration"));
+        MainWindow w(std::move(client), config_file, !parser.get<bool>("--disable-steam-integration"));
         w.show();
 
         return a.exec();
