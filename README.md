@@ -47,7 +47,7 @@ Requirements:
     pacman -S cmake fmt nlohmann-json pugixml qt5-base qt5-svg spdlog
 
 #### Fedora
-    dnf install gcc gcc-c++ cmake qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel spdlog-devel
+    dnf install gcc gcc-c++ cmake libcurl-devel qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel spdlog-devel
 
 #### MacOS
     brew install gcc cmake qt
