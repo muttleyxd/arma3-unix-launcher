@@ -171,43 +171,39 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Success")
 {
     GIVEN("Valid appid for installed game")
     {
-        std::string const invalid_game = "107411";
-        std::filesystem::path const expected_workshop_path = default_steam_path / "steamapps/workshop/content" / arma3_workshop_id;
-        std::filesystem::path const not_existing_workshop_path = default_steam_path / "steamapps/workshop/content" / invalid_game;
+        std::filesystem::path const parent_workshop_path = default_steam_path / "steamapps/workshop/content";
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
         REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
-        REQUIRE_CALL(filesystemUtilsMock, Exists(expected_workshop_path)).RETURN(true);
-        REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
         SteamUtils steam({default_steam_path});
 
-        WHEN("Getting workshop path for installed game")
+        WHEN("Parent workshop directory exists")
         {
+            REQUIRE_CALL(filesystemUtilsMock, Exists(parent_workshop_path)).RETURN(true);
             THEN("Workshop path for installed game is returned")
             {
-                CHECK_EQ(expected_workshop_path, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
-                CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);
+                CHECK_EQ(parent_workshop_path / arma3_workshop_id, steam.GetWorkshopPath(default_steam_path, arma3_workshop_id));
             }
         }
     }
 }
 
-TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_NotExistingApp")
+TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_ParentDirectoryDoesNotExist")
 {
     GIVEN("Valid appid for installed game")
     {
         std::string const invalid_game = "107411";
-        std::filesystem::path const not_existing_workshop_path = default_steam_path / "steamapps/workshop/content" / invalid_game;
+        std::filesystem::path const parent_workshop_path = default_steam_path / "steamapps/workshop/content";
 
         REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true);
         REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path);
-        REQUIRE_CALL(filesystemUtilsMock, Exists(not_existing_workshop_path)).RETURN(false);
 
         SteamUtils steam({default_steam_path});
 
-        WHEN("Getting workshop path for not installed game")
+        WHEN("Parent workshop does not exist")
         {
+            REQUIRE_CALL(filesystemUtilsMock, Exists(parent_workshop_path)).RETURN(false);
             THEN("Exception is thrown")
             {
                 CHECK_THROWS_AS(steam.GetWorkshopPath(default_steam_path, invalid_game), SteamWorkshopDirectoryNotFoundException);

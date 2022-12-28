@@ -146,6 +146,14 @@ int main(int argc, char *argv[])
                     {
                         spdlog::info("Install path: '{}'", path);
                         arma_path = steam.GetGamePathFromInstallPath(path, DayZ::Definitions::app_id);
+                        try
+                        {
+                            workshop_path = steam.GetWorkshopPath(path, ARMA3::Definitions::app_id);
+                        }
+                        catch (std::exception const &e) // todo: write macro for this? ex. TRY()
+                        {
+                            spdlog::warn("DayZ path is correct '{}', failed getting workshop path: '{}'", arma_path, e.what());
+                        }
                         workshop_path = steam.GetWorkshopPath(path, DayZ::Definitions::app_id);
                         client = std::make_unique<DayZ::Client>(arma_path, workshop_path);
                         break;
@@ -206,7 +214,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        MainWindow w(std::move(client), config_file, parser.get<bool>("--disable-steam-integration"));
+        MainWindow w(std::move(client), config_file, !parser.get<bool>("--disable-steam-integration"));
         w.show();
 
         return a.exec();

@@ -237,6 +237,15 @@ namespace ARMA3
 
     std::vector<Mod> Client::GetWorkshopMods()
     {
+        auto const workshop_path = GetPathWorkshop();
+
+        /*
+         * workshop directory may not exist, in case where we don't have any mods subscribed
+         * if parent path does not exist, then something is seriously broken and it should fail visibly
+         */
+        if (!FilesystemUtils::Exists(workshop_path) && FilesystemUtils::Exists(workshop_path.parent_path()))
+            return {};
+
         return GetModsFromDirectory(GetPathWorkshop());
     }
 
