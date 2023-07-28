@@ -1,7 +1,6 @@
 #pragma once
 
 #include "steam_integration_stub.hpp"
-#include <string>
 
 namespace Steam
 {
