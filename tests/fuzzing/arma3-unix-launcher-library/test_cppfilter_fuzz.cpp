@@ -1,5 +1,6 @@
 #include "cppfilter.hpp"
 
+#include <cstdint>
 #include <stdexcept>
 #include <vector>
 
