@@ -1,4 +1,5 @@
 #include "steam_integration_stub.hpp"
+#include <string>
 
 class CallbackCatcher
 {
