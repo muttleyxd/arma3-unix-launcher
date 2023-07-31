@@ -31,6 +31,7 @@ namespace
                                                             "dlcGlobalMobilization": false,
                                                             "dlcSogPrairieFire": false,
                                                             "dlcCSLA": false,
+                                                            "dlcSpearhead1944": false,
                                                             "dlcWesternSahara": false,
                                                             "enableHT": false,
                                                             "environmentVariables": null,
@@ -134,6 +135,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
     read_setting("dlcSogPrairieFire", ui->checkbox_dlc_sog_prairie_fire);
     read_setting("dlcCSLA", ui->checkbox_dlc_csla);
+    read_setting("dlcSpearhead1944", ui->checkbox_dlc_spearhead_1944);
     read_setting("dlcWesternSahara", ui->checkbox_dlc_western_sahara);
     read_setting("protonDisableEsync", ui->checkbox_disable_esync);
 
@@ -215,6 +217,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("dlcGlobalMobilization", ui->checkbox_dlc_global_mobilization);
     write_setting("dlcSogPrairieFire", ui->checkbox_dlc_sog_prairie_fire);
     write_setting("dlcCSLA", ui->checkbox_dlc_csla);
+    write_setting("dlcSpearhead1944", ui->checkbox_dlc_spearhead_1944);
     write_setting("dlcWesternSahara", ui->checkbox_dlc_western_sahara);
     write_setting("protonDisableEsync", ui->checkbox_disable_esync);
 

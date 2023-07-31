@@ -211,6 +211,8 @@ try
         mods.push_back(client->GetPath() / "vn");
     if (parameters["dlcCSLA"])
         mods.push_back(client->GetPath() / "CSLA");
+    if (parameters["dlcSpearhead1944"])
+        mods.push_back(client->GetPath() / "SPE");
     if (parameters["dlcWesternSahara"])
         mods.push_back(client->GetPath() / "WS");
     if (!parameters["environmentVariables"].is_null())
