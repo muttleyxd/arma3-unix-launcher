@@ -10,3 +10,10 @@ cmake-build*/
 #Packages
 *.tar.xz
 *.deb
+
+#VSCode
+.vscode/
+
+#LLVM Toolchain
+.cache/
+compile_commands.json
