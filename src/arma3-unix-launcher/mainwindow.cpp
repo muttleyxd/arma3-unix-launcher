@@ -735,7 +735,7 @@ void MainWindow::load_mods_from_html(std::string const &path)
         }
         catch (std::exception const &e)
         {
-            spdlog::warn("Failed adding apparently existing mod '{}', reason: {}", it->at("path"), e.what());
+            spdlog::warn("Failed adding apparently existing mod '{}', reason: {}", it->at("path").get<std::string>(), e.what());
         }
     }
 

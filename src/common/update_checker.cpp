@@ -59,8 +59,8 @@ namespace UpdateChecker
 
                 auto const tag_name = response.at(0).at("tag_name");
                 auto const current_tag_name = fmt::format("commit-{}", REPOSITORY_VERSION);
-                spdlog::trace("{}:{} newest tag name: '{}', current tag name: '{}'", __PRETTY_FUNCTION__, __LINE__, tag_name,
-                              current_tag_name);
+                spdlog::trace("{}:{} newest tag name: '{}', current tag name: '{}'", __PRETTY_FUNCTION__, __LINE__, 
+                              tag_name.get<std::string>(), current_tag_name);
 
                 auto const content = response.at(0).at("body");
 
