@@ -1,5 +1,7 @@
 #include "vdf.hpp"
 
+#include <cstdint>
+
 #include "exceptions/syntax_error.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(uint8_t const *data, size_t size)

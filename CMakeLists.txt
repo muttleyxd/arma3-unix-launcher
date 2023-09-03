@@ -5,7 +5,7 @@ include(cmake/external_dependencies.cmake)
 include(cmake/functions.cmake)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-deprecated-declarations")
 add_libraries_to_linker(COMPILER_ID GNU
                         LIBS stdc++fs
                         WHEN ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 9
