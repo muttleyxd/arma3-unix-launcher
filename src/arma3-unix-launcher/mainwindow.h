@@ -86,6 +86,7 @@ class MainWindow : public QMainWindow
         void on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo const &info);
 
         void on_mods_disable_all_mods();
+        void on_mods_enable_all_mods();
 
         void initialize_theme_combobox();
 

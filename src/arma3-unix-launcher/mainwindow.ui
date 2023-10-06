@@ -658,6 +658,14 @@
     </item>
    </layout>
   </widget>
+  <action name="action_mods_enable_all">
+   <property name="text">
+    <string>Enable all mods</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable all mods</string>
+   </property>
+  </action>
   <action name="action_mods_disable_all">
    <property name="text">
     <string>Disable all mods</string>

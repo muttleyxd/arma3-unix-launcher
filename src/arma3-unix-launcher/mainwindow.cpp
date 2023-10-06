@@ -146,6 +146,11 @@ If there is an update, then you will get a notification, nothing will be downloa
     if (steam_integration->is_initialized())
         setup_steam_integration();
 
+    ui->table_mods->addAction(ui->action_mods_enable_all);
+    ui->table_mods->setContextMenuPolicy(Qt::ContextMenuPolicy::ActionsContextMenu);
+    connect(ui->action_mods_enable_all, &QAction::triggered, this,
+            &MainWindow::on_mods_enable_all_mods);
+
     ui->table_mods->addAction(ui->action_mods_disable_all);
     ui->table_mods->setContextMenuPolicy(Qt::ContextMenuPolicy::ActionsContextMenu);
     connect(ui->action_mods_disable_all, &QAction::triggered, this,
@@ -945,6 +950,12 @@ catch (std::exception const &e)
 void MainWindow::on_mods_disable_all_mods()
 {
     ui->table_mods->disable_all_mods();
+    put_mods_from_ui_to_manager_settings();
+}
+
+void MainWindow::on_mods_enable_all_mods()
+{
+    ui->table_mods->enable_all_mods();
     put_mods_from_ui_to_manager_settings();
 }
 
