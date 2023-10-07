@@ -19,6 +19,7 @@ class ModTableWidget : public QTableWidget
         void add_mod(UiMod const &mod, int index = -1);
         bool contains_mod(std::string_view const path_or_workshop_id) const;
         void disable_all_mods();
+        void enable_all_mods();
         UiMod get_mod_at(int index) const;
         std::vector<UiMod> get_mods() const;
 

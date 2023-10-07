@@ -195,6 +195,16 @@ void ModTableWidget::disable_all_mods()
     }
 }
 
+void ModTableWidget::enable_all_mods()
+{
+    for (int row = 0; row < rowCount(); ++row)
+    {
+        auto cell_widget = cellWidget(row, 0);
+        auto checkbox = cell_widget->findChild<QCheckBox *>();
+        checkbox->setCheckState(Qt::CheckState::Checked);
+    }
+}
+
 UiMod ModTableWidget::get_mod_at(int index) const
 {
     auto cell_widget = cellWidget(index, 0);
