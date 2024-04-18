@@ -50,7 +50,7 @@ Requirements:
     dnf install gcc gcc-c++ cmake libcurl-devel qt5-qtbase qt5-qtsvg qt5-qtbase-devel qt5-qtsvg-devel spdlog-devel
 
 #### MacOS
-    brew install gcc cmake qt
+    brew install gcc cmake qt5
 
 #### Build process for Arma 3
     git clone https://github.com/muttleyxd/arma3-unix-launcher.git
