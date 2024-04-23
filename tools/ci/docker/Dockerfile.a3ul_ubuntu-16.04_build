@@ -29,7 +29,7 @@ RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3.7 /usr/bin/python3
 RUN sed -i 's|/usr/bin/python3|/usr/bin/python3.5|g' /usr/bin/lsb_release
 
 # Install py7zr
-RUN pip3.7 install --upgrade pip && pip3.7 install py7zr lxml requests semantic_version
+RUN pip3.7 install --upgrade pip && pip3.7 install py7zr lxml requests semantic_version && pip3.7 install urllib3==1.26.6 
 
 # Install Qt 5.15.2
 ADD https://raw.githubusercontent.com/engnr/qt-downloader/master/qt-downloader /qt/qt-downloader
