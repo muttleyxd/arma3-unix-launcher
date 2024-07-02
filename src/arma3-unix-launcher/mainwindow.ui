@@ -449,6 +449,24 @@
                  </widget>
                 </item>
                 <item>
+                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_profiles">
+                  <item>
+                   <widget class="QCheckBox" name="checkbox_profiles">
+                    <property name="text">
+                     <string>Profiles Directory</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="textbox_profiles">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_world">
                   <item>
                    <widget class="QCheckBox" name="checkbox_world">

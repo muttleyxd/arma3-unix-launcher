@@ -41,6 +41,7 @@ class MainWindow : public QMainWindow
         void on_checkbox_extra_threads_stateChanged(int arg1);
         void on_checkbox_cpu_count_stateChanged(int arg1);
         void on_checkbox_parameter_file_stateChanged(int arg1);
+        void on_checkbox_profiles_stateChanged(int arg1);
         void on_checkbox_world_stateChanged(int arg1);
         void on_checkbox_custom_parameters_stateChanged(int arg1);
         void on_checkbox_server_address_stateChanged(int arg1);

@@ -196,6 +196,12 @@ try
         if (StringUtils::trim(parameter_file).empty())
             throw std::invalid_argument("Parameters -> Parameter file cannot be empty");
     }
+        if (parameters["profiles"].is_string())
+    {
+        std::string profiles_dir = parameters["profiles"];
+        if (StringUtils::trim(profiles_dir).empty())
+            throw std::invalid_argument("Parameters -> Profiles Directory cannot be empty");
+    }
 
     std::vector<std::filesystem::path> mods;
     for (auto const &mod : ui->table_mods->get_mods())
@@ -228,7 +234,13 @@ try
     spdlog::trace("Mod list: ");
     for (auto const &mod : mods)
         spdlog::trace("path: {}", mod.string());
-    client->CreateArmaCfg(mods);
+    if (!parameters["profiles"].is_null()) {
+        std::string profiles = parameters["profiles"];
+        std::filesystem::path profiles_dir = profiles + "/Users/steamuser/Arma3.cfg";
+        client->CreateArmaCfg(mods, profiles_dir);
+    }
+    else
+        client->CreateArmaCfg(mods);
     client->Start(manager.get_launch_parameters(), environment_variables, steam_integration->is_initialized(),
                   parameters["protonDisableEsync"]);
 }
@@ -482,6 +494,11 @@ void MainWindow::on_checkbox_parameter_file_stateChanged(int arg1)
     bool value = arg1 == Qt::CheckState::Checked;
     ui->textbox_parameter_file->setEnabled(value);
     ui->button_parameter_file_open->setEnabled(value);
+}
+
+void MainWindow::on_checkbox_profiles_stateChanged(int arg1)
+{
+    ui->textbox_profiles->setEnabled(arg1 == Qt::CheckState::Checked);
 }
 
 void MainWindow::on_checkbox_world_stateChanged(int arg1)
