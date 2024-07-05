@@ -21,7 +21,7 @@ RUN chmod 644 /usr/include/nlohmann/json.hpp /usr/include/doctest/doctest.h
 RUN sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$(nproc)"/g' /etc/makepkg.conf
 
 # Install pygithub, used for release script
-RUN pip3 install pygithub
+RUN pip3 install pygithub --break-system-packages
 
 # Install release script
 ADD https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py /usr/bin/github-release
