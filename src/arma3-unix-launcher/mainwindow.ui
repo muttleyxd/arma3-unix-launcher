@@ -250,6 +250,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_reaction_forces">
+                  <property name="text">
+                   <string>Enable Reaction Forces DLC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="checkbox_dlc_csla">
                   <property name="text">
                    <string>Enable CSLA Iron Curtain DLC</string>
