@@ -49,7 +49,8 @@ namespace
                                                             "port": null,
                                                             "skipIntro": false,
                                                             "window": false,
-                                                            "world": null
+                                                            "world": null,
+                                                            "profiles": null
                                                         },
                                                         "settings": {
                                                             "checkForUpdates": null,
@@ -105,6 +106,11 @@ std::string Settings::get_launch_parameters()
             ret += fmt::format(" {}", std::string(parameter.value()));
         else if (parameter.value().type() == nlohmann::json::value_t::boolean && parameter.value())
             ret += fmt::format(" -{}", parameter.key());
+        else if ((parameter.key() == "profiles") && parameter.value().is_string())
+        {
+            std::string value = StringUtils::ToWindowsPath(parameter.value(), 'Z' );
+            ret += fmt::format(" -{}=\"{}\"", parameter.key(), value);
+        }
         else if (parameter.value().type() == nlohmann::json::value_t::string)
         {
             std::string value = parameter.value();
@@ -147,6 +153,7 @@ void Settings::load_settings_to_ui(Ui::MainWindow *ui)
     read_setting("enableHT", ui->checkbox_enable_hyper_threading);
     read_setting("filePatching", ui->checkbox_enable_file_patching);
     read_setting("noLogs", ui->checkbox_no_logs);
+    read_setting("profiles", ui->checkbox_profiles, ui->textbox_profiles);
     read_setting("world", ui->checkbox_world, ui->textbox_world);
     read_setting("noPause", ui->checkbox_no_pause);
     read_setting("hugepages", ui->checkbox_hugepages);
@@ -230,6 +237,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
     write_setting("enableHT", ui->checkbox_enable_hyper_threading);
     write_setting("filePatching", ui->checkbox_enable_file_patching);
     write_setting("noLogs", ui->checkbox_no_logs);
+    write_setting("profiles", ui->checkbox_profiles, ui->textbox_profiles);
     write_setting("world", ui->checkbox_world, ui->textbox_world);
     write_setting("noPause", ui->checkbox_no_pause);
     write_setting("hugepages", ui->checkbox_hugepages);
