@@ -14,7 +14,7 @@ jobs:
     - name: install-dependencies
       run: |
         brew install gcc@11 cmake qt@5 p7zip wget gpg openssl@1.1
-        pip3 install pygithub
+        pip3 install pygithub --break-system-packages
         curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
         chmod +x github-release
     - name: make build directory
