@@ -222,6 +222,8 @@ try
         mods.push_back(client->GetPath() / "vn");
     if (parameters["dlcReactionForces"])
         mods.push_back(client->GetPath() / "RF");
+    if (parameters["dlcExpeditionaryForces"])
+        mods.push_back(client->GetPath() / "EF");
     if (parameters["dlcCSLA"])
         mods.push_back(client->GetPath() / "CSLA");
     if (parameters["dlcSpearhead1944"])
