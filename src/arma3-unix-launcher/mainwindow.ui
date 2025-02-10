@@ -257,6 +257,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="checkbox_dlc_expeditionary_forces">
+                  <property name="text">
+                   <string>Enable Expeditionary Forces DLC</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="checkbox_dlc_csla">
                   <property name="text">
                    <string>Enable CSLA Iron Curtain DLC</string>

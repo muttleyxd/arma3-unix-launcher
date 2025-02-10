@@ -13,7 +13,7 @@ namespace ARMA3::Definitions
 
     static constexpr char const *app_id = "107410";
 
-    static const std::array<char const *, 30> exclusions{"Addons", "AoW", "Argo", "BattlEye", "Contact", "Curator", "Dll", "Dta", "Enoch", "Expansion", "fontconfig", "GM", "CSLA", "Heli", "Jets", "Kart", "Keys", "Launcher", "MPMissions", "Mark", "Missions", "Orange", "SPE", "Tacops", "Tank", "vn", "RF", "WS", "legal", "steam_shader_cache"};
+    static const std::array<char const *, 31> exclusions{"Addons", "AoW", "Argo", "BattlEye", "Contact", "Curator", "Dll", "Dta", "Enoch", "Expansion", "fontconfig", "GM", "CSLA", "Heli", "Jets", "Kart", "Keys", "Launcher", "MPMissions", "Mark", "Missions", "Orange", "SPE", "Tacops", "Tank", "vn", "RF", "EF", "WS", "legal", "steam_shader_cache"};
     //TODO: Use dta/product.bin for exclusion list
 
     #ifdef __linux
