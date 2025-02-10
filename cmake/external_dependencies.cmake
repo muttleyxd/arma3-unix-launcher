@@ -1,4 +1,3 @@
-
 include(CheckCXXSourceCompiles)
 include(FetchContent)
 
@@ -72,6 +71,7 @@ function(setup_curlpp)
         set(CURLPP_LIB_PATH3 "${curlpp_BINARY_DIR}/libcurlpp.so.1.0.0" PARENT_SCOPE)
     endif()
     add_library(curlpp::curlpp ALIAS curlpp)
+    target_compile_options(curlpp PRIVATE -fpermissive)
 endfunction()
 
 function(setup_doctest)
