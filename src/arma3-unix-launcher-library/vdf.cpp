@@ -21,7 +21,7 @@ void VDF::LoadFromText(std::string_view const text, bool append)
 {
     if (!append)
         KeyValue.clear();
-    ParseVDF(RemoveWhitespaces(text));
+    ParseVDF(std::string(text));
 }
 
 void VDF::AddKeyValuePair()
@@ -88,7 +88,9 @@ void VDF::ProcessChar(char c)
 
 void VDF::LookForKey(char c)
 {
-    if (c == '"')
+    if (std::isspace(c))
+        return;
+    else if (c == '"')
         state_ = VDFState::ReadingKey;
     else if (c == '}' && CanPop())
         hierarchy_.pop_back();
@@ -98,7 +100,9 @@ void VDF::LookForKey(char c)
 
 void VDF::LookForValue(char c)
 {
-    if (c == '"')
+    if (std::isspace(c))
+        return;
+    else if (c == '"')
         state_ = VDFState::ReadingValue;
     else if (c == '{')
     {

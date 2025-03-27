@@ -113,6 +113,24 @@ arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 
 
 <img src="https://i.imgur.com/t2HXjY5.png" width="400"><img src="https://i.imgur.com/sAetuqr.png" width="400">
 
+## Arma 3 Troubleshooting
+
+### Launch Issues
+When directly launching the game if you experience issues getting the game to start, such as a VDF error, a temporary solution can be to start the launcher with the `-d` or `--disable-steam-integration` flag.
+
+### Proton Custom Version (Compatability Tool Not Found)
+If using a custom verison of proton, like Glorious Eggroll or a source build, sometimes the launcher cannot find the implementation if its directory is different from what is written in the `config.vdf`. For example, if you're using Arch Linux's `proton-ge-custom-bin` it may install under `/usr/share/steam/compatibilitytools.d/proton-ge-custom`, but the CompatToolMapping for Arma in your `.steam/steam/config/config.vdf` may read as `Proton-GE`. To fix this, create a soft link to the actual installation, using the value in config.vdf as a link.
+
+If your custom tool is tn the user folder, assuming your custom build is in `proton-ge-custom/` but your config.vdf is pointing to `Proton-GE`:
+```shell
+ln -s [your/steam/path]/compatibilitytools.d/proton-ge-custom [your/steam/path]/compatibilitytools.d/Proton-GE
+```
+
+If your custom tool is in the system folder,assuming your custom build is in `proton-ge-custom/` but your config.vdf is pointing to `Proton-GE`:
+```shell
+sudo ln -s /usr/share/steam/compatibilitytools.d/proton-ge-custom /usr/share/steam/compatibilitytools.d/Proton-GE
+```
+
 ## DayZ Installation
 
 Before trying to run DayZ via Steam Proton, be sure to increase the max_map_count:
