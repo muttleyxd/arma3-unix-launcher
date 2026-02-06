@@ -1,0 +1,121 @@
+name: Arch Linux Daily Dependency Check
+
+on:
+  # Run daily at 00:00 UTC
+  schedule:
+    - cron: '0 0 * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild even if dependencies unchanged'
+        required: false
+        default: 'false'
+
+jobs:
+  check-and-rebuild:
+    runs-on: ubuntu-22.04
+    outputs:
+      should_build: ${{ steps.check_deps.outputs.changed }}
+      pkgrel: ${{ steps.version.outputs.pkgrel }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Cache dependency versions
+      uses: actions/cache@v3
+      with:
+        path: /tmp/arch-deps-cache.txt
+        key: arch-deps-${{ github.run_id }}
+        restore-keys: |
+          arch-deps-
+
+    - name: Check dependency changes
+      id: check_deps
+      run: |
+        chmod +x tools/ci/check-archlinux-deps.sh
+        if tools/ci/check-archlinux-deps.sh /tmp/arch-deps-cache.txt || [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download previous package for version comparison
+      if: steps.check_deps.outputs.changed == 'true'
+      continue-on-error: true
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: archlinux_daily_check.yml
+        name: archlinux-package
+        path: /tmp/previous-package
+
+    - name: Determine pkgrel version
+      if: steps.check_deps.outputs.changed == 'true'
+      id: version
+      run: |
+        chmod +x tools/ci/bump-pkgrel.sh
+        PREVIOUS_PKG=""
+        if [ -f /tmp/previous-package/*.pkg.tar.zst ]; then
+          PREVIOUS_PKG=$(ls /tmp/previous-package/*.pkg.tar.zst | head -1)
+        fi
+        PKGREL=$(tools/ci/bump-pkgrel.sh ${{ github.workspace }} "$PREVIOUS_PKG")
+        echo "pkgrel=$PKGREL" >> $GITHUB_OUTPUT
+        echo "Determined pkgrel: $PKGREL"
+
+  build-and-publish:
+    needs: check-and-rebuild
+    if: needs.check-and-rebuild.outputs.should_build == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set permissions
+      run: chmod 755 ${{ github.workspace }}
+
+    - name: Rebuild and push Arch Linux Docker image
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        tools/ci/build-and-push-docker.sh
+
+    - name: Build package with updated dependencies
+      run: |
+        tools/ci/build-archlinux-in-docker.sh \
+          ${{ github.workspace }} \
+          ${{ needs.check-and-rebuild.outputs.pkgrel }}
+
+    - name: Upload package as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: archlinux-package
+        path: "*.pkg.tar.*"
+        retention-days: 90
+
+    - name: Create draft release
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.actionrelease }}
+      with:
+        file: "*.pkg.tar.*"
+        draft: true
+
+    - name: Setup SSH for AUR
+      if: success()
+      env:
+        AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+      run: |
+        tools/ci/setup-aur-ssh.sh "${{ github.workspace }}/.ssh-aur"
+
+    - name: Publish to AUR
+      if: success()
+      run: |
+        tools/ci/publish-to-aur-in-docker.sh \
+          ${{ github.workspace }} \
+          ${{ needs.check-and-rebuild.outputs.pkgrel }} \
+          ${{ github.workspace }}/.ssh-aur
