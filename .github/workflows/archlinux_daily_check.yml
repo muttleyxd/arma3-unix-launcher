@@ -16,7 +16,8 @@ jobs:
   check-and-rebuild:
     runs-on: ubuntu-22.04
     outputs:
-      should_build: ${{ steps.check_deps.outputs.changed }}
+      should_build: ${{ steps.should_build.outputs.needed }}
+      rebuild_docker: ${{ steps.should_build.outputs.rebuild_docker }}
       pkgrel: ${{ steps.version.outputs.pkgrel }}
     steps:
     - name: Checkout repository
@@ -42,8 +43,67 @@ jobs:
           echo "changed=false" >> $GITHUB_OUTPUT
         fi
 
+    - name: Check for new commits since last AUR package
+      id: check_commits
+      if: steps.check_deps.outputs.changed == 'false'
+      run: |
+        # Get current commit info
+        CURRENT_COMMIT=$(git rev-parse HEAD)
+        CURRENT_COUNT=$(git rev-list --count HEAD)
+
+        echo "Current commit: $CURRENT_COMMIT (commit count: $CURRENT_COUNT)"
+
+        # Clone AUR package to check what's published
+        TEMP_DIR=$(mktemp -d)
+        cd "$TEMP_DIR"
+
+        # Try to fetch from AUR (may fail if package doesn't exist yet)
+        if git clone https://aur.archlinux.org/arma3-unix-launcher-bin.git aur-pkg 2>/dev/null; then
+          cd aur-pkg
+          # Extract pkgver from PKGBUILD (format: 420.5b3bf5e)
+          AUR_VERSION=$(grep "^pkgver=" PKGBUILD | cut -d'=' -f2)
+          AUR_COMMIT_COUNT=$(echo "$AUR_VERSION" | cut -d'.' -f1)
+          AUR_COMMIT_HASH=$(echo "$AUR_VERSION" | cut -d'.' -f2)
+
+          echo "AUR package version: $AUR_VERSION (commit count: $AUR_COMMIT_COUNT)"
+
+          if [ "$CURRENT_COUNT" -gt "$AUR_COMMIT_COUNT" ]; then
+            echo "✓ New commits detected! Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT"
+            echo "has_new_commits=true" >> $GITHUB_OUTPUT
+          else
+            echo "No new commits (Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT)"
+            echo "has_new_commits=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "⚠ AUR package not found or inaccessible, assuming rebuild needed"
+          echo "has_new_commits=true" >> $GITHUB_OUTPUT
+        fi
+
+        cd "${{ github.workspace }}"
+        rm -rf "$TEMP_DIR"
+
+    - name: Determine if build is needed
+      id: should_build
+      run: |
+        DEPS_CHANGED="${{ steps.check_deps.outputs.changed }}"
+        NEW_COMMITS="${{ steps.check_commits.outputs.has_new_commits }}"
+
+        if [ "$DEPS_CHANGED" = "true" ]; then
+          echo "✓ Build needed: Arch Linux dependencies changed"
+          echo "needed=true" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=true" >> $GITHUB_OUTPUT
+        elif [ "$NEW_COMMITS" = "true" ]; then
+          echo "✓ Build needed: New commits since last AUR package"
+          echo "needed=true" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
+        else
+          echo "✗ Build not needed: No changes detected"
+          echo "needed=false" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Download previous package for version comparison
-      if: steps.check_deps.outputs.changed == 'true'
+      if: steps.should_build.outputs.needed == 'true'
       continue-on-error: true
       uses: dawidd6/action-download-artifact@v6
       with:
@@ -52,7 +112,7 @@ jobs:
         path: /tmp/previous-package
 
     - name: Determine pkgrel version
-      if: steps.check_deps.outputs.changed == 'true'
+      if: steps.should_build.outputs.needed == 'true'
       id: version
       run: |
         chmod +x tools/ci/bump-pkgrel.sh
@@ -78,6 +138,7 @@ jobs:
       run: chmod 755 ${{ github.workspace }}
 
     - name: Rebuild and push Arch Linux Docker image
+      if: needs.check-and-rebuild.outputs.rebuild_docker == 'true'
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
