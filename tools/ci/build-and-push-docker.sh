@@ -18,10 +18,10 @@ echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 set -x
 
 echo "=== Rebuilding Arch Linux Docker image ==="
-docker build --no-cache -t a3ul_archlinux_build -f docker/Dockerfile.a3ul_archlinux_build .
+docker build --no-cache -t a3ul_archlinux_build:latest -f docker/Dockerfile.a3ul_archlinux_build .
 
-echo "=== Tagging image ==="
-docker tag a3ul_archlinux_build "${DOCKER_USERNAME}/a3ul_archlinux_build:latest"
+echo "=== Tagging image for Docker Hub ==="
+docker tag a3ul_archlinux_build:latest "${DOCKER_USERNAME}/a3ul_archlinux_build:latest"
 
 echo "=== Pushing to Docker Hub ==="
 docker push "${DOCKER_USERNAME}/a3ul_archlinux_build:latest"
