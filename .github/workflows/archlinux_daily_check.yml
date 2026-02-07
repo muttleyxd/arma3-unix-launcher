@@ -45,7 +45,7 @@ jobs:
     - name: Download previous package for version comparison
       if: steps.check_deps.outputs.changed == 'true'
       continue-on-error: true
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         workflow: archlinux_daily_check.yml
         name: archlinux-package
