@@ -67,12 +67,18 @@ jobs:
 
           echo "AUR package version: $AUR_VERSION (commit count: $AUR_COMMIT_COUNT)"
 
-          if [ "$CURRENT_COUNT" -gt "$AUR_COMMIT_COUNT" ]; then
-            echo "✓ New commits detected! Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT"
-            echo "has_new_commits=true" >> $GITHUB_OUTPUT
+          # Validate that AUR_COMMIT_COUNT is a positive integer
+          if [[ "$AUR_COMMIT_COUNT" =~ ^[0-9]+$ ]]; then
+            if [ "$CURRENT_COUNT" -gt "$AUR_COMMIT_COUNT" ]; then
+              echo "✓ New commits detected! Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT"
+              echo "has_new_commits=true" >> $GITHUB_OUTPUT
+            else
+              echo "No new commits (Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT)"
+              echo "has_new_commits=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "No new commits (Current: $CURRENT_COUNT, AUR: $AUR_COMMIT_COUNT)"
-            echo "has_new_commits=false" >> $GITHUB_OUTPUT
+            echo "⚠ Invalid version format in AUR package, assuming rebuild needed"
+            echo "has_new_commits=true" >> $GITHUB_OUTPUT
           fi
         else
           echo "⚠ AUR package not found or inaccessible, assuming rebuild needed"
@@ -145,11 +151,20 @@ jobs:
       run: |
         tools/ci/build-and-push-docker.sh
 
+    - name: Pull Docker image from Docker Hub
+      if: needs.check-and-rebuild.outputs.rebuild_docker == 'false'
+      run: |
+        echo "=== Pulling existing Docker image from Docker Hub ==="
+        docker pull muttleyxd/a3ul_archlinux_build:latest
+        docker tag muttleyxd/a3ul_archlinux_build:latest a3ul_archlinux_build:latest
+
     - name: Build package with updated dependencies
       run: |
+        DOCKER_IMAGE="a3ul_archlinux_build:latest"
         tools/ci/build-archlinux-in-docker.sh \
           ${{ github.workspace }} \
-          ${{ needs.check-and-rebuild.outputs.pkgrel }}
+          ${{ needs.check-and-rebuild.outputs.pkgrel }} \
+          "$DOCKER_IMAGE"
 
     - name: Upload package as artifact
       uses: actions/upload-artifact@v4
@@ -176,7 +191,9 @@ jobs:
     - name: Publish to AUR
       if: success()
       run: |
+        DOCKER_IMAGE="a3ul_archlinux_build:latest"
         tools/ci/publish-to-aur-in-docker.sh \
           ${{ github.workspace }} \
           ${{ needs.check-and-rebuild.outputs.pkgrel }} \
-          ${{ github.workspace }}/.ssh-aur
+          ${{ github.workspace }}/.ssh-aur \
+          "$DOCKER_IMAGE"
