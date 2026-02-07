@@ -20,12 +20,12 @@ jobs:
       pkgrel: ${{ steps.version.outputs.pkgrel }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Cache dependency versions
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: /tmp/arch-deps-cache.txt
         key: arch-deps-${{ github.run_id }}
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -91,7 +91,7 @@ jobs:
           ${{ needs.check-and-rebuild.outputs.pkgrel }}
 
     - name: Upload package as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: archlinux-package
         path: "*.pkg.tar.*"
