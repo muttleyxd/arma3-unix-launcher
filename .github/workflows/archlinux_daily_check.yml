@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       should_build: ${{ steps.should_build.outputs.needed }}
+      rebuild_docker: ${{ steps.should_build.outputs.rebuild_docker }}
       pkgrel: ${{ steps.version.outputs.pkgrel }}
     steps:
     - name: Checkout repository
@@ -88,12 +89,15 @@ jobs:
         if [ "$DEPS_BROKEN" = "true" ]; then
           echo "✓ Build needed: AUR package broken with current Arch dependencies"
           echo "needed=true" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=true" >> $GITHUB_OUTPUT
         elif [ "$NEW_COMMITS" = "true" ]; then
           echo "✓ Build needed: New commits since last AUR package"
           echo "needed=true" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
         else
           echo "✗ Build not needed: No changes detected"
           echo "needed=false" >> $GITHUB_OUTPUT
+          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Download previous package for version comparison
@@ -131,9 +135,19 @@ jobs:
     - name: Set permissions
       run: chmod 755 ${{ github.workspace }}
 
-    - name: Pull Docker image from Docker Hub
+    - name: Rebuild and push Arch Linux Docker image
+      if: needs.check-and-rebuild.outputs.rebuild_docker == 'true'
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
-        echo "=== Pulling Docker image from Docker Hub ==="
+        echo "=== Rebuilding Docker image with latest Arch packages ==="
+        tools/ci/build-and-push-docker.sh
+
+    - name: Pull Docker image from Docker Hub
+      if: needs.check-and-rebuild.outputs.rebuild_docker == 'false'
+      run: |
+        echo "=== Pulling existing Docker image from Docker Hub ==="
         docker pull muttleyxd/a3ul_archlinux_build:latest
         docker tag muttleyxd/a3ul_archlinux_build:latest a3ul_archlinux_build:latest
 
