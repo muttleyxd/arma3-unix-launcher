@@ -23,7 +23,7 @@ docker run --rm \
     # builduser can read workspace, writes build output to /tmp/build
     su builduser -c '
       set -euxo pipefail
-      git config --global --add safe.directory \"*\"
+      git config --global --add safe.directory /github/workspace
       cd /github/workspace
       /github/workspace/tools/ci/packaging/archlinux/build.sh /github/workspace /tmp/build /tmp/build \$PKGREL
       ls -lh /tmp/build/*.pkg.tar*
