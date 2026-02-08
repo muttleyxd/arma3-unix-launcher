@@ -61,15 +61,12 @@ endfunction()
 
 function(setup_curlpp)
     set(CHECK_SOURCE "#error unimplemented}")
+    # Force static library build
+    set(BUILD_SHARED_LIBS OFF)
     setup_library("${CHECK_SOURCE}"
                   NAME curlpp
                   GIT_REPOSITORY https://github.com/jpbarrette/curlpp.git
                   )
-    if (NOT APPLE)
-        set(CURLPP_LIB_PATH1 "${curlpp_BINARY_DIR}/libcurlpp.so" PARENT_SCOPE)
-        set(CURLPP_LIB_PATH2 "${curlpp_BINARY_DIR}/libcurlpp.so.1" PARENT_SCOPE)
-        set(CURLPP_LIB_PATH3 "${curlpp_BINARY_DIR}/libcurlpp.so.1.0.0" PARENT_SCOPE)
-    endif()
     add_library(curlpp::curlpp ALIAS curlpp)
     target_compile_options(curlpp PRIVATE -fpermissive)
 endfunction()
