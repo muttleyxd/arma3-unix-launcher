@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       should_build: ${{ steps.should_build.outputs.needed }}
-      rebuild_docker: ${{ steps.should_build.outputs.rebuild_docker }}
       pkgrel: ${{ steps.version.outputs.pkgrel }}
     steps:
     - name: Checkout repository
@@ -25,27 +24,19 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Cache dependency versions
-      uses: actions/cache@v4
-      with:
-        path: /tmp/arch-deps-cache.txt
-        key: arch-deps-${{ github.run_id }}
-        restore-keys: |
-          arch-deps-
-
-    - name: Check dependency changes
+    - name: Check if AUR package works with current dependencies
       id: check_deps
       run: |
         chmod +x tools/ci/check-archlinux-deps.sh
-        if tools/ci/check-archlinux-deps.sh /tmp/arch-deps-cache.txt || [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
-          echo "changed=true" >> $GITHUB_OUTPUT
+        if tools/ci/check-archlinux-deps.sh || [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+          echo "broken=true" >> $GITHUB_OUTPUT
         else
-          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "broken=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Check for new commits since last AUR package
       id: check_commits
-      if: steps.check_deps.outputs.changed == 'false'
+      if: steps.check_deps.outputs.broken == 'false'
       run: |
         # Get current commit info
         CURRENT_COMMIT=$(git rev-parse HEAD)
@@ -91,21 +82,18 @@ jobs:
     - name: Determine if build is needed
       id: should_build
       run: |
-        DEPS_CHANGED="${{ steps.check_deps.outputs.changed }}"
+        DEPS_BROKEN="${{ steps.check_deps.outputs.broken }}"
         NEW_COMMITS="${{ steps.check_commits.outputs.has_new_commits }}"
 
-        if [ "$DEPS_CHANGED" = "true" ]; then
-          echo "✓ Build needed: Arch Linux dependencies changed"
+        if [ "$DEPS_BROKEN" = "true" ]; then
+          echo "✓ Build needed: AUR package broken with current Arch dependencies"
           echo "needed=true" >> $GITHUB_OUTPUT
-          echo "rebuild_docker=true" >> $GITHUB_OUTPUT
         elif [ "$NEW_COMMITS" = "true" ]; then
           echo "✓ Build needed: New commits since last AUR package"
           echo "needed=true" >> $GITHUB_OUTPUT
-          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
         else
           echo "✗ Build not needed: No changes detected"
           echo "needed=false" >> $GITHUB_OUTPUT
-          echo "rebuild_docker=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Download previous package for version comparison
@@ -143,22 +131,13 @@ jobs:
     - name: Set permissions
       run: chmod 755 ${{ github.workspace }}
 
-    - name: Rebuild and push Arch Linux Docker image
-      if: needs.check-and-rebuild.outputs.rebuild_docker == 'true'
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      run: |
-        tools/ci/build-and-push-docker.sh
-
     - name: Pull Docker image from Docker Hub
-      if: needs.check-and-rebuild.outputs.rebuild_docker == 'false'
       run: |
-        echo "=== Pulling existing Docker image from Docker Hub ==="
+        echo "=== Pulling Docker image from Docker Hub ==="
         docker pull muttleyxd/a3ul_archlinux_build:latest
         docker tag muttleyxd/a3ul_archlinux_build:latest a3ul_archlinux_build:latest
 
-    - name: Build package with updated dependencies
+    - name: Build package
       run: |
         DOCKER_IMAGE="a3ul_archlinux_build:latest"
         tools/ci/build-archlinux-in-docker.sh \

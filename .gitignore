@@ -17,3 +17,5 @@ cmake-build*/
 #LLVM Toolchain
 .cache/
 compile_commands.json
+
+.env.local
