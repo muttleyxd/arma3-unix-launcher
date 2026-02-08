@@ -18,12 +18,12 @@ docker run --rm \
   "$DOCKER_IMAGE" \
   bash -c "
     set -euxo pipefail
-    git config --global --add safe.directory '*'
 
     # Run build as builduser (required by makepkg)
     # builduser can read workspace, writes build output to /tmp/build
     su builduser -c '
       set -euxo pipefail
+      git config --global --add safe.directory \"*\"
       cd /github/workspace
       /github/workspace/tools/ci/packaging/archlinux/build.sh /github/workspace /tmp/build /tmp/build \$PKGREL
       ls -lh /tmp/build/*.pkg.tar*
