@@ -1,51 +1,98 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Script to check Arch Linux dependency versions
-# Returns 0 if dependencies changed, 1 if unchanged
+# Script to check if the latest AUR package works with current Arch Linux dependencies
+# Tests by running ldd on the binary in a fresh archlinux:latest container
+# Returns 0 if rebuild needed (ldd fails or deps missing), 1 if package works fine
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-CACHE_FILE="${1:-/tmp/arch-deps-cache.txt}"
 
-echo "=== Checking Arch Linux dependency versions ==="
+echo "=== Checking if latest AUR package works with current Arch dependencies ==="
 
-# Get current versions of key dependencies
-get_current_versions() {
-    docker run --rm archlinux:latest bash -c '
-        pacman -Sy --noconfirm > /dev/null 2>&1
-        echo "spdlog=$(pacman -Si spdlog | grep "^Version" | awk "{print \$3}")"
-        echo "fmt=$(pacman -Si fmt | grep "^Version" | awk "{print \$3}")"
-        echo "pugixml=$(pacman -Si pugixml | grep "^Version" | awk "{print \$3}")"
-        echo "qt5-base=$(pacman -Si qt5-base | grep "^Version" | awk "{print \$3}")"
-    ' 2>/dev/null | sort
-}
+# Create a test script that will run inside the container
+TEST_SCRIPT=$(cat <<'EOF'
+set -euo pipefail
 
-CURRENT_VERSIONS=$(get_current_versions)
-echo "Current versions:"
-echo "$CURRENT_VERSIONS"
+echo "=== Installing runtime dependencies ==="
+pacman -Sy --noconfirm fmt pugixml qt5-base qt5-svg > /dev/null 2>&1
 
-# Check if cache exists
-if [ ! -f "$CACHE_FILE" ]; then
-    echo "No cache found, dependencies considered changed"
-    echo "$CURRENT_VERSIONS" > "$CACHE_FILE"
+echo "=== Fetching latest package from AUR ==="
+# Try to get the latest package from AUR
+TEMP_DIR=$(mktemp -d)
+cd "$TEMP_DIR"
+
+# Clone AUR package repository
+if ! git clone https://aur.archlinux.org/arma3-unix-launcher-bin.git aur-pkg 2>/dev/null; then
+    echo "⚠ AUR package not found, rebuild needed"
     exit 0
 fi
 
-# Compare with cached versions
-CACHED_VERSIONS=$(cat "$CACHE_FILE")
-echo ""
-echo "Cached versions:"
-echo "$CACHED_VERSIONS"
+cd aur-pkg
 
-if [ "$CURRENT_VERSIONS" != "$CACHED_VERSIONS" ]; then
+# Get the source URL from PKGBUILD
+if ! grep -q "^source=" PKGBUILD; then
+    echo "⚠ No source found in PKGBUILD, rebuild needed"
+    exit 0
+fi
+
+# Extract download URL (assumes format: source=("url"))
+SOURCE_URL=$(grep "^source=" PKGBUILD | sed 's/source=(//' | sed 's/)//' | tr -d '"' | tr -d "'")
+
+if [ -z "$SOURCE_URL" ]; then
+    echo "⚠ Could not parse source URL, rebuild needed"
+    exit 0
+fi
+
+echo "Downloading package from: $SOURCE_URL"
+if ! curl -L -o package.pkg.tar.zst "$SOURCE_URL" 2>/dev/null; then
+    echo "⚠ Failed to download package, rebuild needed"
+    exit 0
+fi
+
+echo "=== Extracting package ==="
+if ! tar -xf package.pkg.tar.zst 2>/dev/null; then
+    echo "⚠ Failed to extract package, rebuild needed"
+    exit 0
+fi
+
+if [ ! -f usr/bin/arma3-unix-launcher ]; then
+    echo "⚠ Binary not found in package, rebuild needed"
+    exit 0
+fi
+
+echo "=== Running ldd on binary ==="
+echo ""
+LDD_OUTPUT=$(ldd usr/bin/arma3-unix-launcher 2>&1 || true)
+echo "$LDD_OUTPUT"
+echo ""
+
+# Check if ldd shows any "not found" dependencies
+if echo "$LDD_OUTPUT" | grep -q "not found"; then
+    echo "✗ Missing dependencies detected!"
+    echo "$LDD_OUTPUT" | grep "not found"
     echo ""
-    echo "=== Dependencies have changed! ==="
-    echo "Differences:"
-    diff <(echo "$CACHED_VERSIONS") <(echo "$CURRENT_VERSIONS") || true
-    echo "$CURRENT_VERSIONS" > "$CACHE_FILE"
+    echo "=== Rebuild needed: AUR package is broken with current dependencies ==="
+    exit 0
+fi
+
+# Check if ldd command itself failed
+if echo "$LDD_OUTPUT" | grep -qi "error"; then
+    echo "✗ ldd command failed!"
+    echo "=== Rebuild needed: Cannot verify package integrity ==="
+    exit 0
+fi
+
+echo "✓ All dependencies satisfied!"
+echo "=== No rebuild needed: AUR package works with current dependencies ==="
+exit 1
+EOF
+)
+
+# Run the test in a fresh archlinux:latest container
+if docker run --rm archlinux:latest bash -c "$TEST_SCRIPT"; then
+    # Exit code 0 from script means rebuild needed
     exit 0
 else
-    echo ""
-    echo "=== No dependency changes detected ==="
+    # Exit code 1 from script means no rebuild needed
     exit 1
 fi
