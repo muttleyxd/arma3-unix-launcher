@@ -65,9 +65,6 @@ if (APPLE)
                        COMMENT "Copying Steamworks SDK")
 else()
     install(FILES "${STEAMWORKS_LIB_PATH}"
-                  "${CURLPP_LIB_PATH1}"
-                  "${CURLPP_LIB_PATH2}"
-                  "${CURLPP_LIB_PATH3}"
                   "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"
             DESTINATION share/arma3-unix-launcher/lib)
 endif()
