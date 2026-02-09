@@ -25,25 +25,18 @@ function(setup_library SOURCE_TO_TEST)
         set(LIB_SETUP_GIT_TAG master)
     endif()
 
+    message("-- Downloading ${LIB_SETUP_NAME} from ${LIB_SETUP_GIT_REPOSITORY}")
     FetchContent_Declare(${LIB_SETUP_NAME}
                          GIT_REPOSITORY ${LIB_SETUP_GIT_REPOSITORY}
                          GIT_TAG ${LIB_SETUP_GIT_TAG})
-    FetchContent_GetProperties(${LIB_SETUP_NAME})
-    set(POPULATED "${LIB_SETUP_NAME}_POPULATED")
-    if (NOT "${POPULATED}")
-        message("-- Downloading ${LIB_SETUP_NAME} from ${LIB_SETUP_GIT_REPOSITORY}")
-        FetchContent_Populate(${LIB_SETUP_NAME})
-        set(SRCDIR "${LIB_SETUP_NAME}_SOURCE_DIR")
-        set(BINDIR "${LIB_SETUP_NAME}_BINARY_DIR")
 
-        string(APPEND CMAKE_CXX_FLAGS " ${LIB_SETUP_CXX_FLAGS}")
-        add_subdirectory(${${SRCDIR}} ${${BINDIR}} EXCLUDE_FROM_ALL)
-        message("-- Using external ${LIB_SETUP_NAME}")
-    endif()
+    string(APPEND CMAKE_CXX_FLAGS " ${LIB_SETUP_CXX_FLAGS}")
+    FetchContent_MakeAvailable(${LIB_SETUP_NAME})
+    message("-- Using external ${LIB_SETUP_NAME}")
 endfunction()
 
 function(setup_argparse)
-    set(CHECK_SOURCE "#include <argparse.hpp>
+    set(CHECK_SOURCE "#include <argparse/argparse.hpp>
             int main()
             {
               return 0;
@@ -51,11 +44,19 @@ function(setup_argparse)
     setup_library("${CHECK_SOURCE}"
                   NAME argparse
                   GIT_REPOSITORY https://github.com/p-ranav/argparse.git
-                  GIT_TAG 45664c4
+                  GIT_TAG v3.2
                   HEADER_ONLY
                   )
     if (NOT TARGET argparse::argparse)
-        add_library(argparse::argparse ALIAS argparse)
+        # argparse v3.2+ provides argparse target, but we need the alias
+        if (TARGET argparse)
+            add_library(argparse::argparse ALIAS argparse)
+        else()
+            # Fallback for external argparse versions
+            add_library(argparse INTERFACE)
+            target_include_directories(argparse INTERFACE ${argparse_SOURCE_DIR}/include)
+            add_library(argparse::argparse ALIAS argparse)
+        endif()
     endif()
 endfunction()
 
@@ -98,7 +99,7 @@ function(setup_fmt)
     setup_library("${CHECK_SOURCE}"
                   NAME fmt
                   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-                  GIT_TAG 8.1.1
+                  GIT_TAG 11.2.0
                   TEST_LINK_LIBS fmt
                   )
 
@@ -197,6 +198,7 @@ function(setup_steamworkssdk)
     FetchContent_Declare(steamworkssdk
         URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
         URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         )
@@ -239,7 +241,7 @@ function(setup_trompeloeil)
     setup_library("${CHECK_SOURCE}"
                   NAME trompeloeil
                   GIT_REPOSITORY https://github.com/rollbear/trompeloeil.git
-                  GIT_TAG 64fd171
+                  GIT_TAG v49
                   HEADER_ONLY
                   )
     add_library(trompeloeil::trompeloeil ALIAS trompeloeil)

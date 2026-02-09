@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-#include <argparse.hpp>
+#include <argparse/argparse.hpp>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
