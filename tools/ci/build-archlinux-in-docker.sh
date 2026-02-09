@@ -19,11 +19,13 @@ docker run --rm \
   bash -c "
     set -euxo pipefail
 
+    # Set git safe.directory system-wide (survives fakeroot and su)
+    git config --system --add safe.directory /github/workspace
+
     # Run build as builduser (required by makepkg)
     # builduser can read workspace, writes build output to /tmp/build
     su builduser -c '
       set -euxo pipefail
-      git config --global --add safe.directory /github/workspace
       cd /github/workspace
       /github/workspace/tools/ci/packaging/archlinux/build.sh /github/workspace /tmp/build /tmp/build \$PKGREL
       ls -lh /tmp/build/*.pkg.tar*

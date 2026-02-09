@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
 project(arma3-unix-launcher)
 
 include(cmake/external_dependencies.cmake)
