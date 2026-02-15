@@ -20,18 +20,22 @@ docker run --rm \
   bash -c "
     set -euxo pipefail
 
-    # Copy SSH files with correct ownership (SSH is strict about this)
-    mkdir -p /root/.ssh
-    cp -r /ssh-input/* /root/.ssh/
-    chown -R root:root /root/.ssh
-    chmod 700 /root/.ssh
-    chmod 600 /root/.ssh/*
+    # Set up SSH for builduser (makepkg cannot run as root)
+    mkdir -p /home/builduser/.ssh
+    cp -r /ssh-input/* /home/builduser/.ssh/
+    chown -R builduser:builduser /home/builduser/.ssh
+    chmod 700 /home/builduser/.ssh
+    chmod 600 /home/builduser/.ssh/*
 
-    cd /workspace
-    git config --global user.name 'GitHub Actions'
-    git config --global user.email 'actions@github.com'
-    git config --global --add safe.directory '*'
-    tools/ci/publish-to-aur.sh /workspace $PKGREL
+    # Run the publish script as builduser
+    su builduser -c '
+      set -euxo pipefail
+      cd /workspace
+      git config --global user.name \"GitHub Actions\"
+      git config --global user.email \"actions@github.com\"
+      git config --global --add safe.directory \"*\"
+      tools/ci/publish-to-aur.sh /workspace $PKGREL
+    '
   "
 
 echo "=== AUR publish complete ==="
