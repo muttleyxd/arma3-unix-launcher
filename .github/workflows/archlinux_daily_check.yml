@@ -159,6 +159,16 @@ jobs:
           ${{ needs.check-and-rebuild.outputs.pkgrel }} \
           "$DOCKER_IMAGE"
 
+    - name: Get version info
+      id: version
+      run: |
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "tag=commit-$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
+
     - name: Upload package as artifact
       uses: actions/upload-artifact@v4
       with:
@@ -166,13 +176,18 @@ jobs:
         path: "*.pkg.tar.*"
         retention-days: 90
 
-    - name: Create draft release
+    - name: Create/update release and upload packages
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.actionrelease }}
       with:
         file: "*.pkg.tar.*"
-        draft: true
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: "arma3-unix-launcher commit ${{ steps.version.outputs.commit_count }}"
+        draft: false
+        prerelease: false
+        overwrite: true
+        verbose: true
 
     - name: Setup SSH for AUR
       if: success()

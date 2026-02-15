@@ -10,11 +10,20 @@ jobs:
   archlinux-gcc:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set permissions
       run: chmod 777 ${{ github.workspace }}
+    - name: Get version info
+      id: version
+      run: |
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "tag=commit-$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
     - name: Run the build process with Docker
       uses: addnab/docker-run-action@v3
       with:
@@ -27,22 +36,37 @@ jobs:
              tools/ci/packaging/archlinux/build.sh /github/workspace /tmp/build /tmp/build
              ls /tmp/build
              cp /tmp/build/*.pkg.tar* /github/workspace
-    - name: draft release
+    - name: Create/update release and upload packages
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.actionrelease }}
       with:
         file: "*.pkg.tar.*"
-        draft: true
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: "arma3-unix-launcher commit ${{ steps.version.outputs.commit_count }}"
+        draft: false
+        prerelease: false
+        overwrite: true
+        verbose: true
+
   appimage-gcc-8:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set permissions
       run: chmod 777 ${{ github.workspace }}
+    - name: Get version info
+      id: version
+      run: |
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "tag=commit-$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
     - name: Run the build process with Docker
       uses: addnab/docker-run-action@v3
       with:
@@ -53,22 +77,37 @@ jobs:
              cd /github/workspace
              tools/ci/packaging/appimage/build.sh /github/workspace /tmp/build /tmp/build
              cp /tmp/build/*.AppImage /github/workspace
-    - name: draft release
+    - name: Create/update release and upload AppImage
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.actionrelease }}
       with:
         file: "*.AppImage"
-        draft: true
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: "arma3-unix-launcher commit ${{ steps.version.outputs.commit_count }}"
+        draft: false
+        prerelease: false
+        overwrite: true
+        verbose: true
+
   dayz-appimage-gcc-8:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set permissions
       run: chmod 777 ${{ github.workspace }}
+    - name: Get version info
+      id: version
+      run: |
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "tag=commit-$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
     - name: Run the build process with Docker
       uses: addnab/docker-run-action@v3
       with:
@@ -79,11 +118,16 @@ jobs:
              cd /github/workspace
              tools/ci/packaging/appimage_dayz/build.sh /github/workspace /tmp/build /tmp/build
              cp /tmp/build/*.AppImage /github/workspace
-    - name: draft release
+    - name: Create/update release and upload AppImage
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.actionrelease }}
       with:
         file: "*.AppImage"
-        draft: true
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: "arma3-unix-launcher commit ${{ steps.version.outputs.commit_count }}"
+        draft: false
+        prerelease: false
+        overwrite: true
+        verbose: true
