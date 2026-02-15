@@ -8,15 +8,21 @@ jobs:
   build-and-deploy:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: Get version info
+      id: version
+      run: |
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "tag=commit-$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
     - name: install-dependencies
       run: |
         brew install gcc@11 cmake qt@5 p7zip wget gpg openssl@1.1
-        pip3 install pygithub --break-system-packages
-        curl https://raw.githubusercontent.com/muttleyxd/github-release/master/github-release.py -o github-release
-        chmod +x github-release
     - name: make build directory
       run: mkdir build && cd build
     - name: cmake
@@ -29,9 +35,17 @@ jobs:
       run: |
         cd build
         make package
-        export COMMIT_COUNT=`git rev-list --count HEAD`
-        export COMMIT_HASH=`git rev-parse --verify HEAD | cut -c -7`
-        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-$COMMIT_COUNT.$COMMIT_HASH-mac_os_x-x86_64.dmg
-    - name: deploy release
+        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-${{ steps.version.outputs.pkgver }}-mac_os_x-x86_64.dmg
+    - name: Create/update release and upload DMG
       if: github.ref == 'refs/heads/master'
-      run: ./github-release --token ${{ secrets.actionrelease }} --repository muttleyxd/arma3-unix-launcher --file-glob "build/*.dmg"
+      uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.actionrelease }}
+      with:
+        file: "build/*.dmg"
+        tag_name: ${{ steps.version.outputs.tag }}
+        release_name: "arma3-unix-launcher commit ${{ steps.version.outputs.commit_count }}"
+        draft: false
+        prerelease: false
+        overwrite: true
+        verbose: true
