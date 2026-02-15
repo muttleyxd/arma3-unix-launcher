@@ -24,7 +24,7 @@ ssh-keyscan aur.archlinux.org > "$OUTPUT_DIR/known_hosts"
 # Create SSH config
 cat > "$OUTPUT_DIR/config" << 'EOF'
 Host aur.archlinux.org
-  IdentityFile /root/.ssh/aur
+  IdentityFile ~/.ssh/aur
   User aur
   StrictHostKeyChecking no
 EOF

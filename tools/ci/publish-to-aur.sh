@@ -6,7 +6,7 @@ set -euo pipefail
 
 WORKSPACE_DIR="${1:?Workspace directory required}"
 PKGREL="${2:?Package release number required}"
-AUR_REPO="${3:-ssh://aur@aur.archlinux.org/arma3-unix-launcher.git}"
+AUR_REPO="${3:-ssh://aur@aur.archlinux.org/arma3-unix-launcher-bin.git}"
 
 # Validate PKGREL is a positive integer
 if ! [[ "$PKGREL" =~ ^[0-9]+$ ]]; then
