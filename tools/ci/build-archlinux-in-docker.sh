@@ -19,8 +19,11 @@ docker run --rm \
   bash -c "
     set -euxo pipefail
 
-    # Set git safe.directory system-wide (survives fakeroot and su)
-    git config --system --add safe.directory /github/workspace
+    # Configure git safe.directory for makepkg
+    # makepkg sets GIT_CONFIG_GLOBAL=/dev/null and GIT_CONFIG_SYSTEM=/etc/makepkg.d/gitconfig
+    # so we must put our config in the makepkg-specific system config location
+    mkdir -p /etc/makepkg.d
+    printf '[safe]\n\tdirectory = *\n' > /etc/makepkg.d/gitconfig
 
     # Run build as builduser (required by makepkg)
     # builduser can read workspace, writes build output to /tmp/build
