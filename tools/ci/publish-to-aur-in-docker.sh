@@ -15,10 +15,18 @@ echo "Using Docker image: $DOCKER_IMAGE"
 docker run --rm \
   --user root \
   -v "$WORKSPACE_DIR:/workspace" \
-  -v "$SSH_DIR:/root/.ssh:ro" \
+  -v "$SSH_DIR:/ssh-input:ro" \
   "$DOCKER_IMAGE" \
   bash -c "
     set -euxo pipefail
+
+    # Copy SSH files with correct ownership (SSH is strict about this)
+    mkdir -p /root/.ssh
+    cp -r /ssh-input/* /root/.ssh/
+    chown -R root:root /root/.ssh
+    chmod 700 /root/.ssh
+    chmod 600 /root/.ssh/*
+
     cd /workspace
     git config --global user.name 'GitHub Actions'
     git config --global user.email 'actions@github.com'
