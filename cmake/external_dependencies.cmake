@@ -68,8 +68,8 @@ function(setup_curlpp)
                   NAME curlpp
                   GIT_REPOSITORY https://github.com/jpbarrette/curlpp.git
                   )
-    add_library(curlpp::curlpp ALIAS curlpp)
-    target_compile_options(curlpp PRIVATE -fpermissive)
+    add_library(curlpp::curlpp ALIAS curlpp_static)
+    target_compile_options(curlpp_static PRIVATE -fpermissive)
 endfunction()
 
 function(setup_doctest)
@@ -198,7 +198,6 @@ function(setup_steamworkssdk)
     FetchContent_Declare(steamworkssdk
         URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
         URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         )
