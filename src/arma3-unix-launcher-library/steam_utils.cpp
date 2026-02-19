@@ -1,6 +1,7 @@
 #include "steam_utils.hpp"
 
 #include <exception>
+#include <ranges>
 #include <stdexcept>
 
 #include <fmt/format.h>
@@ -119,7 +120,7 @@ std::pair<std::filesystem::path, std::string> SteamUtils::GetCompatibilityToolFo
     auto const tool_manifest = compatibility_tool_path / "toolmanifest.vdf";
     VDF tool_manifest_vdf;
     tool_manifest_vdf.LoadFromText(StdUtils::FileReadAllText(tool_manifest));
-    if (!StdUtils::ContainsKey(tool_manifest_vdf.KeyValue, command_line_key))
+    if (!tool_manifest_vdf.KeyValue.contains(command_line_key))
         throw std::runtime_error(fmt::format("cannot read '{}' from '{}'", command_line_key, tool_manifest.string()));
 
     auto const tool_name = tool_manifest_vdf.KeyValue.at("manifest/commandline");
@@ -202,5 +203,6 @@ std::filesystem::path SteamUtils::get_builtin_compatibility_tool(std::string con
 
 bool SteamUtils::IsFlatpak() const
 {
-    return StdUtils::Contains(GetSteamPath(), "com.valvesoftware.Steam");
+    auto const path = GetSteamPath().string();
+    return path.find("com.valvesoftware.Steam") != std::string::npos;
 }

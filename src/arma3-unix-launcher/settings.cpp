@@ -108,7 +108,7 @@ std::string Settings::get_launch_parameters()
             ret += fmt::format(" -{}", parameter.key());
         else if ((parameter.key() == "profiles") && parameter.value().is_string())
         {
-            std::string value = StringUtils::ToWindowsPath(parameter.value(), 'Z' );
+            std::string value = StringUtils::ToWindowsPath(parameter.value(), 'Z');
             ret += fmt::format(" -{}=\"{}\"", parameter.key(), value);
         }
         else if (parameter.value().type() == nlohmann::json::value_t::string)

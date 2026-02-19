@@ -1,14 +1,8 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/dayz-linux-launcher/lib")
-
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5Svg CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 
-add_executable(dayz-linux-launcher ${SOURCES})
+qt_add_executable(dayz-linux-launcher ${SOURCES})
 target_compile_definitions(dayz-linux-launcher PRIVATE "-DREPOSITORY_VERSION=${COMMIT_COUNT}")
 target_include_directories(dayz-linux-launcher PRIVATE .)
 target_link_libraries(dayz-linux-launcher PRIVATE
@@ -21,8 +15,8 @@ target_link_libraries(dayz-linux-launcher PRIVATE
     nlohmann::json
     pugixml::pugixml
     rihab::scope_guard
-    Qt5::Widgets
-    Qt5::Svg
+    Qt6::Widgets
+    Qt6::Svg
     spdlog::spdlog
     )
 install(TARGETS dayz-linux-launcher

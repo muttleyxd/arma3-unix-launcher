@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.21)
 project(arma3-unix-launcher)
 
 include(cmake/external_dependencies.cmake)
 include(cmake/functions.cmake)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-deprecated-declarations")
 add_libraries_to_linker(COMPILER_ID GNU
                         LIBS stdc++fs
@@ -34,6 +35,12 @@ setup_nlohmann_json()
 setup_scope_guard()
 setup_steamworkssdk()
 setup_spdlog()
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
+qt_standard_project_setup()
+
+# Enable automatic resource compilation (not included in qt_standard_project_setup)
+set(CMAKE_AUTORCC ON)
 
 add_subdirectory(src)
 

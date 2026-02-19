@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <ranges>
 #include <regex>
 #include <string_view>
 
@@ -20,11 +21,12 @@ namespace fs = FilesystemUtils;
 
 Mod::Mod(std::filesystem::path const &path) : path_(path)
 {
-    if (!StdUtils::Contains(fs::Ls(path, true), "addons"))
+    auto const listing = fs::Ls(path, true);
+    if (std::ranges::find(listing, "addons") == listing.end())
         throw DirectoryNotFoundException(path / "addons");
 
     LoadAllCPP();
-    if (!StdUtils::ContainsKey(KeyValue, "publishedid") || KeyValue["publishedid"] == "0")
+    if (!KeyValue.contains("publishedid") || KeyValue["publishedid"] == "0")
         KeyValue["publishedid"] = path.filename();
 }
 

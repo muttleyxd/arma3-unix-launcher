@@ -19,3 +19,6 @@ cmake-build*/
 compile_commands.json
 
 .env.local
+
+# GSD planning directory
+.planning/

@@ -76,17 +76,17 @@ int main(int argc, char *argv[])
         argparse::ArgumentParser parser("arma3-unix-launcher");
 
         parser.add_argument("-d", "--disable-steam-integration").help("disable Steamworks SDK integration").default_value(
-            true).implicit_value(false);
+                  true).implicit_value(false);
         parser.add_argument("-l", "--list-presets").help("list available mod presets").default_value(false).implicit_value(
-            true);
+                  true);
         parser.add_argument("-p",
                             "--preset-to-run").help("preset to run, launcher will start Arma with given mods and exit").nargs(1);
         parser.add_argument("--server-ip").help("server ip to connect to, usable only with --preset-to-run").nargs(1);
         parser.add_argument("--server-port").help("server port to connect to, usable only with --preset-to-run").nargs(1);
         parser.add_argument("--server-password").help("server password to connect to, usable only with --preset-to-run").nargs(
-            1);
+                  1);
         parser.add_argument("-v", "--verbose").help("verbose mode which enables more logging").default_value(
-            false).implicit_value(true);
+                  false).implicit_value(true);
         try
         {
             parser.parse_args(argc, argv);

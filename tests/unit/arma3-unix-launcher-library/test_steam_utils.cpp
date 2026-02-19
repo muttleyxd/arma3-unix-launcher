@@ -214,29 +214,29 @@ TEST_CASE_FIXTURE(SteamUtilsTests, "GetWorkshopDir_Failed_ParentDirectoryDoesNot
 
 class GetCompatibilityToolForAppIdTests : public SteamUtilsTests
 {
-public:
-    GetCompatibilityToolForAppIdTests()
-    {
-        expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true));
-        expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path));
+    public:
+        GetCompatibilityToolForAppIdTests()
+        {
+            expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(default_config_path)).RETURN(true));
+            expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, RealPath(default_steam_path)).RETURN(default_steam_path));
 
-        expectations.push_back(NAMED_ALLOW_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(default_config_path));
+            expectations.push_back(NAMED_ALLOW_CALL(stdUtilsMock, FileReadAllText(default_config_path)).LR_RETURN(default_config_path));
 
-        expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _)));
+            expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(default_config_path.string(), false, _)));
 
-        steam = std::make_unique<SteamUtils>(std::vector<std::filesystem::path>{default_steam_path});
-    }
+            steam = std::make_unique<SteamUtils>(std::vector<std::filesystem::path>{default_steam_path});
+        }
 
-    std::uint64_t const appid = 107410;
-    std::unique_ptr<SteamUtils> steam;
+        std::uint64_t const appid = 107410;
+        std::unique_ptr<SteamUtils> steam;
 
-    std::filesystem::path const steam_compatibility_tool_dir = default_steam_path / "compatibilitytools.d/proton_7";
-    std::filesystem::path const system_compatibility_tool_dir = "/usr/share/steam/compatibilitytools.d/proton_7";
+        std::filesystem::path const steam_compatibility_tool_dir = default_steam_path / "compatibilitytools.d/proton_7";
+        std::filesystem::path const system_compatibility_tool_dir = "/usr/share/steam/compatibilitytools.d/proton_7";
 
-    std::string const filter = fmt::format("CompatToolMapping/{}/name", appid);
+        std::string const filter = fmt::format("CompatToolMapping/{}/name", appid);
 
-    using expectation = std::unique_ptr<trompeloeil::expectation>;
-    std::vector<expectation> expectations;
+        using expectation = std::unique_ptr<trompeloeil::expectation>;
+        std::vector<expectation> expectations;
 };
 
 TEST_CASE_FIXTURE(GetCompatibilityToolForAppIdTests, "Config file does not contain key about compatibility tool for appid")
@@ -247,15 +247,15 @@ TEST_CASE_FIXTURE(GetCompatibilityToolForAppIdTests, "Config file does not conta
 
 class ConfigFileContainsKeyAboutCompatibilityToolForAppid : public GetCompatibilityToolForAppIdTests
 {
-public:
-    ConfigFileContainsKeyAboutCompatibilityToolForAppid()
-    {
-        expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, GetValuesWithFilter(filter, _)).RETURN(std::vector<std::string>{compatibility_tool_shortname}));
-    }
+    public:
+        ConfigFileContainsKeyAboutCompatibilityToolForAppid()
+        {
+            expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, GetValuesWithFilter(filter, _)).RETURN(std::vector<std::string>{compatibility_tool_shortname}));
+        }
 
-    trompeloeil::sequence sequence;
+        trompeloeil::sequence sequence;
 
-    static constexpr char const* compatibility_tool_shortname = "proton_7";
+        static constexpr char const* compatibility_tool_shortname = "proton_7";
 };
 
 TEST_CASE_FIXTURE(ConfigFileContainsKeyAboutCompatibilityToolForAppid, "Requested tool is user tool (exists in compatibilitytools.d)")
@@ -292,32 +292,32 @@ TEST_CASE_FIXTURE(ConfigFileContainsKeyAboutCompatibilityToolForAppid, "Requeste
 
 class RequestedToolIsSteamsToolTests : public ConfigFileContainsKeyAboutCompatibilityToolForAppid
 {
-public:
-    RequestedToolIsSteamsToolTests()
-    {
-        expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(steam_compatibility_tool_dir)).RETURN(false));
-        expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(system_compatibility_tool_dir)).RETURN(false));
+    public:
+        RequestedToolIsSteamsToolTests()
+        {
+            expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(steam_compatibility_tool_dir)).RETURN(false));
+            expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Exists(system_compatibility_tool_dir)).RETURN(false));
 
-        expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_library_folders_path)).RETURN(default_library_folders_path));
-        expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(default_library_folders_path.string(), false, _)).IN_SEQUENCE(sequence));
-        expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, GetValuesWithFilter(_, _)).RETURN(std::vector<std::string>{default_steam_path}).IN_SEQUENCE(sequence));
-        expectations.push_back(NAMED_ALLOW_CALL(stdUtilsMock, FileReadAllText(tool_appmanifest_file)).LR_RETURN(tool_appmanifest_file));
-    }
+            expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(default_library_folders_path)).RETURN(default_library_folders_path));
+            expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(default_library_folders_path.string(), false, _)).IN_SEQUENCE(sequence));
+            expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, GetValuesWithFilter(_, _)).RETURN(std::vector<std::string>{default_steam_path}).IN_SEQUENCE(sequence));
+            expectations.push_back(NAMED_ALLOW_CALL(stdUtilsMock, FileReadAllText(tool_appmanifest_file)).LR_RETURN(tool_appmanifest_file));
+        }
 
-    static constexpr char const* appstate_name_key = "AppState/name";
-    static constexpr char const* appstate_appid_key = "AppState/appid";
-    static constexpr char const* appstate_appid_value = "961940";
+        static constexpr char const* appstate_name_key = "AppState/name";
+        static constexpr char const* appstate_appid_key = "AppState/appid";
+        static constexpr char const* appstate_appid_value = "961940";
 
-    static constexpr char const* appmanifest_file = "appmanifest_961940.acf";
-    std::filesystem::path const steamapps_path = default_steam_path / "steamapps";
-    std::filesystem::path const tool_appmanifest_file = steamapps_path / appmanifest_file;
-    static constexpr char const* install_dir_key = "AppState/installdir";
-    static constexpr char const* install_dir = "Proton 7.0";
-    static constexpr char const* app_name_key = "AppState/name";
-    static constexpr char const* app_name_value = install_dir;
-    std::filesystem::path const manifest_file = default_steam_path / "steamapps/common/Proton 7.0/toolmanifest.vdf";
-    static constexpr char const* manifest_commandline_key = "manifest/commandline";
-    static constexpr char const* manifest_commandline = "/proton run";
+        static constexpr char const* appmanifest_file = "appmanifest_961940.acf";
+        std::filesystem::path const steamapps_path = default_steam_path / "steamapps";
+        std::filesystem::path const tool_appmanifest_file = steamapps_path / appmanifest_file;
+        static constexpr char const* install_dir_key = "AppState/installdir";
+        static constexpr char const* install_dir = "Proton 7.0";
+        static constexpr char const* app_name_key = "AppState/name";
+        static constexpr char const* app_name_value = install_dir;
+        std::filesystem::path const manifest_file = default_steam_path / "steamapps/common/Proton 7.0/toolmanifest.vdf";
+        static constexpr char const* manifest_commandline_key = "manifest/commandline";
+        static constexpr char const* manifest_commandline = "/proton run";
 };
 
 TEST_CASE_FIXTURE(RequestedToolIsSteamsToolTests, "None of library paths contains compatibility tool")
@@ -329,12 +329,12 @@ TEST_CASE_FIXTURE(RequestedToolIsSteamsToolTests, "None of library paths contain
 
 class SteamLibraryPathContainsCompatibilityToolAppManifest : public RequestedToolIsSteamsToolTests
 {
-public:
-    SteamLibraryPathContainsCompatibilityToolAppManifest()
-    {
-        expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Ls(steamapps_path, false)).RETURN(std::vector<std::string>{appmanifest_file}));
-        expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(tool_appmanifest_file)).LR_RETURN(tool_appmanifest_file));
-    }
+    public:
+        SteamLibraryPathContainsCompatibilityToolAppManifest()
+        {
+            expectations.push_back(NAMED_REQUIRE_CALL(filesystemUtilsMock, Ls(steamapps_path, false)).RETURN(std::vector<std::string>{appmanifest_file}));
+            expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(tool_appmanifest_file)).LR_RETURN(tool_appmanifest_file));
+        }
 };
 
 TEST_CASE_FIXTURE(SteamLibraryPathContainsCompatibilityToolAppManifest, "VDF tool appmanifest does not contain required key")
@@ -346,17 +346,17 @@ TEST_CASE_FIXTURE(SteamLibraryPathContainsCompatibilityToolAppManifest, "VDF too
 
 class VDFToolAppmanifestContainsAppStateInstalldirKey : public SteamLibraryPathContainsCompatibilityToolAppManifest
 {
-public:
-    VDFToolAppmanifestContainsAppStateInstalldirKey()
-    {
-        expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(tool_appmanifest_file.string(), false, _)).SIDE_EFFECT
-        (
-            _3.KeyValue[install_dir_key] = install_dir;
-            _3.KeyValue[app_name_key] = app_name_value;
-            _3.KeyValue[appstate_appid_key] = appstate_appid_value;
-        ));
-        expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(manifest_file)).LR_RETURN(manifest_file));
-    }
+    public:
+        VDFToolAppmanifestContainsAppStateInstalldirKey()
+        {
+            expectations.push_back(NAMED_REQUIRE_CALL(vdfMock, LoadFromText(tool_appmanifest_file.string(), false, _)).SIDE_EFFECT
+                                   (
+                                       _3.KeyValue[install_dir_key] = install_dir;
+                                       _3.KeyValue[app_name_key] = app_name_value;
+                                       _3.KeyValue[appstate_appid_key] = appstate_appid_value;
+                                   ));
+            expectations.push_back(NAMED_REQUIRE_CALL(stdUtilsMock, FileReadAllText(manifest_file)).LR_RETURN(manifest_file));
+        }
 };
 
 TEST_CASE_FIXTURE(VDFToolAppmanifestContainsAppStateInstalldirKey, "Manifest file does not contain required key")
