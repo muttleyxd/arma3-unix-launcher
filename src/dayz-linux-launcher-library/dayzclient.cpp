@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <ranges>
 #include <string>
 
 #include <fmt/format.h>
@@ -252,13 +253,14 @@ namespace DayZ
 
         for (auto const &ent : fs::Ls(dir))
         {
-            if (StdUtils::Contains(Definitions::exclusions, ent))
+            if (std::ranges::find(Definitions::exclusions, ent) != Definitions::exclusions.end())
                 continue;
 
             std::filesystem::path mod_dir = dir / ent;
             if (!fs::IsDirectory(mod_dir))
                 continue;
-            if (!StdUtils::Contains(fs::Ls(mod_dir, true), "addons"))
+            auto const mod_listing = fs::Ls(mod_dir, true);
+            if (std::ranges::find(mod_listing, "addons") == mod_listing.end())
                 continue;
 
             ret.emplace_back(mod_dir);

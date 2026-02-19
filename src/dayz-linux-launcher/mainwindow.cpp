@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <optional>
+#include <ranges>
 #include <set>
 
 #include <fmt/format.h>
@@ -287,7 +288,7 @@ void MainWindow::on_workshop_mod_installed(Steam::Structs::ItemDownloadedInfo co
         if (ui->table_mods->contains_mod(workshop_id))
             return;
 
-        auto const enabled = StdUtils::Contains(mods_to_enable, info.workshop_id);
+        auto const enabled = std::ranges::find(mods_to_enable, info.workshop_id) != mods_to_enable.end();
         ui->table_mods->add_mod({enabled, mod.GetValueOrReturnDefault("name", "cannot read name"), workshop_id, true});
     }
     catch (std::exception const &e)
@@ -333,14 +334,15 @@ try
             continue;
         }
 
-        if (StdUtils::Contains(mod_dir, client->GetPathWorkshop()))
+        auto const workshop_path_str = client->GetPathWorkshop().string();
+        if (mod_dir.string().find(workshop_path_str) != std::string::npos)
         {
             failed_mods += fmt::format("{} is a workshop mod.\n", mod_dir);
             continue;
         }
 
         auto dir_listing = fs::Ls(mod_dir, true);
-        if (!StdUtils::Contains(dir_listing, "addons"))
+        if (std::ranges::find(dir_listing, "addons") == dir_listing.end())
         {
             failed_mods += fmt::format("{} does not exist.\n", mod_dir / "addons");
             continue;
@@ -877,7 +879,7 @@ void MainWindow::on_updateNotification(bool is_there_a_new_version, std::string 
     if (is_there_a_new_version == false)
         return;
 
-    auto const message_template = R"(There is a new version of dayz-linux-launcher available
+    constexpr auto message_template = R"(There is a new version of dayz-linux-launcher available
 
 Do you want to open {}?
 
@@ -983,9 +985,11 @@ void MainWindow::on_combobox_theme_currentTextChanged(QString const &combobox_th
     if (combobox_theme != "System")
     {
         QFile style_resource(fmt::format(":/stylesheet/{}.stylesheet", combobox_theme.toStdString()).c_str());
-        style_resource.open(QIODevice::ReadOnly);
-        style = style_resource.readAll();
-        style_resource.close();
+        if (style_resource.open(QIODevice::ReadOnly))
+        {
+            style = style_resource.readAll();
+            style_resource.close();
+        }
     }
 
     qApp->setStyleSheet(style);

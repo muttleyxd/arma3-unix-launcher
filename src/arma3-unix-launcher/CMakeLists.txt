@@ -1,15 +1,10 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 if (NOT APPLE)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/share/arma3-unix-launcher/lib")
 endif()
-find_package(Qt5Widgets CONFIG REQUIRED)
-find_package(Qt5Svg CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES *.cpp *.h *.hpp *.qrc *.ui)
 
-add_executable(arma3-unix-launcher MACOSX_BUNDLE ${SOURCES})
+qt_add_executable(arma3-unix-launcher MACOSX_BUNDLE ${SOURCES})
 target_compile_definitions(arma3-unix-launcher PRIVATE "-DREPOSITORY_VERSION=${COMMIT_COUNT}")
 target_include_directories(arma3-unix-launcher PRIVATE .)
 target_link_libraries(arma3-unix-launcher PRIVATE
@@ -21,8 +16,8 @@ target_link_libraries(arma3-unix-launcher PRIVATE
     nlohmann::json
     pugixml::pugixml
     rihab::scope_guard
-    Qt5::Widgets
-    Qt5::Svg
+    Qt6::Widgets
+    Qt6::Svg
     spdlog::spdlog
     )
 install(TARGETS arma3-unix-launcher
@@ -38,8 +33,8 @@ if (NOT APPLE)
 endif()
 
 if (APPLE)
-    find_package(Qt5Widgets CONFIG REQUIRED)
-    get_target_property(WIDGETS_LOCATION Qt5::Widgets IMPORTED_LOCATION)
+    find_package(Qt6Widgets CONFIG REQUIRED)
+    get_target_property(WIDGETS_LOCATION Qt6::Widgets IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR "${WIDGETS_LOCATION}" DIRECTORY)
     find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QT_BIN_DIR}")
     

@@ -3,6 +3,7 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <ranges>
 
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
@@ -35,8 +36,14 @@ namespace
             auto const steam_flatpak_path = home_directory / ".var/app/com.valvesoftware.Steam";
             auto const path = home_directory / ".steam/steam/linux64/steamclient.so";
 
-            return fs::Exists(steam_flatpak_path) || (fs::Exists(path)
-                    && StdUtils::Contains(fs::RealPath(path), "com.valvesoftware.Steam"));
+            if (fs::Exists(steam_flatpak_path))
+                return true;
+            if (fs::Exists(path))
+            {
+                auto const real_path = fs::RealPath(path).string();
+                return real_path.find("com.valvesoftware.Steam") != std::string::npos;
+            }
+            return false;
         }
         catch (std::exception const &e)
         {
@@ -183,7 +190,7 @@ namespace Steam
         {
             std::scoped_lock lock(title_cache_access);
 
-            if (StdUtils::ContainsKey(title_cache, id))
+            if (title_cache.contains(id))
                 return title_cache[id];
         }
 

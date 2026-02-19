@@ -86,7 +86,7 @@ a:hover {{
 </html>
 )modPreset";
 
-constexpr char const* STEAM_MOD_TEMPLATE = R"steamModTemplate(        <tr data-type="ModContainer">
+    constexpr char const* STEAM_MOD_TEMPLATE = R"steamModTemplate(        <tr data-type="ModContainer">
           <td data-type="DisplayName">{mod_name}</td>
           <td>
             <span class="from-steam">Steam</span>
@@ -97,7 +97,7 @@ constexpr char const* STEAM_MOD_TEMPLATE = R"steamModTemplate(        <tr data-t
         </tr>
 )steamModTemplate";
 
-constexpr char const* LOCAL_MOD_TEMPLATE = R"localModTemplate(        <tr data-type="ModContainer">
+    constexpr char const* LOCAL_MOD_TEMPLATE = R"localModTemplate(        <tr data-type="ModContainer">
           <td data-type="DisplayName">{mod_name}</td>
           <td>
             <span class="from-local">Local</span>
@@ -112,18 +112,18 @@ constexpr char const* LOCAL_MOD_TEMPLATE = R"localModTemplate(        <tr data-t
 }
 
 namespace ARMA3::HtmlPresetExport {
-std::string export_mods(std::string_view preset_name, std::vector<Mod> const& mods, std::filesystem::path const& workshop_path)
-{
-    using namespace fmt::literals;
+    std::string export_mods(std::string_view preset_name, std::vector<Mod> const& mods, std::filesystem::path const& workshop_path)
+    {
+        using namespace fmt::literals;
 
-    std::string mod_list = "";
-    for (auto const& mod: mods) {
-        auto mod_name = StringUtils::Replace(mod.GetName(), "&", "&amp;");
-        if (mod.IsWorkshopMod(workshop_path))
-            mod_list += fmt::format(STEAM_MOD_TEMPLATE, "mod_name"_a=mod_name, "workshop_id"_a=mod.path_.filename().string());
-        else
-            mod_list += fmt::format(LOCAL_MOD_TEMPLATE, "mod_name"_a=mod_name, "mod_dir"_a=mod.path_.filename().string(), "mod_link"_a=mod.GetValueOrReturnDefault("url", "action", "https://github.com/muttleyxd/arma3-unix-launcher"));
+        std::string mod_list = "";
+        for (auto const& mod: mods) {
+            auto mod_name = StringUtils::Replace(mod.GetName(), "&", "&amp;");
+            if (mod.IsWorkshopMod(workshop_path))
+                mod_list += fmt::format(STEAM_MOD_TEMPLATE, "mod_name"_a=mod_name, "workshop_id"_a=mod.path_.filename().string());
+            else
+                mod_list += fmt::format(LOCAL_MOD_TEMPLATE, "mod_name"_a=mod_name, "mod_dir"_a=mod.path_.filename().string(), "mod_link"_a=mod.GetValueOrReturnDefault("url", "action", "https://github.com/muttleyxd/arma3-unix-launcher"));
+        }
+        return fmt::format(PRESET_TEMPLATE, "mod_list"_a=StringUtils::trim_right(mod_list), "preset_name"_a=preset_name);
     }
-    return fmt::format(PRESET_TEMPLATE, "mod_list"_a=StringUtils::trim_right(mod_list), "preset_name"_a=preset_name);
-}
 }

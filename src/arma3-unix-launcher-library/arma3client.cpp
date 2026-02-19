@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <ranges>
 #include <string>
 
 #include <fmt/format.h>
@@ -240,9 +241,9 @@ namespace ARMA3
         auto const workshop_path = GetPathWorkshop();
 
         /*
-         * workshop directory may not exist, in case where we don't have any mods subscribed
-         * if parent path does not exist, then something is seriously broken and it should fail visibly
-         */
+                 * workshop directory may not exist, in case where we don't have any mods subscribed
+                 * if parent path does not exist, then something is seriously broken and it should fail visibly
+                 */
         if (!FilesystemUtils::Exists(workshop_path) && FilesystemUtils::Exists(workshop_path.parent_path()))
             return {};
 
@@ -295,7 +296,7 @@ namespace ARMA3
 
     bool Client::IsFlatpak()
     {
-#ifdef __linux
+        #ifdef __linux
         try
         {
             SteamUtils steam_utils;
@@ -306,9 +307,9 @@ namespace ARMA3
             spdlog::warn("Exception trying to determine if Flatpak, exception text: {}", e.what());
             return false;
         }
-#else
+        #else
         return false;
-#endif
+        #endif
     }
 
     std::filesystem::path const &Client::GetPath()
@@ -332,13 +333,14 @@ namespace ARMA3
 
         for (auto const &ent : fs::Ls(dir))
         {
-            if (StdUtils::Contains(Definitions::exclusions, ent))
+            if (std::ranges::find(Definitions::exclusions, ent) != Definitions::exclusions.end())
                 continue;
 
             std::filesystem::path mod_dir = dir / ent;
             if (!fs::IsDirectory(mod_dir))
                 continue;
-            if (!StdUtils::Contains(fs::Ls(mod_dir, true), "addons"))
+            auto const mod_listing = fs::Ls(mod_dir, true);
+            if (std::ranges::find(mod_listing, "addons") == mod_listing.end())
                 continue;
 
             ret.emplace_back(mod_dir);

@@ -33,7 +33,7 @@ namespace
                 return node.name() == std::string("span") && node.find_attribute([](pugi::xml_attribute const & attribute)
                 {
                     return attribute.name() == std::string("class") && (attribute.value() == std::string("from-local")
-                            || attribute.value() == std::string("from-steam"));
+                           || attribute.value() == std::string("from-steam"));
                 });
             });
             if (!origin.empty())

@@ -68,7 +68,9 @@ function(setup_curlpp)
                   NAME curlpp
                   GIT_REPOSITORY https://github.com/jpbarrette/curlpp.git
                   )
-    add_library(curlpp::curlpp ALIAS curlpp_static)
+    if (NOT TARGET curlpp::curlpp)
+        add_library(curlpp::curlpp ALIAS curlpp_static)
+    endif()
     target_compile_options(curlpp_static PRIVATE -fpermissive)
 endfunction()
 
@@ -80,7 +82,9 @@ function(setup_doctest)
                   GIT_REPOSITORY https://github.com/onqtam/doctest.git
                   HEADER_ONLY
                   )
-    add_library(doctest::doctest ALIAS doctest)
+    if (NOT TARGET doctest::doctest)
+        add_library(doctest::doctest ALIAS doctest)
+    endif()
 endfunction()
 
 function(setup_fmt)
@@ -99,7 +103,7 @@ function(setup_fmt)
     setup_library("${CHECK_SOURCE}"
                   NAME fmt
                   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-                  GIT_TAG 11.2.0
+                  GIT_TAG 12.1.0
                   TEST_LINK_LIBS fmt
                   )
 
@@ -124,7 +128,7 @@ function(setup_nlohmann_json)
         add_library(nlohmann_json INTERFACE)
     else()
         FetchContent_Declare(nlohmann_json
-                             URL https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip)
+                             URL https://github.com/nlohmann/json/releases/download/v3.12.0/include.zip)
         FetchContent_GetProperties(nlohmann_json)
         if (NOT nlohmann_json_POPULATED)
             FetchContent_Populate(nlohmann_json)
@@ -156,7 +160,9 @@ function(setup_pugixml)
     if (TARGET_IMPORTED)
         set_target_properties(pugixml PROPERTIES IMPORTED_GLOBAL TRUE)
     endif()
-    add_library(pugixml::pugixml ALIAS pugixml)
+    if (NOT TARGET pugixml::pugixml)
+        add_library(pugixml::pugixml ALIAS pugixml)
+    endif()
 endfunction()
 
 function(setup_scope_guard)
@@ -187,7 +193,7 @@ function(setup_spdlog)
     setup_library("${CHECK_SOURCE}"
                   NAME spdlog
                   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-                  GIT_TAG v1.x
+                  GIT_TAG v1.17.0
                   TEST_DEFINITIONS -DSPDLOG_FMT_EXTERNAL
                   TEST_LINK_LIBS ${FMT_TARGET_NAME}
                   CXX_FLAGS "-Wno-attributes -Wno-reorder -Wno-redundant-move"
@@ -243,5 +249,15 @@ function(setup_trompeloeil)
                   GIT_TAG v49
                   HEADER_ONLY
                   )
-    add_library(trompeloeil::trompeloeil ALIAS trompeloeil)
+    if (NOT TARGET trompeloeil::trompeloeil)
+        add_library(trompeloeil::trompeloeil ALIAS trompeloeil)
+    endif()
+
+    add_compile_options_to_target(
+        TARGET trompeloeil
+        SCOPE INTERFACE
+        WHEN "${CMAKE_CXX_STANDARD}" GREATER_EQUAL 20
+        OPTIONS -Wno-deprecated
+        WARNING_MESSAGE "Suppressing C++20 deprecation warning for trompeloeil implicit 'this' capture"
+    )
 endfunction()
