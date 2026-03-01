@@ -6,7 +6,14 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: macos-latest
+    matrix:
+      strategy:
+        include:
+          - arch: arm64
+            runner: macos-26
+          - arch: x86_64
+            runner: macos-26-intel
+    runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -22,11 +29,11 @@ jobs:
         echo "pkgver=${COMMIT_COUNT}.${COMMIT_SHORT}" >> $GITHUB_OUTPUT
     - name: install-dependencies
       run: |
-        brew install gcc@11 cmake qt@6 p7zip wget gpg openssl@1.1
+        brew install cmake qt@6 p7zip wget gpg
     - name: make build directory
       run: mkdir build && cd build
     - name: cmake
-      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH='/usr/local;/opt/homebrew;/opt/homebrew/opt/qt@6;/opt/homebrew/opt/openssl@1.1' -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror -static-libgcc" -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11 -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12
+      run: cd build && cmake .. -DCPACK_GENERATOR=DragNDrop -DCMAKE_PREFIX_PATH="$(brew --prefix);$(brew --prefix qt@6)" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror" -DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=13.3 -DCMAKE_OSX_SYSROOT=macosx
     - name: build
       run: cd build && make -j$(sysctl -n hw.ncpu)
     - name: run tests
@@ -35,7 +42,7 @@ jobs:
       run: |
         cd build
         make package
-        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-${{ steps.version.outputs.pkgver }}-mac_os_x-x86_64.dmg
+        mv arma3-unix-launcher-*.dmg arma3-unix-launcher-${{ steps.version.outputs.pkgver }}-mac_os_x-${{ matrix.arch }}.dmg
     - name: Create/update release and upload DMG
       if: github.ref == 'refs/heads/master'
       uses: xresloader/upload-to-github-release@v1
