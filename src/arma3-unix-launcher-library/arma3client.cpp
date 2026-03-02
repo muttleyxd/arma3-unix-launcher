@@ -225,7 +225,7 @@ namespace ARMA3
         }
         else
         {
-            std::string launch_command = fmt::format("env {} open steam://run/107410//" + StringUtils::Replace(arguments, " ", "%20"), user_environment_variables);
+            std::string launch_command = fmt::format("env {} open steam://run/107410//{}", user_environment_variables, StringUtils::Replace(arguments, " ", "%20"));
             StdUtils::StartBackgroundProcess(launch_command);
         }
         #endif
