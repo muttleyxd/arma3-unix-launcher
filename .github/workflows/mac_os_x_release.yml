@@ -6,8 +6,8 @@ on:
 
 jobs:
   build-and-deploy:
-    matrix:
-      strategy:
+    strategy:
+      matrix:
         include:
           - arch: arm64
             runner: macos-26
