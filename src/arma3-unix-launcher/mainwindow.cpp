@@ -1009,14 +1009,9 @@ std::string MainWindow::full_path_to_ui_path(std::string ui_path) const
 }
 
 bool MainWindow::is_workshop_mod(std::string const &path_or_workshop_id)
-try
 {
-    // if path exists, then is absolute and certainly is not workshop id
-    return std::stoull(path_or_workshop_id) > 0;
-}
-catch (...)
-{
-    return false;
+    return !path_or_workshop_id.empty()
+           && std::all_of(path_or_workshop_id.begin(), path_or_workshop_id.end(), ::isdigit);
 }
 
 Mod MainWindow::get_mod(std::string const &path_or_workshop_id)
