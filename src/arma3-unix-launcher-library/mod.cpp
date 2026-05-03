@@ -73,9 +73,11 @@ void Mod::ParseCPP(std::string const &text)
 
             size_t value_start = split_place + 1;
             size_t value_end = line.length();
-            if (line.at(value_start) == '"') // Remove quotes
+            if (value_start >= value_end)
+                continue;
+            if (line[value_start] == '"') // Remove quotes
                 value_start++;
-            if (line.at(value_end - 1) == '"')
+            if (value_end > 0 && line[value_end - 1] == '"')
                 value_end--;
 
             std::string const key(StringUtils::trim(line.substr(0, split_place)));
