@@ -26,10 +26,10 @@
 - [x] Task: Web API response parsing f20f220
     - [x] Tests with JSON fixtures: id → preview_url and title; skips `result != 1`, missing `preview_url`; malformed JSON returns empty (parsed with exceptions disabled)
     - [x] Implement parser
-- [~] Task: Thumbnail disk cache (`common/thumbnail_cache.{hpp,cpp}`)
-    - [ ] Tests (temp dir, injected clock): path `<cache>/thumbnails/<id>.<ext>`, fresh vs stale after 7 days, store/load, corrupt/unwritable dir handled without throwing
-    - [ ] Implement cache rooted at `~/Library/Caches/a3unixlauncher`
-- [ ] Task: Thumbnail service (`common/thumbnail_service.{hpp,cpp}`)
+- [x] Task: Thumbnail disk cache (`common/thumbnail_cache.{hpp,cpp}`) 139b1e8
+    - [x] Tests (temp dir, injected clock): path `<cache>/thumbnails/<id>.<ext>`, fresh vs stale after 7 days, store/load, corrupt/unwritable dir handled without throwing
+    - [x] Implement cache rooted at `~/Library/Caches/a3unixlauncher`
+- [~] Task: Thumbnail service (`common/thumbnail_service.{hpp,cpp}`)
     - [ ] Tests (mock HTTP, synchronous executor): cached+fresh served without network; missing/stale fetched in batches; offline falls back to stale cache; failures reported as "no thumbnail"; callback per ID
     - [ ] Implement with a background worker thread and cancellation on shutdown
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Workshop Preview Metadata and Thumbnail Cache' (Protocol in workflow.md)
