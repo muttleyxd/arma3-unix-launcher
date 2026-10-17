@@ -29,6 +29,12 @@
 
       checks.${system}.default = arma3-unix-launcher.override { withTests = true; };
 
+      apps.${system}.dmg = {
+        type = "app";
+        program = nixpkgs.lib.getExe (pkgs.callPackage ./nix/make-dmg.nix { inherit arma3-unix-launcher; });
+        meta.description = "Package the launcher as a .dmg (pass the output path, default ./Arma 3 Unix Launcher.dmg)";
+      };
+
       devShells.${system}.default = pkgs.mkShell {
         # mkShell uses the darwin stdenv, so the compiler is clang
         packages = [ curl curlpp ] ++ (with pkgs; [
