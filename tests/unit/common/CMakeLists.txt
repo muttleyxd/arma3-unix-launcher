@@ -54,3 +54,14 @@ create_unit_test(TEST_GROUP common
                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  http_client
+                 SOURCES    test_http_client.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/http_client.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/http_client.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 LINK_LIBS  curl fmt::fmt-header-only spdlog::spdlog
+                 )
