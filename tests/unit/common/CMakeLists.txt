@@ -76,3 +76,13 @@ create_unit_test(TEST_GROUP common
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt-header-only nlohmann::json
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  thumbnail_cache
+                 SOURCES    test_thumbnail_cache.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_cache.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_cache.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 )
