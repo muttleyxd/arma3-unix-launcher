@@ -34,7 +34,7 @@
 - [ ] `nix develop -c cmake -B build -DRUN_TESTS=ON && cmake --build build && ctest --test-dir build` passes.
 - [ ] `nix run` starts the launcher from the built bundle.
 - [ ] ~~`nix run .#dmg` produces a mountable `.dmg`.~~ Deferred (2026-10-17): the app exists and passes tools/ci/check-dmg.sh, but manual .dmg verification is postponed; iterate by running the binary instead.
-- [ ] macOS CI job is green on Nix.
+- [ ] ~~macOS CI job is green on Nix.~~ Deferred (2026-10-17) with README updates (FR5, FR6) to a future track.
 
 ## Out of Scope
 - Linux, Intel/universal binaries, DayZ launcher, Proton.

@@ -29,7 +29,9 @@
 - [x] Task: Add `apps.default` so `nix run` starts the launcher from the built bundle (added 2026-10-17 at user request: run from the binary while iterating). c1b4514
 - [x] Task: Conductor - User Manual Verification 'Phase 3: nix build Package and nix flake check' (Protocol in workflow.md)
 
-## Phase 4: CI and Docs
+## Deferred: Phase 4: CI and Docs
+
+> Deferred by the user on 2026-10-17 to start feature work. Not part of this track's completion; pick up in a future track.
 
 - [ ] Task: Write failing check: CI workflow lint (e.g. `actionlint`) on updated workflow; ensure job references `nix flake check`.
 - [ ] Task: Update `.github/workflows/mac_os_x_check.yml`: drop Intel matrix entry, install Nix (e.g. `DeterminateSystems/nix-installer-action`), run `nix flake check` and `nix build`. Leave Linux workflows unchanged.
