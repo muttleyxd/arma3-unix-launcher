@@ -14,15 +14,22 @@
         config.allowUnfreePredicate = pkg: nixpkgs.lib.getName pkg == "steamworks-sdk";
       };
       steamworks-sdk = pkgs.callPackage ./nix/steamworks-sdk.nix { };
+      # curl is only used for the update check. curlMinimal has no IDN/PSL support, which keeps
+      # GNU libiconv (via libidn2) out of the closure: it clashes with Apple's libiconv.2.dylib
+      # when macdeployqt flattens all libraries into Contents/Frameworks
+      curl = pkgs.curlMinimal;
+      curlpp = pkgs.curlpp.override { inherit curl; };
+      arma3-unix-launcher = pkgs.callPackage ./nix/package.nix { inherit steamworks-sdk curl curlpp; };
     in
     {
       packages.${system} = {
-        inherit steamworks-sdk;
+        inherit steamworks-sdk arma3-unix-launcher;
+        default = arma3-unix-launcher;
       };
 
       devShells.${system}.default = pkgs.mkShell {
         # mkShell uses the darwin stdenv, so the compiler is clang
-        packages = with pkgs; [
+        packages = [ curl curlpp ] ++ (with pkgs; [
           cmake
           ninja
           pkg-config
@@ -31,8 +38,6 @@
           qt6.qtbase
           qt6.qtsvg
           argparse
-          curl
-          curlpp
           fmt
           nlohmann_json
           pugixml
@@ -40,7 +45,7 @@
 
           doctest
           trompeloeil
-        ];
+        ]);
 
         # Read by CMakeLists.txt and cmake/external_dependencies.cmake as option defaults
         A3UL_USE_SYSTEM_DEPS = "ON";

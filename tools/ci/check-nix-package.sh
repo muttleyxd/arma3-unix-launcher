@@ -2,7 +2,8 @@
 # Verifies the flake package and checks:
 #  1. `nix build` produces "Arma 3 Unix Launcher.app" with libsteam_api.dylib bundled
 #  2. the app runs outside any Nix shell (`--help` succeeds with a clean environment)
-#  3. the bundle is self-contained: no Mach-O file in it links against /nix/store
+#  3. the bundle is self-contained: no Mach-O file in it links against /nix/store, and the
+#     package closure is the app alone
 #  4. `nix flake check` passes
 #
 # Usage: check-nix-package.sh [--skip-flake-check]
@@ -56,6 +57,13 @@ if [ -n "$STORE_REFERENCES" ]; then
     fail "bundle links against /nix/store, it would not run on another Mac"
 fi
 echo "PASS: bundle is self-contained"
+
+CLOSURE="$(nix path-info --recursive "$OUT" | grep -vxF "$OUT")"
+if [ -n "$CLOSURE" ]; then
+    echo "$CLOSURE"
+    fail "package still references other store paths (embedded path strings), closure is not minimal"
+fi
+echo "PASS: package closure contains only the app"
 
 if [ $SKIP_FLAKE_CHECK -eq 0 ]; then
     nix flake check "$SOURCE_DIR" || fail "nix flake check"
