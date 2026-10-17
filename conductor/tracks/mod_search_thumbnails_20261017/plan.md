@@ -2,7 +2,7 @@
 
 > TDD per workflow.md: each task writes failing doctest tests first, then the implementation. New library code lives in `src/common` (Qt-free) with tests in `tests/unit/common`. UI tasks keep logic in the library and are verified manually.
 
-## Phase 1: Search, Links and HTTPS Foundations
+## Phase 1: Search, Links and HTTPS Foundations [checkpoint: 44e2883]
 - [x] Task: Coverage tooling 1fa36a9
     - [x] Add `A3UL_COVERAGE` CMake option (clang source-based coverage) and llvm tools to the devShell
     - [x] Add `tools/ci/coverage.sh` printing an `llvm-cov report` for `src/common` and the library
