@@ -25,7 +25,8 @@
 - [x] Task: Add `packages.default` derivation: CMake configure with `A3UL_USE_SYSTEM_DEPS=ON`, Release, `CMAKE_OSX_DEPLOYMENT_TARGET`; install `.app` to `$out/Applications`. 988051b
 - [x] Task: Ensure `macdeployqt` from Nix Qt deploys frameworks and `libsteam_api.dylib` is copied; fix rpaths so the app runs outside the Nix shell (verify with `otool -L`). 69f744f
 - [x] Task: Add `checks.default`: Debug build with `-DRUN_TESTS=ON -DDEVELOPER_MODE=ON -DCMAKE_CXX_FLAGS=-Werror`, run `ctest --output-on-failure`. 49c8842
-- [x] Task: Add `apps.dmg` that runs `hdiutil`/CPack DragNDrop on `result/` outside the sandbox. 42e543f
+- [x] Task: (verification deferred by user 2026-10-17) Add `apps.dmg` that runs `hdiutil`/CPack DragNDrop on `result/` outside the sandbox. 42e543f
+- [x] Task: Add `apps.default` so `nix run` starts the launcher from the built bundle (added 2026-10-17 at user request: run from the binary while iterating). c1b4514
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: nix build Package and nix flake check' (Protocol in workflow.md)
 
 ## Phase 4: CI and Docs

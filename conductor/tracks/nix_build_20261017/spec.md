@@ -32,7 +32,8 @@
 - [ ] `nix build` → `result/Applications/Arma 3 Unix Launcher.app` opens and detects Arma 3 / Workshop mods.
 - [ ] Configure with `A3UL_USE_SYSTEM_DEPS=ON` performs zero downloads (verified with network-disabled sandbox build).
 - [ ] `nix develop -c cmake -B build -DRUN_TESTS=ON && cmake --build build && ctest --test-dir build` passes.
-- [ ] `nix run .#dmg` produces a mountable `.dmg`.
+- [ ] `nix run` starts the launcher from the built bundle.
+- [ ] ~~`nix run .#dmg` produces a mountable `.dmg`.~~ Deferred (2026-10-17): the app exists and passes tools/ci/check-dmg.sh, but manual .dmg verification is postponed; iterate by running the binary instead.
 - [ ] macOS CI job is green on Nix.
 
 ## Out of Scope
