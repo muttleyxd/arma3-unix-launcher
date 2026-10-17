@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Verifies the flake package and checks:
 #  1. `nix build` produces "Arma 3 Unix Launcher.app" with libsteam_api.dylib bundled
-#  2. the app runs outside any Nix shell (`--help` succeeds with a clean environment)
+#  2. the app runs outside any Nix shell (`--help` succeeds with a clean environment) and
+#     `nix run` starts it
 #  3. the bundle is self-contained: no Mach-O file in it links against /nix/store, and the
 #     package closure is the app alone
 #  4. every Mach-O file in the bundle carries an embedded (ad-hoc) signature
@@ -49,6 +50,16 @@ grep -q -- "--preset-to-run" <<< "$HELP_OUTPUT" || {
     fail "unexpected --help output"
 }
 echo "PASS: app runs outside the Nix shell"
+
+RUN_OUTPUT="$(nix run "$SOURCE_DIR" -- --help 2>&1)" || {
+    echo "$RUN_OUTPUT"
+    fail "nix run failed"
+}
+grep -q -- "--preset-to-run" <<< "$RUN_OUTPUT" || {
+    echo "$RUN_OUTPUT"
+    fail "unexpected nix run --help output"
+}
+echo "PASS: nix run starts the launcher"
 
 STORE_REFERENCES=""
 UNSIGNED=""
