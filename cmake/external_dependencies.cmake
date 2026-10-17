@@ -222,7 +222,7 @@ function(setup_spdlog)
 endfunction()
 
 function(setup_steamworkssdk)
-    set(STEAMWORKS_SDK_DIR "" CACHE PATH "Path to an extracted Steamworks SDK (skips download)")
+    set(STEAMWORKS_SDK_DIR "$ENV{STEAMWORKS_SDK_DIR}" CACHE PATH "Path to an extracted Steamworks SDK (skips download)")
     if (STEAMWORKS_SDK_DIR)
         set(steamworkssdk_SOURCE_DIR "${STEAMWORKS_SDK_DIR}")
     else()

@@ -21,12 +21,30 @@
       };
 
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          gcc
+        # mkShell uses the darwin stdenv, so the compiler is clang
+        packages = with pkgs; [
           cmake
-          qt5.qt3d
-          qt5.qtbase
+          ninja
+          pkg-config
+          astyle
+
+          qt6.qtbase
+          qt6.qtsvg
+          argparse
+          curl
+          curlpp
+          fmt
+          nlohmann_json
+          pugixml
+          spdlog
+
+          doctest
+          trompeloeil
         ];
+
+        # Read by CMakeLists.txt and cmake/external_dependencies.cmake as option defaults
+        A3UL_USE_SYSTEM_DEPS = "ON";
+        STEAMWORKS_SDK_DIR = "${steamworks-sdk}";
       };
     };
 }
