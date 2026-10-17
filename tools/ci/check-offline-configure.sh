@@ -3,9 +3,16 @@
 # Configure may succeed (all deps provided by the system / Nix) or fail, but a failure must
 # come from the A3UL_USE_SYSTEM_DEPS guard and no FetchContent download may happen.
 #
-# Usage: check-offline-configure.sh [extra cmake args...]
+# Usage: check-offline-configure.sh [--require-success] [extra cmake args...]
+#   --require-success  also fail unless configure succeeds (all deps must be provided)
 
 set -u
+
+REQUIRE_SUCCESS=0
+if [ "${1:-}" = "--require-success" ]; then
+    REQUIRE_SUCCESS=1
+    shift
+fi
 
 SOURCE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 TMP_ROOT="${TMPDIR:-/tmp}"
@@ -32,6 +39,10 @@ fi
 
 if [ -n "$(ls -A "$BUILD_DIR/_deps" 2>/dev/null)" ]; then
     fail "FetchContent populated $BUILD_DIR/_deps"
+fi
+
+if [ $STATUS -ne 0 ] && [ $REQUIRE_SUCCESS -eq 1 ]; then
+    fail "configure failed, but --require-success was given"
 fi
 
 if [ $STATUS -ne 0 ] && ! grep -q "A3UL_USE_SYSTEM_DEPS" <<< "$OUTPUT"; then

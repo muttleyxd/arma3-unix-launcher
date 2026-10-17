@@ -71,6 +71,16 @@ function(setup_argparse)
 endfunction()
 
 function(setup_curlpp)
+    # curlpp ships no CMake package config, distributions (e.g. Nix) provide a pkg-config file
+    find_package(PkgConfig QUIET)
+    if (PKG_CONFIG_FOUND)
+        pkg_check_modules(CURLPP QUIET IMPORTED_TARGET GLOBAL curlpp)
+        if (CURLPP_FOUND)
+            add_library(curlpp::curlpp ALIAS PkgConfig::CURLPP)
+            return()
+        endif()
+    endif()
+
     set(CHECK_SOURCE "#error unimplemented}")
     # Force static library build
     set(BUILD_SHARED_LIBS OFF)
