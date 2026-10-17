@@ -62,6 +62,8 @@
 
           doctest
           trompeloeil
+          # llvm-cov / llvm-profdata matching the clang version, for tools/ci/coverage.sh
+          llvmPackages.llvm
         ]);
 
         # Read by the CMake files as option defaults

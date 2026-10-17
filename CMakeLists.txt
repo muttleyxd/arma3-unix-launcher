@@ -27,6 +27,12 @@ if (A3UL_USE_SYSTEM_DEPS)
     set(FETCHCONTENT_FULLY_DISCONNECTED ON)
 endif()
 
+option(A3UL_COVERAGE "Instrument for clang source-based coverage (see tools/ci/coverage.sh)" OFF)
+if (A3UL_COVERAGE)
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+    add_link_options(-fprofile-instr-generate)
+endif()
+
 if (NOT DEFINED COMMIT_COUNT)
     set(COMMIT_COUNT 0) # used for update notifications
 endif()
