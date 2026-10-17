@@ -8,14 +8,14 @@
 - [x] Task: Add `A3UL_USE_SYSTEM_DEPS` option; make `setup_library()` call `message(FATAL_ERROR ...)` instead of FetchContent when set. 9543be7
 - [x] Task: Make `setup_steamworkssdk()` accept `-DSTEAMWORKS_SDK_DIR=` (skip download when provided; required when `A3UL_USE_SYSTEM_DEPS=ON`). 61db51f
 - [x] Task: Make header-only/library checks (`argparse`, `doctest`, `trompeloeil`, `nlohmann_json`, `scope_guard`, `fmt`, `spdlog`, `curlpp`, `pugixml`) resolve via `find_package` against system/Nix installs; fix any target-name mismatches. 2802770
-- [ ] Task: Update `tech-stack.md` if any library resolution differs from the documented plan.
+- [~] Task: Update `tech-stack.md` if any library resolution differs from the documented plan.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Offline-Capable CMake' (Protocol in workflow.md)
 
 ## Phase 2: Flake DevShell
 
 - [ ] Task: Write failing check: `nix develop -c cmake -B build-nix -DA3UL_USE_SYSTEM_DEPS=ON -DRUN_TESTS=ON` fails with current flake (Qt5/gcc).
-- [ ] Task: Restructure `flake.nix` for `aarch64-darwin`; define package overlays for pugixml fork (`fetchFromGitHub`, pinned hash) and Steamworks SDK 1.53 (`fetchzip`, pinned hash, `allowUnfree` scoped to it).
-- [ ] Task: DevShell provides clang stdenv, cmake, ninja, qt6.qtbase, qt6.qtsvg, spdlog, fmt, argparse, nlohmann_json, curl, curlpp, doctest, trompeloeil, astyle; exports `STEAMWORKS_SDK_DIR` and `CMAKE_ARGS` defaults.
+- [ ] Task: Restructure `flake.nix` for `aarch64-darwin`; define a Steamworks SDK 1.53 package (`fetchzip`, pinned hash, `allowUnfree` scoped to it); pugixml comes straight from nixpkgs.
+- [ ] Task: DevShell provides clang stdenv, cmake, ninja, qt6.qtbase, qt6.qtsvg, pkg-config, spdlog, fmt, argparse, nlohmann_json, curl, curlpp, doctest, trompeloeil, astyle; exports `STEAMWORKS_SDK_DIR` and `CMAKE_ARGS` defaults.
 - [ ] Task: Verify `cmake --build build-nix && ctest --test-dir build-nix` passes inside the devShell (existing unit tests green); confirm `.envrc` (`use flake . --impure`) still works or drop `--impure` if no longer needed.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Flake DevShell' (Protocol in workflow.md)
 
