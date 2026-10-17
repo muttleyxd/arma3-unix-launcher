@@ -17,7 +17,7 @@
 - [x] Task: Restructure `flake.nix` for `aarch64-darwin`; define a Steamworks SDK 1.53 package (`fetchzip`, pinned hash, `allowUnfree` scoped to it); pugixml comes straight from nixpkgs. 175e6b9
 - [x] Task: DevShell provides clang stdenv, cmake, ninja, qt6.qtbase, qt6.qtsvg, pkg-config, spdlog, fmt, argparse, nlohmann_json, curl, curlpp, doctest, trompeloeil, astyle; exports `STEAMWORKS_SDK_DIR` and `CMAKE_ARGS` defaults. 1e30b4d
 - [x] Task: Verify `cmake --build build-nix && ctest --test-dir build-nix` passes inside the devShell (existing unit tests green); confirm `.envrc` (`use flake . --impure`) still works or drop `--impure` if no longer needed. 0c6da00
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Flake DevShell' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Flake DevShell' (Protocol in workflow.md)
 
 ## Phase 3: `nix build` Package and `nix flake check`
 
