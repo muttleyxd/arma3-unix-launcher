@@ -86,3 +86,19 @@ create_unit_test(TEST_GROUP common
                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  thumbnail_service
+                 SOURCES    test_thumbnail_service.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_service.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_service.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_cache.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/thumbnail_cache.hpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_details.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_details.hpp
+                            ${CMAKE_SOURCE_DIR}/tests/unit/mock/http_client_mock.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 LINK_LIBS  fmt::fmt-header-only nlohmann::json spdlog::spdlog Threads::Threads
+                 )
