@@ -9,8 +9,8 @@ Arma 3 Unix Launcher is a native desktop launcher for Bohemia Interactive's Arma
 
 ## Target Platform
 - macOS on Apple Silicon (aarch64-darwin), native Steam client running the native macOS Arma 3 build
-- All dependencies and builds go through the Nix flake: `nix build` produces the app, `nix flake check` runs the tests, and the devShell (`nix develop` or direnv) is for day-to-day incremental CMake work
-- Distributed as a `.dmg` app bundle
+- All dependencies and builds go through the Nix flake: `nix build` produces the app, `nix run` starts it, `nix flake check` runs the tests, and the devShell (`nix develop` or direnv) is for day-to-day incremental CMake work
+- Distributed as a `.dmg` app bundle (`nix run .#dmg`; release packaging not yet wired into CI)
 - Out of scope: Linux, Intel/universal macOS binaries, Proton handling, and the DayZ launcher variant (left in the tree from upstream but not maintained or tested here)
 
 ## Target Users
