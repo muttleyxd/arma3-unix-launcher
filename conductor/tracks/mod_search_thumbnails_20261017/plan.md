@@ -18,9 +18,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
 
 ## Phase 2: Workshop Preview Metadata and Thumbnail Cache
-- [ ] Task: HTTP client interface (`common/http_client.{hpp,cpp}`)
-    - [ ] `IHttpClient` (POST form / GET bytes → `std::optional`), curlpp implementation using the CA bundle; trompeloeil mock in `tests/unit/mock`
-- [ ] Task: Web API request building (`common/workshop_details.{hpp,cpp}`)
+- [x] Task: HTTP client interface (`common/http_client.{hpp,cpp}`) 4263279
+    - [x] `IHttpClient` (POST form / GET bytes → `std::optional`), libcurl C API implementation (curlpp throws) using the CA bundle; trompeloeil mock in `tests/unit/mock`
+- [~] Task: Web API request building (`common/workshop_details.{hpp,cpp}`)
     - [ ] Tests: form body `itemcount` + `publishedfileids[i]`, batches of at most 100 IDs
     - [ ] Implement request builder
 - [ ] Task: Web API response parsing
