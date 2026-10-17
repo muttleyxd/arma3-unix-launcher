@@ -212,13 +212,19 @@ function(setup_spdlog)
 endfunction()
 
 function(setup_steamworkssdk)
-    FetchContent_Declare(steamworkssdk
-        URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
-        URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        )
-    FetchContent_MakeAvailable(steamworkssdk)
+    set(STEAMWORKS_SDK_DIR "" CACHE PATH "Path to an extracted Steamworks SDK (skips download)")
+    if (STEAMWORKS_SDK_DIR)
+        set(steamworkssdk_SOURCE_DIR "${STEAMWORKS_SDK_DIR}")
+    else()
+        fail_if_downloads_disabled("Steamworks SDK (set STEAMWORKS_SDK_DIR)")
+        FetchContent_Declare(steamworkssdk
+            URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
+            URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            )
+        FetchContent_MakeAvailable(steamworkssdk)
+    endif()
 
 
     add_library(steamworks_sdk SHARED IMPORTED GLOBAL)

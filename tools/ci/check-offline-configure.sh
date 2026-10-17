@@ -8,7 +8,8 @@
 set -u
 
 SOURCE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
-BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/a3ul-offline-configure.XXXXXX")" || exit 1
+TMP_ROOT="${TMPDIR:-/tmp}"
+BUILD_DIR="$(mktemp -d "${TMP_ROOT%/}/a3ul-offline-configure.XXXXXX")" || exit 1
 trap 'rm -rf "$BUILD_DIR"' EXIT
 
 OUTPUT="$(cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" \
