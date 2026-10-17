@@ -19,7 +19,7 @@
 - [x] Task: Verify `cmake --build build-nix && ctest --test-dir build-nix` passes inside the devShell (existing unit tests green); confirm `.envrc` (`use flake . --impure`) still works or drop `--impure` if no longer needed. 0c6da00
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Flake DevShell' (Protocol in workflow.md)
 
-## Phase 3: `nix build` Package and `nix flake check`
+## Phase 3: `nix build` Package and `nix flake check` [checkpoint: 6384896]
 
 - [x] Task: Write failing check: `nix build` and `nix flake check` fail (no outputs defined). 5f2ee21
 - [x] Task: Add `packages.default` derivation: CMake configure with `A3UL_USE_SYSTEM_DEPS=ON`, Release, `CMAKE_OSX_DEPLOYMENT_TARGET`; install `.app` to `$out/Applications`. 988051b
