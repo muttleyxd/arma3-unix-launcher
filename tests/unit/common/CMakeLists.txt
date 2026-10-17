@@ -44,3 +44,13 @@ create_unit_test(TEST_GROUP common
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt-header-only
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  ca_bundle
+                 SOURCES    test_ca_bundle.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/ca_bundle.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/ca_bundle.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 )
