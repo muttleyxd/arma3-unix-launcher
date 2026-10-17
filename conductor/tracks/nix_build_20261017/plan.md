@@ -15,7 +15,7 @@
 
 - [x] Task: Write failing check: `nix develop -c cmake -B build-nix -DA3UL_USE_SYSTEM_DEPS=ON -DRUN_TESTS=ON` fails with current flake (Qt5/gcc). 5274b4f
 - [x] Task: Restructure `flake.nix` for `aarch64-darwin`; define a Steamworks SDK 1.53 package (`fetchzip`, pinned hash, `allowUnfree` scoped to it); pugixml comes straight from nixpkgs. 175e6b9
-- [ ] Task: DevShell provides clang stdenv, cmake, ninja, qt6.qtbase, qt6.qtsvg, pkg-config, spdlog, fmt, argparse, nlohmann_json, curl, curlpp, doctest, trompeloeil, astyle; exports `STEAMWORKS_SDK_DIR` and `CMAKE_ARGS` defaults.
+- [x] Task: DevShell provides clang stdenv, cmake, ninja, qt6.qtbase, qt6.qtsvg, pkg-config, spdlog, fmt, argparse, nlohmann_json, curl, curlpp, doctest, trompeloeil, astyle; exports `STEAMWORKS_SDK_DIR` and `CMAKE_ARGS` defaults. 1e30b4d
 - [ ] Task: Verify `cmake --build build-nix && ctest --test-dir build-nix` passes inside the devShell (existing unit tests green); confirm `.envrc` (`use flake . --impure`) still works or drop `--impure` if no longer needed.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Flake DevShell' (Protocol in workflow.md)
 
