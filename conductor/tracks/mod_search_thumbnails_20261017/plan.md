@@ -23,10 +23,10 @@
 - [x] Task: Web API request building (`common/workshop_details.{hpp,cpp}`) e851908
     - [x] Tests: form body `itemcount` + `publishedfileids[i]`, batches of at most 100 IDs
     - [x] Implement request builder
-- [~] Task: Web API response parsing
-    - [ ] Tests with JSON fixtures: id → preview_url and title; skips `result != 1`, missing `preview_url`; malformed JSON returns empty (parsed with exceptions disabled)
-    - [ ] Implement parser
-- [ ] Task: Thumbnail disk cache (`common/thumbnail_cache.{hpp,cpp}`)
+- [x] Task: Web API response parsing f20f220
+    - [x] Tests with JSON fixtures: id → preview_url and title; skips `result != 1`, missing `preview_url`; malformed JSON returns empty (parsed with exceptions disabled)
+    - [x] Implement parser
+- [~] Task: Thumbnail disk cache (`common/thumbnail_cache.{hpp,cpp}`)
     - [ ] Tests (temp dir, injected clock): path `<cache>/thumbnails/<id>.<ext>`, fresh vs stale after 7 days, store/load, corrupt/unwritable dir handled without throwing
     - [ ] Implement cache rooted at `~/Library/Caches/a3unixlauncher`
 - [ ] Task: Thumbnail service (`common/thumbnail_service.{hpp,cpp}`)
