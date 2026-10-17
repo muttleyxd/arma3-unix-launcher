@@ -33,3 +33,14 @@ create_unit_test(TEST_GROUP common
                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  workshop_links
+                 SOURCES    test_workshop_links.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_links.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_links.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 LINK_LIBS  fmt::fmt-header-only
+                 )
