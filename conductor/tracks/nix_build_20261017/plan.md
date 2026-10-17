@@ -4,7 +4,7 @@
 
 ## Phase 1: Offline-Capable CMake
 
-- [ ] Task: Write failing check: configuring with `-DA3UL_USE_SYSTEM_DEPS=ON -DFETCHCONTENT_FULLY_DISCONNECTED=ON` and a missing lib must error (not download). Add as a script under `tools/ci/` (e.g. `check_offline_configure.sh`).
+- [x] Task: Write failing check: configuring with `-DA3UL_USE_SYSTEM_DEPS=ON -DFETCHCONTENT_FULLY_DISCONNECTED=ON` and a missing lib must error (not download). Add as a script under `tools/ci/` (e.g. `check_offline_configure.sh`). 74edaa1
 - [ ] Task: Add `A3UL_USE_SYSTEM_DEPS` option; make `setup_library()` call `message(FATAL_ERROR ...)` instead of FetchContent when set.
 - [ ] Task: Make `setup_steamworkssdk()` accept `-DSTEAMWORKS_SDK_DIR=` (skip download when provided; required when `A3UL_USE_SYSTEM_DEPS=ON`).
 - [ ] Task: Make header-only/library checks (`argparse`, `doctest`, `trompeloeil`, `nlohmann_json`, `scope_guard`, `fmt`, `spdlog`, `curlpp`, `pugixml`) resolve via `find_package` against system/Nix installs; fix any target-name mismatches.
