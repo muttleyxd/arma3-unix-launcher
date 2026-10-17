@@ -2,7 +2,7 @@
 
 > TDD note: this track is build infrastructure. "Tests" are executable checks: CMake configure/build assertions, `nix flake check`, and existing doctest suites. Each task writes the failing check first (Red), then makes it pass (Green). The >80% coverage target applies to any new C++ code; build scripts are verified by checks instead.
 
-## Phase 1: Offline-Capable CMake
+## Phase 1: Offline-Capable CMake [checkpoint: 4d3dbf6]
 
 - [x] Task: Write failing check: configuring with `-DA3UL_USE_SYSTEM_DEPS=ON -DFETCHCONTENT_FULLY_DISCONNECTED=ON` and a missing lib must error (not download). Add as a script under `tools/ci/` (e.g. `check_offline_configure.sh`). 74edaa1
 - [x] Task: Add `A3UL_USE_SYSTEM_DEPS` option; make `setup_library()` call `message(FATAL_ERROR ...)` instead of FetchContent when set. 9543be7
