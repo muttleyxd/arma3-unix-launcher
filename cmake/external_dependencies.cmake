@@ -1,6 +1,14 @@
 include(CheckCXXSourceCompiles)
 include(FetchContent)
 
+function(fail_if_downloads_disabled NAME)
+    if (A3UL_USE_SYSTEM_DEPS)
+        message(FATAL_ERROR "${NAME} was not found on the system and A3UL_USE_SYSTEM_DEPS is ON, "
+                            "refusing to download it. Provide ${NAME} (e.g. via the Nix flake) "
+                            "or configure with -DA3UL_USE_SYSTEM_DEPS=OFF.")
+    endif()
+endfunction()
+
 function(setup_library SOURCE_TO_TEST)
     set(boolArgs HEADER_ONLY)
     set(oneValueArgs NAME CXX_FLAGS GIT_REPOSITORY GIT_TAG TEST_DEFINITIONS TEST_LINK_LIBS)
@@ -20,6 +28,8 @@ function(setup_library SOURCE_TO_TEST)
         endif()
         return()
     endif()
+
+    fail_if_downloads_disabled(${LIB_SETUP_NAME})
 
     if (NOT LIB_SETUP_GIT_TAG)
         set(LIB_SETUP_GIT_TAG master)
@@ -127,6 +137,7 @@ function(setup_nlohmann_json)
     if (SYSTEM_nlohmann_json_WORKS)
         add_library(nlohmann_json INTERFACE)
     else()
+        fail_if_downloads_disabled(nlohmann_json)
         FetchContent_Declare(nlohmann_json
                              URL https://github.com/nlohmann/json/releases/download/v3.12.0/include.zip)
         FetchContent_GetProperties(nlohmann_json)

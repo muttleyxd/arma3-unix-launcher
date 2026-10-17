@@ -15,6 +15,11 @@ add_libraries_to_linker(COMPILER_ID GNU
 option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
 option(DEVELOPER_MODE "Enable developer checks" OFF)
 option(RUN_TESTS "Run tests with DocTest" OFF)
+option(A3UL_USE_SYSTEM_DEPS "Never download dependencies, require them to be provided by the system (e.g. Nix)" OFF)
+
+if (A3UL_USE_SYSTEM_DEPS)
+    set(FETCHCONTENT_FULLY_DISCONNECTED ON)
+endif()
 
 if (NOT DEFINED COMMIT_COUNT)
     set(COMMIT_COUNT 0) # used for update notifications
