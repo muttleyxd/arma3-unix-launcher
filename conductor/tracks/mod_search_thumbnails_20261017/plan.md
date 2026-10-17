@@ -15,7 +15,7 @@
 - [x] Task: CA bundle lookup for macOS (`common/ca_bundle.{hpp,cpp}`) 995ddd4
     - [x] Tests (injected file-exists predicate): finds `/etc/ssl/cert.pem`, keeps existing Linux paths, returns `std::nullopt` when none exist (no throw)
     - [x] Implement and switch `update_checker.cpp` to it
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
 
 ## Phase 2: Workshop Preview Metadata and Thumbnail Cache
 - [ ] Task: HTTP client interface (`common/http_client.{hpp,cpp}`)
