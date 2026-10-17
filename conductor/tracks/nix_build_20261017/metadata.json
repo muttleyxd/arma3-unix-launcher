@@ -1,0 +1,8 @@
+{
+  "track_id": "nix_build_20261017",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-10-17T14:17:26Z",
+  "updated_at": "2026-10-17T14:17:26Z",
+  "description": "Nix-first build for Apple Silicon: flake provides all deps (Qt6, clang, libs, Steamworks SDK), offline CMake, `nix build` .app, `nix flake check` tests, CI on Nix"
+}
