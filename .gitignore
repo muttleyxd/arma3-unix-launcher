@@ -22,3 +22,6 @@ compile_commands.json
 
 # GSD planning directory
 .planning/
+
+# direnv / nix-direnv cache
+.direnv/
