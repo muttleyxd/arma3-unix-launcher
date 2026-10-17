@@ -9,7 +9,7 @@
 - [x] Task: Make `setup_steamworkssdk()` accept `-DSTEAMWORKS_SDK_DIR=` (skip download when provided; required when `A3UL_USE_SYSTEM_DEPS=ON`). 61db51f
 - [x] Task: Make header-only/library checks (`argparse`, `doctest`, `trompeloeil`, `nlohmann_json`, `scope_guard`, `fmt`, `spdlog`, `curlpp`, `pugixml`) resolve via `find_package` against system/Nix installs; fix any target-name mismatches. 2802770
 - [x] Task: Update `tech-stack.md` if any library resolution differs from the documented plan. 2de01fc
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Offline-Capable CMake' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Offline-Capable CMake' (Protocol in workflow.md)
 
 ## Phase 2: Flake DevShell
 
