@@ -9,10 +9,10 @@
 - [x] Task: Mod search matching (`common/mod_search.{hpp,cpp}`) b0043d1
     - [x] Tests: case-insensitive substring, multi-word AND (`ace med`), Workshop ID match, empty/whitespace query matches all, unicode-safe lowercase of ASCII
     - [x] Implement `ModSearch::Matches(name, workshop_id, query)`
-- [~] Task: Workshop links (`common/workshop_links.{hpp,cpp}`)
-    - [ ] Tests: `steam://url/CommunityFilePage/<id>` and `https://steamcommunity.com/sharedfiles/filedetails/?id=<id>`; reject non-numeric IDs
-    - [ ] Implement `WorkshopLinks::SteamClientUrl` / `BrowserUrl`
-- [ ] Task: CA bundle lookup for macOS (`common/ca_bundle.{hpp,cpp}`)
+- [x] Task: Workshop links (`common/workshop_links.{hpp,cpp}`) b068ffc
+    - [x] Tests: `steam://url/CommunityFilePage/<id>` and `https://steamcommunity.com/sharedfiles/filedetails/?id=<id>`; reject non-numeric IDs
+    - [x] Implement `WorkshopLinks::SteamClientUrl` / `BrowserUrl`
+- [~] Task: CA bundle lookup for macOS (`common/ca_bundle.{hpp,cpp}`)
     - [ ] Tests (injected file-exists predicate): finds `/etc/ssl/cert.pem`, keeps existing Linux paths, returns `std::nullopt` when none exist (no throw)
     - [ ] Implement and switch `update_checker.cpp` to it
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
