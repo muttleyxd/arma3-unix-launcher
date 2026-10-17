@@ -86,6 +86,8 @@ fi
 echo "PASS: package closure contains only the app"
 
 if [ $SKIP_FLAKE_CHECK -eq 0 ]; then
+    nix eval "$SOURCE_DIR#checks.aarch64-darwin.default.drvPath" > /dev/null 2>&1 ||
+        fail "flake has no checks.aarch64-darwin.default (unit tests)"
     nix flake check "$SOURCE_DIR" || fail "nix flake check"
     echo "PASS: nix flake check"
 fi

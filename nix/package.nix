@@ -9,12 +9,16 @@
 , argparse
 , curl
 , curlpp
+, doctest
 , fmt
 , nlohmann_json
 , pugixml
 , spdlog
 , steamworks-sdk
+, trompeloeil
 , writeShellScriptBin
+  # Debug build with -Werror and DEVELOPER_MODE that runs the unit tests, used by `nix flake check`
+, withTests ? false
 }:
 
 let
@@ -40,7 +44,7 @@ let
   '';
 in
 stdenv.mkDerivation {
-  pname = "arma3-unix-launcher";
+  pname = "arma3-unix-launcher" + lib.optionalString withTests "-tests";
   version = "0-unstable";
 
   src = lib.fileset.toSource {
@@ -72,6 +76,9 @@ stdenv.mkDerivation {
     nlohmann_json
     pugixml
     spdlog
+  ] ++ lib.optionals withTests [
+    doctest
+    trompeloeil
   ];
 
   cmakeFlags = [
@@ -79,7 +86,14 @@ stdenv.mkDerivation {
     (lib.cmakeFeature "STEAMWORKS_SDK_DIR" "${steamworks-sdk}")
     # cctools strip cannot handle current load commands; the fixup phase strips instead
     (lib.cmakeFeature "MACDEPLOYQT_EXTRA_ARGS" "-no-strip")
+  ] ++ lib.optionals withTests [
+    (lib.cmakeBool "RUN_TESTS" true)
+    (lib.cmakeBool "DEVELOPER_MODE" true)
+    (lib.cmakeFeature "CMAKE_CXX_FLAGS" "-Werror")
   ];
+
+  cmakeBuildType = if withTests then "Debug" else "Release";
+  doCheck = withTests;
 
   # The .app is made self-contained by macdeployqt, wrapper scripts would break the bundle
   dontWrapQtApps = true;

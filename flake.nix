@@ -27,6 +27,8 @@
         default = arma3-unix-launcher;
       };
 
+      checks.${system}.default = arma3-unix-launcher.override { withTests = true; };
+
       devShells.${system}.default = pkgs.mkShell {
         # mkShell uses the darwin stdenv, so the compiler is clang
         packages = [ curl curlpp ] ++ (with pkgs; [
