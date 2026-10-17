@@ -4,5 +4,5 @@ This file tracks all major tracks for the project.
 
 ---
 
-- [ ] **Track: mod search with workshop links and thumbnails with a carosel browser**
+- [~] **Track: mod search with workshop links and thumbnails with a carosel browser**
   *Link: [./tracks/mod_search_thumbnails_20261017/](./tracks/mod_search_thumbnails_20261017/)*
