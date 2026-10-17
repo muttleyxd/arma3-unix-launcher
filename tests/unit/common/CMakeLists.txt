@@ -65,3 +65,14 @@ create_unit_test(TEST_GROUP common
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  curl fmt::fmt-header-only spdlog::spdlog
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  workshop_details
+                 SOURCES    test_workshop_details.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_details.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_details.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 LINK_LIBS  fmt::fmt-header-only nlohmann::json
+                 )
