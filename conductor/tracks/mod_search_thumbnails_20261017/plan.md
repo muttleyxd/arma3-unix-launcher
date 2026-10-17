@@ -12,9 +12,9 @@
 - [x] Task: Workshop links (`common/workshop_links.{hpp,cpp}`) b068ffc
     - [x] Tests: `steam://url/CommunityFilePage/<id>` and `https://steamcommunity.com/sharedfiles/filedetails/?id=<id>`; reject non-numeric IDs
     - [x] Implement `WorkshopLinks::SteamClientUrl` / `BrowserUrl`
-- [~] Task: CA bundle lookup for macOS (`common/ca_bundle.{hpp,cpp}`)
-    - [ ] Tests (injected file-exists predicate): finds `/etc/ssl/cert.pem`, keeps existing Linux paths, returns `std::nullopt` when none exist (no throw)
-    - [ ] Implement and switch `update_checker.cpp` to it
+- [x] Task: CA bundle lookup for macOS (`common/ca_bundle.{hpp,cpp}`) 995ddd4
+    - [x] Tests (injected file-exists predicate): finds `/etc/ssl/cert.pem`, keeps existing Linux paths, returns `std::nullopt` when none exist (no throw)
+    - [x] Implement and switch `update_checker.cpp` to it
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
 
 ## Phase 2: Workshop Preview Metadata and Thumbnail Cache
