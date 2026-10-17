@@ -4,7 +4,8 @@
 #  2. the app runs outside any Nix shell (`--help` succeeds with a clean environment)
 #  3. the bundle is self-contained: no Mach-O file in it links against /nix/store, and the
 #     package closure is the app alone
-#  4. `nix flake check` passes
+#  4. every Mach-O file in the bundle carries an embedded (ad-hoc) signature
+#  5. `nix flake check` passes
 #
 # Usage: check-nix-package.sh [--skip-flake-check]
 
@@ -32,6 +33,13 @@ BINARY="$APP/Contents/MacOS/Arma 3 Unix Launcher"
 [ -f "$APP/Contents/MacOS/libsteam_api.dylib" ] || fail "libsteam_api.dylib not bundled"
 echo "PASS: nix build produced $APP"
 
+DEPLOY_ERRORS="$(nix log "$OUT" 2>/dev/null | grep -E "^ERROR: ")"
+if [ -n "$DEPLOY_ERRORS" ]; then
+    echo "$DEPLOY_ERRORS" | sort | uniq -c
+    fail "macdeployqt reported errors during the build"
+fi
+echo "PASS: macdeployqt ran without errors"
+
 HELP_OUTPUT="$(env -i HOME="$HOME" PATH=/usr/bin:/bin "$BINARY" --help 2>&1)" || {
     echo "$HELP_OUTPUT"
     fail "app --help failed outside the Nix shell"
@@ -43,14 +51,26 @@ grep -q -- "--preset-to-run" <<< "$HELP_OUTPUT" || {
 echo "PASS: app runs outside the Nix shell"
 
 STORE_REFERENCES=""
+UNSIGNED=""
 while IFS= read -r -d '' file; do
     if file -b "$file" | grep -q "Mach-O"; then
         refs="$(otool -L "$file" | tail -n +2 | grep "/nix/store/")"
         if [ -n "$refs" ]; then
             STORE_REFERENCES+="${file#"$APP/"}:"$'\n'"$refs"$'\n'
         fi
+        # Ad-hoc signatures from the sandbox cannot seal bundle resources, so only require an
+        # embedded signature here; the .dmg app re-signs the whole bundle with Apple's codesign
+        if ! /usr/bin/codesign --display "$file" > /dev/null 2>&1; then
+            UNSIGNED+="${file#"$APP/"}"$'\n'
+        fi
     fi
 done < <(find "$APP" -type f -print0)
+
+if [ -n "$UNSIGNED" ]; then
+    echo "$UNSIGNED"
+    fail "Mach-O files without an embedded signature (arm64 refuses to load them)"
+fi
+echo "PASS: all Mach-O files are signed"
 
 if [ -n "$STORE_REFERENCES" ]; then
     echo "$STORE_REFERENCES"

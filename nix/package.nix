@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , cmake
+, darwin
 , ninja
 , nukeReferences
 , pkg-config
@@ -13,8 +14,31 @@
 , pugixml
 , spdlog
 , steamworks-sdk
+, writeShellScriptBin
 }:
 
+let
+  # macdeployqt ad-hoc signs every binary it changes on arm64 using
+  # `codesign --preserve-metadata=... --force -s - <file>` and finally runs `codesign --deep -v <app>`.
+  # sigtool's codesign only signs Mach-O files and does not know --preserve-metadata, so drop that
+  # flag, skip non-Mach-O paths and skip verification here; tools/ci/check-nix-package.sh verifies
+  # the result with Apple's codesign.
+  macdeployqt-codesign = writeShellScriptBin "codesign" ''
+    args=()
+    for arg in "$@"; do
+      case "$arg" in
+        -v|--verify) exit 0 ;;
+        --preserve-metadata=*) ;;
+        *) args+=("$arg") ;;
+      esac
+    done
+    file="''${args[-1]}"
+    if ! ${darwin.sigtool}/bin/sigtool --file "$file" show-arch > /dev/null 2>&1; then
+      exit 0
+    fi
+    exec ${darwin.sigtool}/bin/codesign "''${args[@]}"
+  '';
+in
 stdenv.mkDerivation {
   pname = "arma3-unix-launcher";
   version = "0-unstable";
@@ -32,6 +56,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
+    macdeployqt-codesign
     ninja
     nukeReferences
     pkg-config
@@ -52,6 +77,8 @@ stdenv.mkDerivation {
   cmakeFlags = [
     (lib.cmakeBool "A3UL_USE_SYSTEM_DEPS" true)
     (lib.cmakeFeature "STEAMWORKS_SDK_DIR" "${steamworks-sdk}")
+    # cctools strip cannot handle current load commands; the fixup phase strips instead
+    (lib.cmakeFeature "MACDEPLOYQT_EXTRA_ARGS" "-no-strip")
   ];
 
   # The .app is made self-contained by macdeployqt, wrapper scripts would break the bundle

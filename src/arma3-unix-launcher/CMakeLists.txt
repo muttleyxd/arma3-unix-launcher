@@ -37,11 +37,22 @@ if (APPLE)
     get_target_property(WIDGETS_LOCATION Qt6::Widgets IMPORTED_LOCATION)
     get_filename_component(QT_BIN_DIR "${WIDGETS_LOCATION}" DIRECTORY)
     find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QT_BIN_DIR}")
-    
+    set(MACDEPLOYQT_EXTRA_ARGS "$ENV{MACDEPLOYQT_EXTRA_ARGS}" CACHE STRING "Additional arguments for macdeployqt, e.g. -no-strip")
+
+    # Steamworks has to be in the bundle before macdeployqt inspects the executable's dependencies.
+    # It may be copied from a read-only location (e.g. the Nix store), macdeployqt needs to modify it.
+    add_custom_command(TARGET arma3-unix-launcher POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
+                       COMMAND chmod u+w "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
+                       COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt" "$<TARGET_BUNDLE_CONTENT_DIR:arma3-unix-launcher>/Resources/steamworks-LICENSE.txt"
+                       COMMENT "Copying Steamworks SDK")
+
+    separate_arguments(MACDEPLOYQT_EXTRA_ARGS_LIST UNIX_COMMAND "${MACDEPLOYQT_EXTRA_ARGS}")
     add_custom_command(TARGET arma3-unix-launcher POST_BUILD
         COMMAND "${MACDEPLOYQT_EXECUTABLE}"
             "$<TARGET_FILE_DIR:arma3-unix-launcher>/../.."
             -always-overwrite
+            ${MACDEPLOYQT_EXTRA_ARGS_LIST}
         COMMENT "Running macdeployqt...")
 
     set(CPACK_GENERATOR "DragNDrop")
@@ -53,11 +64,6 @@ if (APPLE)
     target_sources(arma3-unix-launcher PRIVATE ${ICON_FILE})
 
     set_target_properties(arma3-unix-launcher PROPERTIES OUTPUT_NAME "Arma 3 Unix Launcher")
-
-    add_custom_command(TARGET arma3-unix-launcher POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy "${STEAMWORKS_LIB_PATH}" "$<TARGET_FILE_DIR:arma3-unix-launcher>/libsteam_api.dylib"
-                       COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt" "$<TARGET_FILE_DIR:arma3-unix-launcher>/steamworks-LICENSE.txt"
-                       COMMENT "Copying Steamworks SDK")
 else()
     install(FILES "${STEAMWORKS_LIB_PATH}"
                   "${CMAKE_SOURCE_DIR}/external/steamworks-LICENSE.txt"

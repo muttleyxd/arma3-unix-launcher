@@ -47,9 +47,11 @@
           trompeloeil
         ]);
 
-        # Read by CMakeLists.txt and cmake/external_dependencies.cmake as option defaults
+        # Read by the CMake files as option defaults
         A3UL_USE_SYSTEM_DEPS = "ON";
         STEAMWORKS_SDK_DIR = "${steamworks-sdk}";
+        # cctools strip from nixpkgs cannot handle current load commands
+        MACDEPLOYQT_EXTRA_ARGS = "-no-strip";
       };
     };
 }
