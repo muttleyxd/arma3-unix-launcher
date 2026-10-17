@@ -20,10 +20,10 @@
 ## Phase 2: Workshop Preview Metadata and Thumbnail Cache
 - [x] Task: HTTP client interface (`common/http_client.{hpp,cpp}`) 4263279
     - [x] `IHttpClient` (POST form / GET bytes → `std::optional`), libcurl C API implementation (curlpp throws) using the CA bundle; trompeloeil mock in `tests/unit/mock`
-- [~] Task: Web API request building (`common/workshop_details.{hpp,cpp}`)
-    - [ ] Tests: form body `itemcount` + `publishedfileids[i]`, batches of at most 100 IDs
-    - [ ] Implement request builder
-- [ ] Task: Web API response parsing
+- [x] Task: Web API request building (`common/workshop_details.{hpp,cpp}`) e851908
+    - [x] Tests: form body `itemcount` + `publishedfileids[i]`, batches of at most 100 IDs
+    - [x] Implement request builder
+- [~] Task: Web API response parsing
     - [ ] Tests with JSON fixtures: id → preview_url and title; skips `result != 1`, missing `preview_url`; malformed JSON returns empty (parsed with exceptions disabled)
     - [ ] Implement parser
 - [ ] Task: Thumbnail disk cache (`common/thumbnail_cache.{hpp,cpp}`)
