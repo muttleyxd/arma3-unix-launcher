@@ -23,3 +23,13 @@ create_unit_test(TEST_GROUP common
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  fmt::fmt-header-only
                  )
+
+create_unit_test(TEST_GROUP common
+                 TEST_NAME  mod_search
+                 SOURCES    test_mod_search.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/mod_search.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/mod_search.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/common
+                 )
