@@ -12,7 +12,9 @@ BUILD_DIR="${1:-build-devshell-check}"
 
 cd "$SOURCE_DIR" || exit 1
 
-nix develop --ignore-environment --keep HOME --keep TMPDIR "$SOURCE_DIR" --command bash -c '
+# nix-darwin's /etc/bashrc sources a zsh-only set-environment script unless this guard is set
+nix develop --ignore-environment --keep HOME --keep TMPDIR --keep __NIX_DARWIN_SET_ENVIRONMENT_DONE \
+            "$SOURCE_DIR" --command bash -c '
     set -u
     BUILD_DIR="$1"
     if [ -z "${STEAMWORKS_SDK_DIR:-}" ]; then
