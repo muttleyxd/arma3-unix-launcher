@@ -11,7 +11,7 @@
 - [x] Task: Update `tech-stack.md` if any library resolution differs from the documented plan. 2de01fc
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Offline-Capable CMake' (Protocol in workflow.md)
 
-## Phase 2: Flake DevShell
+## Phase 2: Flake DevShell [checkpoint: f8328ac]
 
 - [x] Task: Write failing check: `nix develop -c cmake -B build-nix -DA3UL_USE_SYSTEM_DEPS=ON -DRUN_TESTS=ON` fails with current flake (Qt5/gcc). 5274b4f
 - [x] Task: Restructure `flake.nix` for `aarch64-darwin`; define a Steamworks SDK 1.53 package (`fetchzip`, pinned hash, `allowUnfree` scoped to it); pugixml comes straight from nixpkgs. 175e6b9
