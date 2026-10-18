@@ -34,7 +34,7 @@
     - [x] Implement with a background worker thread and cancellation on shutdown
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Workshop Preview Metadata and Thumbnail Cache' (Protocol in workflow.md)
 
-## Phase 3: UI Integration
+## Phase 3: UI Integration [checkpoint: 9d61df0]
 - [x] Task: Search box 8524f2a
     - [x] Add search field above the mod table; filter rows with `ModSearch` (`setRowHidden`), Esc clears, ⌘F focuses
     - [x] Disable drag reordering while filtered; verify selected-mods counter unaffected
