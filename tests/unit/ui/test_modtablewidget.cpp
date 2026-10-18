@@ -124,6 +124,23 @@ TEST_CASE("Filter_DoesNotChangeEnabledStateOrCounters")
     CHECK_FALSE(mods[1].enabled);
 }
 
+TEST_CASE("CurrentWorkshopId")
+{
+    ModTableWidget table;
+    fill(table);
+    CHECK_FALSE(table.current_workshop_id().has_value());
+
+    table.selectRow(2);
+    CHECK_EQ(table.current_workshop_id(), "843425103");
+
+    table.selectRow(3); // local mod
+    CHECK_FALSE(table.current_workshop_id().has_value());
+
+    table.selectRow(0);
+    table.set_filter("cba"); // selected row hidden
+    CHECK_FALSE(table.current_workshop_id().has_value());
+}
+
 int main(int argc, char **argv)
 {
     qputenv("QT_QPA_PLATFORM", "offscreen");

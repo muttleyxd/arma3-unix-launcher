@@ -33,3 +33,16 @@ create_unit_test(TEST_GROUP ui
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher ${CMAKE_SOURCE_DIR}/src/common
                  LINK_LIBS  Qt6::Widgets Qt6::Test fmt::fmt-header-only
                  )
+
+create_unit_test(TEST_GROUP ui
+                 TEST_NAME  workshop_page
+                 SOURCES    test_workshop_page.cpp
+                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher/workshop_page.cpp
+                            ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher/workshop_page.h
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_links.cpp
+                            ${CMAKE_SOURCE_DIR}/src/common/workshop_links.hpp
+
+                            ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
+                 INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher ${CMAKE_SOURCE_DIR}/src/common
+                 LINK_LIBS  Qt6::Gui fmt::fmt-header-only
+                 )

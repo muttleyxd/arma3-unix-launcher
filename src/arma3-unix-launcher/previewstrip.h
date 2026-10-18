@@ -49,12 +49,15 @@ class PreviewStrip : public QWidget
         std::string card_key(int index) const;
         int current_card() const;
         QPixmap card_pixmap(int index) const;
+        // Area of the "open Workshop page" button on a card in viewport coordinates, invalid if it has none
+        QRect open_button_rect(QModelIndex const &index) const;
         static QPixmap placeholder();
 
     signals:
         void collapsed_changed(bool collapsed);
         // Workshop mods shown in the strip that have no thumbnail yet
         void thumbnails_needed(std::vector<std::uint64_t> workshop_ids);
+        void workshop_page_requested(std::string workshop_id);
 
     protected:
         bool eventFilter(QObject *watched, QEvent *event) override;

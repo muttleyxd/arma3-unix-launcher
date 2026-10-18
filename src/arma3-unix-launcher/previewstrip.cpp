@@ -4,7 +4,9 @@
 #include <QIcon>
 #include <QImage>
 #include <QPainter>
+#include <QMouseEvent>
 #include <QScrollBar>
+#include <QStyledItemDelegate>
 #include <QVBoxLayout>
 #include <QWheelEvent>
 
@@ -14,6 +16,62 @@ namespace
 {
     constexpr int card_width = PreviewStrip::thumbnail_pixels + 24;
     constexpr int card_height = PreviewStrip::thumbnail_pixels + 40;
+
+    // Draws an "open Workshop page" button on Workshop mod cards and handles clicks on it
+    class CardDelegate : public QStyledItemDelegate
+    {
+        public:
+            static constexpr int button_size = 22;
+
+            CardDelegate(QObject *parent, std::function<void(std::string)> on_open)
+                : QStyledItemDelegate(parent)
+                , on_open_(std::move(on_open))
+            {
+            }
+
+            static QRect button_rect(QRect const &card)
+            {
+                return QRect(card.right() - button_size - 4, card.top() + 4, button_size, button_size);
+            }
+
+            void paint(QPainter *painter, QStyleOptionViewItem const &option, QModelIndex const &index) const override
+            {
+                QStyledItemDelegate::paint(painter, option, index);
+                if (!index.data(PreviewStrip::is_workshop_role).toBool())
+                    return;
+
+                auto const rect = button_rect(option.rect);
+                painter->save();
+                painter->setRenderHint(QPainter::Antialiasing);
+                painter->setPen(Qt::NoPen);
+                painter->setBrush(QColor(0, 0, 0, 170));
+                painter->drawRoundedRect(rect, 4, 4);
+                painter->setPen(Qt::white);
+                painter->drawText(rect, Qt::AlignCenter, QString::fromUtf8("\u2197")); // north east arrow
+                painter->restore();
+            }
+
+            bool editorEvent(QEvent *event, QAbstractItemModel *model, QStyleOptionViewItem const &option,
+                             QModelIndex const &index) override
+            {
+                auto const is_mouse_event = event->type() == QEvent::MouseButtonPress
+                                            || event->type() == QEvent::MouseButtonRelease
+                                            || event->type() == QEvent::MouseButtonDblClick;
+                if (!is_mouse_event || !index.data(PreviewStrip::is_workshop_role).toBool())
+                    return QStyledItemDelegate::editorEvent(event, model, option, index);
+
+                auto const mouse = static_cast<QMouseEvent *>(event);
+                if (!button_rect(option.rect).contains(mouse->position().toPoint()))
+                    return QStyledItemDelegate::editorEvent(event, model, option, index);
+
+                if (event->type() == QEvent::MouseButtonRelease && mouse->button() == Qt::LeftButton)
+                    on_open_(index.data(PreviewStrip::key_role).toString().toStdString());
+                return true; // the button does not change the selection
+            }
+
+        private:
+            std::function<void(std::string)> on_open_;
+    };
 
     class SelectionSyncGuard
     {
@@ -69,6 +127,10 @@ PreviewStrip::PreviewStrip(QWidget *parent)
     view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setFixedHeight(card_height + view_->horizontalScrollBar()->sizeHint().height() + 2 * view_->frameWidth());
     view_->viewport()->installEventFilter(this);
+    view_->setItemDelegate(new CardDelegate(view_, [this](std::string workshop_id)
+    {
+        emit workshop_page_requested(std::move(workshop_id));
+    }));
     connect(view_->selectionModel(), &QItemSelectionModel::currentChanged, this, &PreviewStrip::select_table_row_for_card);
     layout->addWidget(view_);
 
@@ -163,6 +225,13 @@ int PreviewStrip::current_card() const
 QPixmap PreviewStrip::card_pixmap(int index) const
 {
     return model_.item(index)->data(pixmap_role).value<QPixmap>();
+}
+
+QRect PreviewStrip::open_button_rect(QModelIndex const &index) const
+{
+    if (!index.isValid() || !index.data(is_workshop_role).toBool())
+        return {};
+    return CardDelegate::button_rect(view_->visualRect(index));
 }
 
 QPixmap PreviewStrip::placeholder()

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <optional>
+#include <string>
 #include <vector>
 
 #include <QTableWidget>
@@ -31,6 +33,9 @@ class ModTableWidget : public QTableWidget
         // Hides mods not matching query (see ModSearch::Matches); drag and drop is off while filtering
         void set_filter(QString const &query);
         bool is_filtering() const;
+
+        // Workshop id of the selected (visible) mod, std::nullopt for none or a local mod
+        std::optional<std::string> current_workshop_id() const;
 
     signals:
         // Mods were added, removed, reordered, enabled/disabled or filtered

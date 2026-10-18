@@ -6,6 +6,7 @@
 #include <QScrollBar>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include <QTest>
 #include <QWheelEvent>
 
 #include <thread>
@@ -278,12 +279,46 @@ TEST_CASE("Thumbnail_ScaledForDevicePixelRatio")
     CHECK_EQ(pixmap.height(), static_cast<int>(PreviewStrip::thumbnail_pixels * ratio / 2));
 }
 
+TEST_CASE("OpenButton_OnWorkshopCardsOnly")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    QSignalSpy requested(&strip, &PreviewStrip::workshop_page_requested);
+    strip.attach(&table);
+    fill(table);
+    strip.resize(800, strip.sizeHint().height());
+    strip.show();
+    strip.sync_now();
+    QApplication::processEvents();
+
+    auto const model = strip.view()->model();
+    auto const workshop_button = strip.open_button_rect(model->index(0, 0));
+    REQUIRE(workshop_button.isValid());
+    QTest::mouseClick(strip.view()->viewport(), Qt::LeftButton, Qt::NoModifier, workshop_button.center());
+    REQUIRE_EQ(requested.count(), 1);
+    CHECK_EQ(requested.takeFirst().at(0).value<std::string>(), "463939057");
+
+    // Local mods have no Workshop page
+    CHECK_FALSE(strip.open_button_rect(model->index(2, 0)).isValid());
+    auto const local_card = strip.view()->visualRect(model->index(2, 0));
+    QTest::mouseClick(strip.view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                      QPoint(local_card.right() - workshop_button.width() / 2, workshop_button.center().y()));
+    CHECK_EQ(requested.count(), 0);
+
+    // Clicking elsewhere on a card only selects it
+    QTest::mouseClick(strip.view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                      strip.view()->visualRect(model->index(1, 0)).center());
+    CHECK_EQ(requested.count(), 0);
+    CHECK_EQ(table.currentRow(), 1);
+}
+
 int main(int argc, char **argv)
 {
     qputenv("QT_QPA_PLATFORM", "offscreen");
     qputenv("QT_SCALE_FACTOR", "2"); // Retina-like device pixel ratio
     QApplication application(argc, argv);
     qRegisterMetaType<std::vector<std::uint64_t>>();
+    qRegisterMetaType<std::string>();
 
     doctest::Context context(argc, argv);
     return context.run();

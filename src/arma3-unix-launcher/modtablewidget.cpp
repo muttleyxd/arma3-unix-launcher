@@ -281,3 +281,14 @@ void ModTableWidget::apply_filter_to_all_rows()
     for (int row = 0; row < rowCount(); ++row)
         apply_filter(row);
 }
+
+std::optional<std::string> ModTableWidget::current_workshop_id() const
+{
+    auto const row = currentRow();
+    if (row < 0 || isRowHidden(row) || selectedItems().isEmpty())
+        return std::nullopt;
+    auto const mod = get_mod_at(row);
+    if (!mod.is_workshop_mod)
+        return std::nullopt;
+    return mod.path_or_workshop_id;
+}

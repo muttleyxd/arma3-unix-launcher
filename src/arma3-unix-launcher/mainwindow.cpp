@@ -40,6 +40,7 @@
 #include "update_checker.hpp"
 
 #include "previewstrip.h"
+#include "workshop_page.h"
 
 #include "exceptions/preset_loading_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
@@ -170,6 +171,31 @@ If there is an update, then you will get a notification, nothing will be downloa
 
     setup_mod_search();
     setup_preview_strip();
+    setup_open_in_steam();
+}
+
+void MainWindow::setup_open_in_steam()
+{
+    auto const open = [](std::string const &workshop_id)
+    {
+        if (!open_workshop_page(workshop_id))
+            spdlog::warn("Could not open the Workshop page of mod {}", workshop_id);
+    };
+    connect(preview_strip, &PreviewStrip::workshop_page_requested, this, open);
+
+    auto const action = new QAction("Open in Steam", ui->table_mods);
+    action->setVisible(false);
+    ui->table_mods->addAction(action);
+    connect(action, &QAction::triggered, this, [this, open]()
+    {
+        if (auto const workshop_id = ui->table_mods->current_workshop_id())
+            open(*workshop_id);
+    });
+    // Local mods have no Workshop page
+    connect(ui->table_mods, &QTableWidget::itemSelectionChanged, action, [this, action]()
+    {
+        action->setVisible(ui->table_mods->current_workshop_id().has_value());
+    });
 }
 
 void MainWindow::setup_preview_strip()
