@@ -35,10 +35,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Workshop Preview Metadata and Thumbnail Cache' (Protocol in workflow.md)
 
 ## Phase 3: UI Integration
-- [ ] Task: Search box
-    - [ ] Add search field above the mod table; filter rows with `ModSearch` (`setRowHidden`), Esc clears, ⌘F focuses
-    - [ ] Disable drag reordering while filtered; verify selected-mods counter unaffected
-- [ ] Task: Preview strip widget (`previewstrip.{h,cpp}`)
+- [x] Task: Search box 8524f2a
+    - [x] Add search field above the mod table; filter rows with `ModSearch` (`setRowHidden`), Esc clears, ⌘F focuses
+    - [x] Disable drag reordering while filtered; verify selected-mods counter unaffected
+- [~] Task: Preview strip widget (`previewstrip.{h,cpp}`)
     - [ ] Horizontal `QListView` (icon mode, uniform item sizes) over a model of the visible mods; placeholder card art
     - [ ] Two-way selection sync with the table, centre on selection, arrow keys / wheel scrolling
     - [ ] Collapse toggle persisted in settings
