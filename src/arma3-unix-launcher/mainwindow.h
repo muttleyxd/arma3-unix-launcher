@@ -19,6 +19,8 @@
 #include "settings.hpp"
 #include "ui_mod.hpp"
 
+class PreviewStrip;
+
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
@@ -72,6 +74,7 @@ class MainWindow : public QMainWindow
         std::filesystem::path config_file;
         std::thread update_notification_thread;
         Settings manager;
+        PreviewStrip *preview_strip = nullptr; // owned by the Mods tab
 
         std::vector<std::uint64_t> mods_to_enable;
 
@@ -91,6 +94,7 @@ class MainWindow : public QMainWindow
 
         void initialize_theme_combobox();
         void setup_mod_search();
+        void setup_preview_strip();
 
         std::string ui_path_to_full_path(std::string ui_path) const;
         std::string full_path_to_ui_path(std::string ui_path) const;

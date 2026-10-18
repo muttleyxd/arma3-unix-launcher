@@ -36,6 +36,8 @@
 #include "ui_mod.hpp"
 #include "update_checker.hpp"
 
+#include "previewstrip.h"
+
 #include "exceptions/preset_loading_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
 #include "html_preset_parser.hpp"
@@ -164,6 +166,22 @@ If there is an update, then you will get a notification, nothing will be downloa
     ui->button_mod_preset_save->setMenu(&menu_button_save);
 
     setup_mod_search();
+    setup_preview_strip();
+}
+
+void MainWindow::setup_preview_strip()
+{
+    preview_strip = new PreviewStrip(ui->tab_mods);
+    ui->verticalLayout_2->insertWidget(ui->verticalLayout_2->indexOf(ui->table_mods), preview_strip);
+    preview_strip->attach(ui->table_mods);
+
+    auto const &collapsed = manager.settings["settings"]["previewStripCollapsed"];
+    if (collapsed.is_boolean())
+        preview_strip->set_collapsed(collapsed.get<bool>());
+    connect(preview_strip, &PreviewStrip::collapsed_changed, this, [this](bool is_collapsed)
+    {
+        manager.settings["settings"]["previewStripCollapsed"] = is_collapsed;
+    });
 }
 
 void MainWindow::setup_mod_search()

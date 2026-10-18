@@ -1,0 +1,238 @@
+#define DOCTEST_CONFIG_IMPLEMENT
+#include <doctest/doctest.h>
+
+#include <QApplication>
+#include <QCheckBox>
+#include <QScrollBar>
+#include <QSignalSpy>
+#include <QWheelEvent>
+
+#include "default_test_reporter.hpp"
+
+#include "modtablewidget.h"
+#include "previewstrip.h"
+
+namespace
+{
+    void fill(ModTableWidget &table)
+    {
+        table.add_mod({true, "ACE3", "463939057", true});
+        table.add_mod({false, "CBA_A3", "450814997", true});
+        table.add_mod({true, "Local thing", "/mods/@xyz", false});
+    }
+
+    std::vector<std::string> keys(PreviewStrip const &strip)
+    {
+        std::vector<std::string> result;
+        for (int i = 0; i < strip.card_count(); ++i)
+            result.push_back(strip.card_key(i));
+        return result;
+    }
+
+    QPixmap solid(QColor const color)
+    {
+        QPixmap pixmap(64, 64);
+        pixmap.fill(color);
+        return pixmap;
+    }
+
+    bool same_image(QPixmap const &a, QPixmap const &b)
+    {
+        return a.toImage() == b.toImage();
+    }
+}
+
+TEST_CASE("Cards_MirrorVisibleTableRows")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    CHECK_EQ(keys(strip), (std::vector<std::string> {"463939057", "450814997", "/mods/@xyz"}));
+    auto const model = strip.view()->model();
+    CHECK_EQ(model->index(0, 0).data(Qt::DisplayRole).toString(), "ACE3");
+    CHECK_EQ(model->index(0, 0).data(Qt::CheckStateRole).toInt(), Qt::Checked);
+    CHECK_EQ(model->index(1, 0).data(Qt::CheckStateRole).toInt(), Qt::Unchecked);
+    CHECK(model->index(0, 0).data(PreviewStrip::is_workshop_role).toBool());
+    CHECK_FALSE(model->index(2, 0).data(PreviewStrip::is_workshop_role).toBool());
+    // Cards only show the enabled state, toggling happens in the table
+    CHECK_FALSE(model->flags(model->index(0, 0)).testFlag(Qt::ItemIsUserCheckable));
+
+    table.set_filter("cba");
+    strip.sync_now();
+    CHECK_EQ(keys(strip), std::vector<std::string> {"450814997"});
+
+    table.set_filter("");
+    table.removeRow(0);
+    strip.sync_now();
+    CHECK_EQ(keys(strip), (std::vector<std::string> {"450814997", "/mods/@xyz"}));
+}
+
+TEST_CASE("Cards_FollowEnabledStateAndSorting")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    table.cellWidget(1, 0)->findChild<QCheckBox *>()->setCheckState(Qt::Checked);
+    strip.sync_now();
+    CHECK_EQ(strip.view()->model()->index(1, 0).data(Qt::CheckStateRole).toInt(), Qt::Checked);
+
+    table.sortItems(1, Qt::DescendingOrder);
+    strip.sync_now();
+    CHECK_EQ(keys(strip), (std::vector<std::string> {"/mods/@xyz", "450814997", "463939057"}));
+}
+
+TEST_CASE("Changes_AreCoalescedUntilTheEventLoopRuns")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    CHECK_EQ(strip.card_count(), 0);
+
+    QApplication::processEvents();
+    CHECK_EQ(strip.card_count(), 3);
+}
+
+TEST_CASE("Thumbnails_PlaceholderUntilSet")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    CHECK(same_image(strip.card_pixmap(0), PreviewStrip::placeholder()));
+    CHECK(same_image(strip.card_pixmap(2), PreviewStrip::placeholder()));
+
+    strip.set_thumbnail("463939057", solid(Qt::red));
+    CHECK_FALSE(same_image(strip.card_pixmap(0), PreviewStrip::placeholder()));
+    CHECK(same_image(strip.card_pixmap(1), PreviewStrip::placeholder()));
+
+    // Kept across rebuilds
+    table.set_filter("ace");
+    strip.sync_now();
+    REQUIRE_EQ(strip.card_count(), 1);
+    CHECK_FALSE(same_image(strip.card_pixmap(0), PreviewStrip::placeholder()));
+}
+
+TEST_CASE("Thumbnails_RequestedForWorkshopModsWithoutOne")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    QSignalSpy needed(&strip, &PreviewStrip::thumbnails_needed);
+    strip.attach(&table);
+    strip.set_thumbnail("450814997", solid(Qt::blue));
+    fill(table);
+    strip.sync_now();
+
+    REQUIRE_EQ(needed.count(), 1);
+    auto const ids = needed.takeFirst().at(0).value<std::vector<std::uint64_t>>();
+    CHECK_EQ(ids, std::vector<std::uint64_t> {463939057});
+
+    // Not requested again for the same mods
+    table.set_filter("a");
+    strip.sync_now();
+    CHECK_EQ(needed.count(), 0);
+}
+
+TEST_CASE("Selection_TableToStrip")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    table.selectRow(1);
+    CHECK_EQ(strip.current_card(), 1);
+
+    table.set_filter("local");
+    strip.sync_now();
+    table.selectRow(2);
+    CHECK_EQ(strip.current_card(), 0);
+}
+
+TEST_CASE("Selection_StripToTable")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    strip.view()->setCurrentIndex(strip.view()->model()->index(2, 0));
+    CHECK_EQ(table.currentRow(), 2);
+    REQUIRE_EQ(table.selectionModel()->selectedRows().size(), 1);
+    CHECK_EQ(table.selectionModel()->selectedRows().at(0).row(), 2);
+    CHECK_EQ(strip.current_card(), 2);
+}
+
+TEST_CASE("Collapse")
+{
+    PreviewStrip strip;
+    QSignalSpy changed(&strip, &PreviewStrip::collapsed_changed);
+    CHECK_FALSE(strip.is_collapsed());
+
+    strip.set_collapsed(true);
+    CHECK(strip.is_collapsed());
+    CHECK(strip.view()->isHidden());
+    REQUIRE_EQ(changed.count(), 1);
+    CHECK(changed.takeFirst().at(0).toBool());
+
+    strip.set_collapsed(true);
+    CHECK_EQ(changed.count(), 0);
+
+    strip.set_collapsed(false);
+    CHECK_FALSE(strip.view()->isHidden());
+    CHECK_EQ(changed.count(), 1);
+}
+
+TEST_CASE("Layout_IsAHorizontalStrip")
+{
+    PreviewStrip strip;
+    auto const view = strip.view();
+    CHECK_EQ(view->flow(), QListView::LeftToRight);
+    CHECK_FALSE(view->isWrapping());
+    CHECK(view->uniformItemSizes());
+    CHECK_EQ(view->verticalScrollBarPolicy(), Qt::ScrollBarAlwaysOff);
+}
+
+TEST_CASE("Wheel_ScrollsHorizontally")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    for (int i = 1; i <= 50; ++i)
+        table.add_mod({false, "Mod " + std::to_string(i), std::to_string(i), true});
+    strip.resize(400, strip.sizeHint().height());
+    strip.show();
+    strip.sync_now();
+    QApplication::processEvents();
+
+    auto const scroll_bar = strip.view()->horizontalScrollBar();
+    REQUIRE_GT(scroll_bar->maximum(), 0);
+    REQUIRE_EQ(scroll_bar->value(), 0);
+
+    auto const viewport = strip.view()->viewport();
+    QPointF const position(10, 10);
+    QWheelEvent wheel(position, viewport->mapToGlobal(position), QPoint(), QPoint(0, -120), Qt::NoButton,
+                      Qt::NoModifier, Qt::NoScrollPhase, false);
+    QApplication::sendEvent(viewport, &wheel);
+    CHECK_GT(scroll_bar->value(), 0);
+}
+
+int main(int argc, char **argv)
+{
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+    QApplication application(argc, argv);
+    qRegisterMetaType<std::vector<std::uint64_t>>();
+
+    doctest::Context context(argc, argv);
+    return context.run();
+}

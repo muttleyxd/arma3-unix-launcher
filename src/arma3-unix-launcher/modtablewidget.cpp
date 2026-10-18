@@ -43,12 +43,16 @@ ModTableWidget::ModTableWidget(QWidget *parent) : QTableWidget(parent)
     setup(*this);
     // Hidden flags belong to row positions, sorting moves mods between them
     QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::apply_filter_to_all_rows);
+    QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::mods_changed);
+    QObject::connect(model(), &QAbstractItemModel::rowsRemoved, this, &ModTableWidget::mods_changed);
 }
 
 ModTableWidget::ModTableWidget(int rows, int columns, QWidget *parent) : QTableWidget(rows, columns, parent)
 {
     setup(*this);
     QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::apply_filter_to_all_rows);
+    QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::mods_changed);
+    QObject::connect(model(), &QAbstractItemModel::rowsRemoved, this, &ModTableWidget::mods_changed);
 }
 
 void ModTableWidget::dropEvent(QDropEvent *event) // https://stackoverflow.com/a/43789304
@@ -164,6 +168,7 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
     setItem(index, 3, new QTableWidgetItem(mod.is_workshop_mod_to_string()));
 
     QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::update_mod_selection_counters);
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::mods_changed);
 
     //kinda hacky again, but QTableWidgetItem isn't a QObject, so we cannot connect to it
     QObject::connect(checkbox, &QCheckBox::stateChanged, this, [ = ](int c)
@@ -179,6 +184,7 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
     }
 
     apply_filter(index);
+    emit mods_changed();
 }
 
 bool ModTableWidget::contains_mod(std::string_view const path_or_workshop_id) const
@@ -247,6 +253,7 @@ void ModTableWidget::set_filter(QString const &query)
     setDragDropMode(is_filtering() ? QAbstractItemView::NoDragDrop : QAbstractItemView::InternalMove);
 
     apply_filter_to_all_rows();
+    emit mods_changed();
 }
 
 bool ModTableWidget::is_filtering() const

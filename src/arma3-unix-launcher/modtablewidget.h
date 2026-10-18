@@ -9,6 +9,8 @@
 
 class ModTableWidget : public QTableWidget
 {
+        Q_OBJECT
+
     public:
         explicit ModTableWidget(QWidget *parent = nullptr);
         ModTableWidget(int rows, int columns, QWidget *parent = nullptr);
@@ -30,6 +32,11 @@ class ModTableWidget : public QTableWidget
         void set_filter(QString const &query);
         bool is_filtering() const;
 
+    signals:
+        // Mods were added, removed, reordered, enabled/disabled or filtered
+        void mods_changed();
+
+    public:
     private:
         int drop_on(QDropEvent *event);
         bool is_below(QPoint const &pos, QModelIndex const &index);
