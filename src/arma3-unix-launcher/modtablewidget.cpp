@@ -138,6 +138,10 @@ void ModTableWidget::update_mod_selection_counters(int)
 
 void ModTableWidget::add_mod(UiMod const &mod, int index)
 {
+    // With sorting active, every setItem() below would re-sort and move the half-filled row
+    bool const was_sorting = isSortingEnabled();
+    setSortingEnabled(false);
+
     if (index == -1)
         index = rowCount();
     insertRow(index);
@@ -184,6 +188,7 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
     }
 
     apply_filter(index);
+    setSortingEnabled(was_sorting); // sorts the complete row into place
     emit mods_changed();
 }
 

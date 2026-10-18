@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QSignalSpy>
 
 #include "default_test_reporter.hpp"
 
@@ -139,6 +140,80 @@ TEST_CASE("CurrentWorkshopId")
     table.selectRow(0);
     table.set_filter("cba"); // selected row hidden
     CHECK_FALSE(table.current_workshop_id().has_value());
+}
+
+TEST_CASE("RowsColumnsConstructor_FiltersAndSignalsLikeDefault")
+{
+    ModTableWidget table(0, 4);
+    QSignalSpy changed(&table, &ModTableWidget::mods_changed);
+    fill(table);
+    table.set_filter("rhs");
+
+    changed.clear();
+    table.sortItems(1, Qt::DescendingOrder);
+    CHECK_EQ(visible_names(table), std::vector<std::string> {"RHSAFRF"});
+    CHECK_GE(changed.count(), 1);
+
+    changed.clear();
+    table.removeRow(0);
+    CHECK_GE(changed.count(), 1);
+}
+
+TEST_CASE("AddMod_WhileSorted_KeepsRowsIntact")
+{
+    // Inserting with sorting active used to re-sort between the cells of a new row, leaving rows
+    // without items (and get_mod_at dereferencing null)
+    ModTableWidget table;
+    fill(table);
+    table.sortItems(1, Qt::AscendingOrder);
+
+    table.add_mod({true, "Zeus Enhanced", "1779063631", true});
+    table.add_mod({false, "Achilles", "723217262", true}, 0);
+
+    std::vector<std::string> names;
+    for (auto const &mod : table.get_mods())
+    {
+        CHECK_FALSE(mod.name.empty());
+        CHECK_FALSE(mod.path_or_workshop_id.empty());
+        names.push_back(mod.name);
+    }
+    CHECK_EQ(names, (std::vector<std::string> {"ACE3 Medical", "Achilles", "CBA_A3", "Local thing", "RHSAFRF",
+            "Zeus Enhanced"
+                                              }));
+    auto const zeus = table.get_mod_at(5);
+    CHECK_EQ(zeus.path_or_workshop_id, "1779063631");
+    CHECK(zeus.enabled);
+}
+
+TEST_CASE("ContainsMod")
+{
+    ModTableWidget table;
+    fill(table);
+    CHECK(table.contains_mod("463939057"));
+    CHECK(table.contains_mod("/mods/@xyz"));
+    CHECK_FALSE(table.contains_mod("1"));
+}
+
+TEST_CASE("EnableAndDisableAll_IncludeFilteredMods")
+{
+    ModTableWidget table;
+    int workshop = -1;
+    int custom = -1;
+    table.set_mod_counter_callback([&](int w, int c)
+    {
+        workshop = w;
+        custom = c;
+    });
+    fill(table);
+    table.set_filter("cba");
+
+    table.enable_all_mods();
+    CHECK_EQ(workshop, 3);
+    CHECK_EQ(custom, 1);
+
+    table.disable_all_mods();
+    CHECK_EQ(workshop, 0);
+    CHECK_EQ(custom, 0);
 }
 
 int main(int argc, char **argv)

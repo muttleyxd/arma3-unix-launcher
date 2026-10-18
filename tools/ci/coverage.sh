@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Builds the unit tests with clang source-based coverage, runs them and prints an llvm-cov report
-# for src/common and src/arma3-unix-launcher-library. Run inside the Nix devShell.
+# for src/common, src/arma3-unix-launcher-library and the app sources covered by the widget tests.
+# Run inside the Nix devShell.
 #
 # Usage: coverage.sh [--min PERCENT FILE...]
 #   --min PERCENT FILE...  also fail unless each FILE (path relative to the repo root) has at
@@ -44,7 +45,8 @@ done < <(find "$BUILD_DIR/tests" -type f -perm -u+x -name 'test_unit_*')
 [ ${#OBJECTS[@]} -gt 0 ] || fail "no test binaries found"
 
 REPORT="$(llvm-cov report "${OBJECTS[@]:1}" -instr-profile="$BUILD_DIR/coverage.profdata" \
-                     "$SOURCE_DIR/src/common" "$SOURCE_DIR/src/arma3-unix-launcher-library")" ||
+                     "$SOURCE_DIR/src/common" "$SOURCE_DIR/src/arma3-unix-launcher-library" \
+                     "$SOURCE_DIR/src/arma3-unix-launcher")" ||
     fail "llvm-cov report"
 echo "$REPORT"
 

@@ -14,7 +14,7 @@ create_unit_test(TEST_GROUP ui
 
                             ${CMAKE_SOURCE_DIR}/tests/unit/default_test_reporter.hpp
                  INCLUDES   ${CMAKE_SOURCE_DIR}/src/arma3-unix-launcher ${CMAKE_SOURCE_DIR}/src/common
-                 LINK_LIBS  Qt6::Widgets fmt::fmt-header-only
+                 LINK_LIBS  Qt6::Widgets Qt6::Test fmt::fmt-header-only
                  )
 
 create_unit_test(TEST_GROUP ui
