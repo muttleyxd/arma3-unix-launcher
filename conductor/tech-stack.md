@@ -41,16 +41,27 @@ Versions are those in the pinned `flake.lock` nixpkgs as of 2026-10-17.
 
 ## Testing
 - Unit: doctest + trompeloeil mocks (`tests/unit`), run by `nix flake check` and `ctest` in the devShell
+- Widget tests: `tests/unit/ui`, real Qt widgets on the `offscreen` platform (`QT_QPA_PLATFORM=offscreen`, `QT_SCALE_FACTOR=2` for Retina behaviour), `QSignalSpy`/`QTest` from Qt6::Test; they also run in the `nix flake check` sandbox
+- Coverage: clang source-based (`-DA3UL_COVERAGE=ON`); `tools/ci/coverage.sh [--min PERCENT FILE...]` prints an llvm-cov report and enforces per-file line coverage (llvm tools are in the devShell)
+- Isolated devShell runs: `tools/ci/in-devshell.sh <command>` (clean environment; keeps nix-darwin's `__NIX_DARWIN_SET_ENVIRONMENT_DONE` guard, without which `/etc/bashrc` breaks PATH)
+- Sanitizers (TSan/ASan) do not work on the development Mac (macOS 26, both nixpkgs and Apple clang); concurrency is covered by deterministic tests with bounded waits
 - Fuzzing: libFuzzer-style harnesses for VDF, mod and cppfilter parsers (`tests/fuzzing`)
 
 ## Code Style
 - astyle (`astylerc`, `astyle-format.sh`), provided by the devShell: Allman braces, 4-space indent, 120-col max, `align-pointer=name`
 
 ## Architecture
-- `src/common`: shared filesystem/string/std utils, update checker
+- `src/common`: shared filesystem/string/std utils, update checker, and Qt-free building blocks for mod search and thumbnails:
+  - `mod_search`: multi-word, ASCII case-insensitive matching on name / Workshop ID
+  - `workshop_links`: `steam://url/CommunityFilePage/<id>` and steamcommunity.com URLs
+  - `ca_bundle`: CA bundle lookup (`SSL_CERT_FILE`, Linux paths, macOS `/etc/ssl/cert.pem`)
+  - `http_client`: `Http::IHttpClient` + libcurl C API implementation (no curlpp: it throws, unsafe with libsteam_api's `__cxa_throw` override); http/https only, 16 MiB limit
+  - `workshop_details`: Steam Web API `ISteamRemoteStorage/GetPublishedFileDetails/v1` (no key, batches of 100), exception-free JSON parsing
+  - `thumbnail_cache`: `~/Library/Caches/a3unixlauncher/thumbnails/<id>.<png|jpg|gif|webp>`, format from file signature, 7-day freshness, stale entries used offline
+  - `thumbnail_service`: `ThumbnailService` (cache first, batched lookups, 512px images via Steam CDN resize params) and `ThumbnailWorker` (background thread, cancels on destruction)
 - `src/arma3-unix-launcher-library`: core logic (Arma3Client, VDF parser, Mod, Steam utils, HTML preset export)
 - `src/steam-integration`: Steamworks wrapper with real impl + stub
-- `src/arma3-unix-launcher`: Qt6 app (MainWindow, ModTableWidget, settings, HTML preset parser)
+- `src/arma3-unix-launcher`: Qt6 app (MainWindow, ModTableWidget with search filter, PreviewStrip thumbnail carousel, `open_workshop_page`, settings, HTML preset parser)
 - `src/dayz-*`: upstream DayZ variant, out of scope
 
 ## CI
@@ -59,8 +70,8 @@ Versions are those in the pinned `flake.lock` nixpkgs as of 2026-10-17.
 ## Known Gaps (to address)
 - CI still uses Homebrew and builds Intel too (deferred Phase 4 of nix_build_20261017)
 - README still documents Qt5 / CMake 3.11 / Homebrew
-- Update checker expects /etc/ssl/certs/ca-*.crt, which stock macOS lacks (/etc/ssl/cert.pem)
 
 ## Change Log
 - **2026-10-17 (track nix_build_20261017, Phase 1):** pugixml comes from nixpkgs 1.16; the `muttleyxd/pugixml` `simple-build-for-a3ul` fork turned out to be unnecessary. curlpp resolves through pkg-config because it ships no CMake config. Added `A3UL_USE_SYSTEM_DEPS` and `STEAMWORKS_SDK_DIR` CMake options. Use an isolated devShell (`nix develop --ignore-environment`) when testing flake changes: the old Qt5 devShell leaked `NIX_CFLAGS_COMPILE` include paths into Qt6 builds.
 - **2026-10-17 (track nix_build_20261017, Phases 2-3):** curlMinimal avoids a GNU/Apple `libiconv.2.dylib` clash in the flattened bundle. sigtool signatures can't seal bundle resources, so only the `.dmg` path (re-signed with Apple's codesign) produces a Gatekeeper-acceptable bundle.
+- **2026-10-18 (track mod_search_thumbnails_20261017):** Added the mod search, Workshop link and thumbnail modules in `src/common`, Qt widget tests on the offscreen platform, clang coverage tooling and `tools/ci/in-devshell.sh`. The update checker now finds the macOS CA bundle. Network access is limited to the Steam Web API and Steam's image CDN; thumbnails are cached under `~/Library/Caches/a3unixlauncher`.
