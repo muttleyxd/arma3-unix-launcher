@@ -42,9 +42,9 @@
     - [x] Horizontal `QListView` (icon mode, uniform item sizes) over a model of the visible mods; placeholder card art
     - [x] Two-way selection sync with the table, centre on selection, arrow keys / wheel scrolling
     - [x] Collapse toggle persisted in settings
-- [~] Task: Thumbnails in the UI
-    - [ ] Run `ThumbnailService` off the UI thread, deliver images via queued signals, scale once and cache `QPixmap`s
-- [ ] Task: Open in Steam
+- [x] Task: Thumbnails in the UI 382e056
+    - [x] Run `ThumbnailService` off the UI thread, deliver images via queued signals, scale once and cache `QPixmap`s
+- [~] Task: Open in Steam
     - [ ] Card button and table context menu for Workshop mods; `QDesktopServices::openUrl` with browser fallback
 - [ ] Task: Large-list check
     - [ ] Script that creates 500 fake Workshop mods in a temp Arma layout; confirm filtering and scrolling stay responsive
