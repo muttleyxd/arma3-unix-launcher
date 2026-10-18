@@ -44,9 +44,9 @@
     - [x] Collapse toggle persisted in settings
 - [x] Task: Thumbnails in the UI 382e056
     - [x] Run `ThumbnailService` off the UI thread, deliver images via queued signals, scale once and cache `QPixmap`s
-- [~] Task: Open in Steam
-    - [ ] Card button and table context menu for Workshop mods; `QDesktopServices::openUrl` with browser fallback
-- [ ] Task: Large-list check
+- [x] Task: Open in Steam 6e49043
+    - [x] Card button and table context menu for Workshop mods; `QDesktopServices::openUrl` with browser fallback
+- [~] Task: Large-list check
     - [ ] Script that creates 500 fake Workshop mods in a temp Arma layout; confirm filtering and scrolling stay responsive
 - [ ] Task: Update `tech-stack.md` (new common modules, Web API usage, cache location)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Integration' (Protocol in workflow.md)
