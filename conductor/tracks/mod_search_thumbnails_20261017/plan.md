@@ -32,7 +32,7 @@
 - [x] Task: Thumbnail service (`common/thumbnail_service.{hpp,cpp}`) cff682f
     - [x] Tests (mock HTTP, synchronous executor): cached+fresh served without network; missing/stale fetched in batches; offline falls back to stale cache; failures reported as "no thumbnail"; callback per ID
     - [x] Implement with a background worker thread and cancellation on shutdown
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Workshop Preview Metadata and Thumbnail Cache' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Workshop Preview Metadata and Thumbnail Cache' (Protocol in workflow.md)
 
 ## Phase 3: UI Integration
 - [ ] Task: Search box
