@@ -3,7 +3,9 @@
 
 #include <Qt>
 
+#include <QApplication>
 #include <QCheckBox>
+#include <QClipboard>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QListView>
@@ -15,6 +17,7 @@
 
 #include <QResizeEvent>
 
+#include <array>
 #include <iostream>
 #include <optional>
 #include <ranges>
@@ -47,6 +50,37 @@ namespace fs = FilesystemUtils;
 
 Q_DECLARE_METATYPE(std::string)
 
+namespace
+{
+    constexpr char const *workshop_url = "https://steamcommunity.com/app/107410/workshop/";
+    constexpr char const *workshop_subscriptions_url =
+        "https://steamcommunity.com/my/myworkshopfiles/?appid=107410&browsefilter=mysubscriptions";
+    constexpr char const *workshop_item_url_template = "https://steamcommunity.com/sharedfiles/filedetails/?id={}";
+
+    std::string format_size(std::uintmax_t bytes)
+    {
+        constexpr double kib = 1024.0;
+        auto const value = static_cast<double>(bytes);
+        if (value >= kib * kib * kib)
+            return fmt::format("{:.1f} GB", value / (kib * kib * kib));
+        if (value >= kib * kib)
+            return fmt::format("{:.0f} MB", value / (kib * kib));
+        return fmt::format("{:.0f} KB", value / kib);
+    }
+
+    // Mod constructor throws when there is no addons directory, check it upfront without exceptions
+    bool has_addons_directory(std::filesystem::path const &mod_path)
+    {
+        std::error_code ec;
+        for (std::filesystem::directory_iterator it(mod_path, ec), end; !ec && it != end; it.increment(ec))
+        {
+            if (StringUtils::Lowercase(it->path().filename().string()) == "addons")
+                return true;
+        }
+        return false;
+    }
+}
+
 MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesystem::path const &config_file_path,
                        bool use_steam_integration, QWidget *parent) :
     QMainWindow(parent),
@@ -69,6 +103,7 @@ MainWindow::MainWindow(std::unique_ptr<ARMA3::Client> arma3_client, std::filesys
     });
 
     setWindowIcon(QIcon(":/icons/blagoicons/arma3.png"));
+    ui->label_arma_path->setText(QString::fromStdString(client->GetPath().string()));
 
     initialize_theme_combobox();
 
@@ -157,9 +192,27 @@ If there is an update, then you will get a notification, nothing will be downloa
     connect(ui->action_mods_disable_all, &QAction::triggered, this,
             &MainWindow::on_mods_disable_all_mods);
 
+    auto separator = new QAction(this);
+    separator->setSeparator(true);
+    ui->table_mods->addAction(separator);
+    ui->table_mods->addAction(ui->action_mod_open_workshop);
+    ui->table_mods->addAction(ui->action_mod_open_folder);
+    ui->table_mods->addAction(ui->action_mod_copy_id);
+
     menu_button_save.addAction(ui->action_mods_save_html);
     menu_button_save.addAction(ui->action_mods_save_json);
     ui->button_mod_preset_save->setMenu(&menu_button_save);
+
+    connect(ui->table_mods, &QTableWidget::itemSelectionChanged, this, &MainWindow::update_mod_preview);
+
+    ui->splitter_mods->setStretchFactor(0, 1);
+    ui->splitter_mods->setStretchFactor(1, 0);
+    ui->splitter_mods->setSizes({700, 320});
+
+    setup_navigation();
+    setup_mod_filters();
+    setup_launch_command_preview();
+    update_mod_preview();
 }
 
 MainWindow::~MainWindow()
@@ -266,10 +319,14 @@ void MainWindow::put_mods_from_ui_to_manager_settings()
 
 void MainWindow::update_mod_selection_counters(int workshop_mod_count, int custom_mod_count)
 {
-    auto text = fmt::format("Selected {} mods ({} from workshop, {} custom)", workshop_mod_count + custom_mod_count,
-                            workshop_mod_count,
-                            custom_mod_count);
+    auto const mod_count = workshop_mod_count + custom_mod_count;
+    auto text = fmt::format("{} {} SELECTED", mod_count, mod_count == 1 ? "MOD" : "MODS");
     ui->label_selected_mods->setText(QString::fromStdString(text));
+    ui->label_selected_mods->setToolTip(QString::fromStdString(fmt::format("{} from Workshop, {} local",
+                                        workshop_mod_count, custom_mod_count)));
+
+    update_footer_details();
+    update_mod_preview();
 }
 
 void MainWindow::setup_steam_integration()
@@ -300,7 +357,7 @@ void MainWindow::check_steam_api()
             auto const percentage = static_cast<uint64_t>((static_cast<float>(download_info.bytes_downloaded) / static_cast<float>
                                     (download_info.bytes_total)) * 100);
             auto const mod_name = steam_integration->get_item_title(mod).substr(0, 40);
-            auto const downloading_label = fmt::format("Steam Workshop - downloading {} - {}%", mod_name, percentage);
+            auto const downloading_label = fmt::format("Downloading {} · {}%", mod_name, percentage);
             ui->label_workshop_status->setText(QString::fromStdString(downloading_label));
             visible = true;
             break;
@@ -470,11 +527,11 @@ catch (std::exception const &ex)
 
 void MainWindow::check_if_arma_is_running()
 {
-    std::string text = "Status: Arma 3 is not running";
+    std::string text = "Arma 3 is not running";
     for (auto const &executable_name : ARMA3::Definitions::executable_names)
         if (auto pid = StdUtils::IsProcessRunning(executable_name, true); pid != -1)
         {
-            text = fmt::format("Status: Arma 3 is running, PID: {}", pid);
+            text = fmt::format("Arma 3 is running · PID {}", pid);
             break;
         }
 
@@ -1039,4 +1096,346 @@ void MainWindow::on_combobox_theme_currentTextChanged(QString const &combobox_th
     }
 
     qApp->setStyleSheet(style);
+}
+
+void MainWindow::setup_navigation()
+{
+    std::array<std::pair<QPushButton *, QWidget *>, 4> const pages{{
+            {ui->button_nav_mods, ui->page_mods},
+            {ui->button_nav_parameters, ui->page_parameters},
+            {ui->button_nav_server, ui->page_server},
+            {ui->button_nav_settings, ui->page_settings}
+        }};
+
+    for (auto const &entry : pages)
+    {
+        auto page = entry.second;
+        connect(entry.first, &QPushButton::clicked, this, [this, page]()
+        {
+            ui->stacked_pages->setCurrentWidget(page);
+        });
+    }
+}
+
+void MainWindow::setup_mod_filters()
+{
+    for (auto button : {ui->button_filter_all, ui->button_filter_enabled, ui->button_filter_disabled, ui->button_filter_workshop,
+                        ui->button_filter_local})
+    {
+        connect(button, &QPushButton::toggled, this, [this](bool checked)
+        {
+            if (checked)
+                apply_mod_filter();
+        });
+    }
+}
+
+void MainWindow::setup_launch_command_preview()
+{
+    for (auto container : {ui->widget_parameters_content, static_cast<QWidget *>(ui->groupbox_server_direct_connect)})
+    {
+        for (auto checkbox : container->findChildren<QCheckBox *>())
+            connect(checkbox, &QCheckBox::toggled, this, &MainWindow::update_launch_command_preview);
+        for (auto textbox : container->findChildren<QLineEdit *>())
+            connect(textbox, &QLineEdit::textChanged, this, &MainWindow::update_launch_command_preview);
+    }
+    connect(ui->spinbox_cpu_count, QOverload<int>::of(&QSpinBox::valueChanged), this,
+            &MainWindow::update_launch_command_preview);
+
+    update_launch_command_preview();
+}
+
+void MainWindow::apply_mod_filter()
+{
+    using Filter = ModTableWidget::Filter;
+
+    auto filter = Filter::all;
+    if (ui->button_filter_enabled->isChecked())
+        filter = Filter::enabled;
+    else if (ui->button_filter_disabled->isChecked())
+        filter = Filter::disabled;
+    else if (ui->button_filter_workshop->isChecked())
+        filter = Filter::workshop;
+    else if (ui->button_filter_local->isChecked())
+        filter = Filter::local;
+
+    ui->table_mods->set_filter(ui->textbox_mod_search->text(), filter);
+    update_mod_preview();
+}
+
+void MainWindow::on_textbox_mod_search_textChanged(QString const &)
+{
+    apply_mod_filter();
+}
+
+std::optional<int> MainWindow::selected_mod_row() const
+{
+    auto const selected_items = ui->table_mods->selectedItems();
+    if (selected_items.isEmpty())
+        return std::nullopt;
+
+    auto row = ui->table_mods->currentRow();
+    if (row < 0 || ui->table_mods->item(row, 1) == nullptr || !ui->table_mods->item(row, 1)->isSelected())
+        row = selected_items.first()->row();
+
+    if (ui->table_mods->isRowHidden(row) || !ui->table_mods->is_row_complete(row))
+        return std::nullopt;
+    return row;
+}
+
+std::filesystem::path MainWindow::get_mod_full_path(UiMod const &mod) const
+{
+    if (mod.is_workshop_mod)
+        return client->GetPathWorkshop() / mod.path_or_workshop_id;
+    return ui_path_to_full_path(mod.path_or_workshop_id);
+}
+
+std::uintmax_t MainWindow::get_mod_size(std::filesystem::path const &path)
+{
+    auto const key = path.string();
+    if (auto it = mod_size_cache.find(key); it != mod_size_cache.end())
+        return it->second;
+
+    std::uintmax_t size = 0;
+    std::error_code ec;
+    using std::filesystem::directory_options;
+    for (std::filesystem::recursive_directory_iterator it(path, directory_options::skip_permission_denied, ec), end;
+            !ec && it != end; it.increment(ec))
+    {
+        std::error_code entry_ec;
+        if (it->is_regular_file(entry_ec))
+        {
+            auto const file_size = it->file_size(entry_ec);
+            if (!entry_ec)
+                size += file_size;
+        }
+    }
+
+    mod_size_cache[key] = size;
+    return size;
+}
+
+void MainWindow::update_mod_preview()
+{
+    auto const row = selected_mod_row();
+
+    ui->button_preview_open_workshop->setVisible(true);
+    ui->button_preview_website->setVisible(false);
+    ui->label_preview_overview->setVisible(false);
+    mod_preview_website.clear();
+
+    if (!row)
+    {
+        ui->label_preview_kicker->setText("PREVIEW");
+        ui->label_preview_name->setText("No mod selected");
+        ui->label_preview_author->setText("Select a mod in the list to see its details.");
+        ui->label_preview_size->setText("—");
+        ui->label_preview_source->setText("—");
+        ui->label_preview_load_order->setText("—");
+        ui->label_preview_path->setText("—");
+        ui->label_preview_overview->clear();
+        for (auto button : {ui->button_preview_open_workshop, ui->button_preview_open_folder, ui->button_preview_copy_id,
+                            ui->button_preview_toggle})
+            button->setEnabled(false);
+        ui->button_preview_toggle->setText("Enable");
+        return;
+    }
+
+    auto const mod = ui->table_mods->get_mod_at(*row);
+    auto const full_path = get_mod_full_path(mod);
+
+    std::string author;
+    std::string overview;
+    bool const installed = has_addons_directory(full_path);
+    if (installed)
+    {
+        try
+        {
+            Mod const m(full_path);
+            author = m.GetValueOrReturnDefault("author", "");
+            overview = m.GetValueOrReturnDefault("overview", "");
+            mod_preview_website = m.GetValueOrReturnDefault("action", "");
+        }
+        catch (std::exception const &e)
+        {
+            spdlog::debug("Cannot read mod details for preview {}: {}", full_path.string(), e.what());
+        }
+    }
+
+    int load_order = 0;
+    if (mod.enabled)
+        for (int i = 0; i <= *row; ++i)
+            if (ui->table_mods->is_mod_enabled_at(i))
+                ++load_order;
+
+    if (mod.is_workshop_mod)
+        ui->label_preview_kicker->setText(QString::fromStdString(fmt::format("WORKSHOP · {}", mod.path_or_workshop_id)));
+    else
+        ui->label_preview_kicker->setText("LOCAL MOD");
+
+    ui->label_preview_name->setText(QString::fromStdString(mod.name));
+    if (!author.empty())
+        ui->label_preview_author->setText(QString::fromStdString(fmt::format("by {}", author)));
+    else
+        ui->label_preview_author->setText(mod.is_workshop_mod ? "Steam Workshop item" : "Local folder");
+
+    ui->label_preview_size->setText(installed ? QString::fromStdString(format_size(get_mod_size(full_path))) :
+                                    "Not installed");
+    ui->label_preview_source->setText(mod.is_workshop_mod ? "Workshop" : "Local");
+    ui->label_preview_load_order->setText(load_order > 0 ? QString::number(load_order) : "—");
+    ui->label_preview_path->setText(QString::fromStdString(full_path.string()));
+
+    ui->label_preview_overview->setTextFormat(Qt::PlainText);
+    ui->label_preview_overview->setText(QString::fromStdString(overview));
+    ui->label_preview_overview->setVisible(!overview.empty());
+
+    ui->button_preview_open_workshop->setVisible(mod.is_workshop_mod);
+    ui->button_preview_open_workshop->setEnabled(mod.is_workshop_mod);
+    ui->button_preview_open_folder->setEnabled(installed);
+    ui->button_preview_copy_id->setEnabled(true);
+    ui->button_preview_copy_id->setText(mod.is_workshop_mod ? "Copy ID" : "Copy path");
+    ui->button_preview_website->setVisible(StringUtils::StartsWith(mod_preview_website, "http"));
+    ui->button_preview_toggle->setEnabled(true);
+    ui->button_preview_toggle->setText(mod.enabled ? "Disable" : "Enable");
+}
+
+void MainWindow::update_launch_command_preview()
+{
+    manager.save_settings_from_ui(ui);
+
+    auto &parameters = manager.settings["parameters"];
+    std::string command;
+    if (parameters["protonDisableEsync"].is_boolean() && parameters["protonDisableEsync"].get<bool>())
+        command += "PROTON_NO_ESYNC=1 ";
+    if (parameters["environmentVariables"].is_string())
+        command += parameters["environmentVariables"].get<std::string>() + " ";
+    command += manager.get_launch_parameters();
+
+    ui->textbox_launch_command->setPlainText(QString::fromStdString(std::string(StringUtils::trim(command))));
+    update_footer_details();
+}
+
+void MainWindow::update_footer_details()
+{
+    QStringList dlcs;
+    for (auto checkbox : ui->groupbox_parameters_dlc->findChildren<QCheckBox *>())
+        if (checkbox->isChecked())
+            dlcs.append(checkbox->text());
+
+    QString details = "DLC: " + (dlcs.isEmpty() ? QString("none") : dlcs.join(", "));
+    if (ui->checkbox_server_address->isChecked() && !ui->textbox_server_address->text().trimmed().isEmpty())
+        details += " · Joins " + ui->textbox_server_address->text().trimmed();
+    ui->label_footer_details->setText(details);
+}
+
+void MainWindow::open_mod_in_workshop(UiMod const &mod)
+{
+    if (!mod.is_workshop_mod)
+        return;
+    auto const url = fmt::format(workshop_item_url_template, mod.path_or_workshop_id);
+    QDesktopServices::openUrl(QUrl(QString::fromStdString(url)));
+}
+
+void MainWindow::open_mod_folder(UiMod const &mod)
+{
+    auto const path = get_mod_full_path(mod);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(path.string())));
+}
+
+void MainWindow::copy_mod_id(UiMod const &mod)
+{
+    auto const text = mod.is_workshop_mod ? mod.path_or_workshop_id : get_mod_full_path(mod).string();
+    QApplication::clipboard()->setText(QString::fromStdString(text));
+}
+
+void MainWindow::on_button_open_workshop_clicked()
+{
+    QDesktopServices::openUrl(QUrl(workshop_url));
+}
+
+void MainWindow::on_button_browse_workshop_clicked()
+{
+    QDesktopServices::openUrl(QUrl(workshop_url));
+}
+
+void MainWindow::on_button_my_subscriptions_clicked()
+{
+    QDesktopServices::openUrl(QUrl(workshop_subscriptions_url));
+}
+
+void MainWindow::on_button_preview_open_workshop_clicked()
+{
+    if (auto const row = selected_mod_row())
+        open_mod_in_workshop(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_button_preview_open_folder_clicked()
+{
+    if (auto const row = selected_mod_row())
+        open_mod_folder(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_button_preview_copy_id_clicked()
+{
+    if (auto const row = selected_mod_row())
+        copy_mod_id(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_button_preview_website_clicked()
+{
+    if (StringUtils::StartsWith(mod_preview_website, "http"))
+        QDesktopServices::openUrl(QUrl(QString::fromStdString(mod_preview_website)));
+}
+
+void MainWindow::on_button_preview_toggle_clicked()
+{
+    auto const row = selected_mod_row();
+    if (!row)
+        return;
+
+    auto const enabled = ui->table_mods->is_mod_enabled_at(*row);
+    ui->table_mods->set_mod_enabled_at(*row, !enabled);
+    put_mods_from_ui_to_manager_settings();
+}
+
+void MainWindow::on_action_mod_open_workshop_triggered()
+{
+    if (auto const row = selected_mod_row())
+        open_mod_in_workshop(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_action_mod_open_folder_triggered()
+{
+    if (auto const row = selected_mod_row())
+        open_mod_folder(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_action_mod_copy_id_triggered()
+{
+    if (auto const row = selected_mod_row())
+        copy_mod_id(ui->table_mods->get_mod_at(*row));
+}
+
+void MainWindow::on_button_copy_launch_command_clicked()
+{
+    QApplication::clipboard()->setText(ui->textbox_launch_command->toPlainText());
+}
+
+void MainWindow::on_button_join_server_clicked()
+{
+    if (ui->textbox_server_address->text().trimmed().isEmpty())
+    {
+        QMessageBox(QMessageBox::Icon::Information, "Cannot join server", "Enter a server address first.").exec();
+        ui->checkbox_server_address->setChecked(true);
+        ui->textbox_server_address->setFocus();
+        return;
+    }
+
+    ui->checkbox_server_address->setChecked(true);
+    if (!ui->textbox_server_port->text().trimmed().isEmpty())
+        ui->checkbox_server_port->setChecked(true);
+    if (!ui->textbox_server_password->text().isEmpty())
+        ui->checkbox_server_password->setChecked(true);
+
+    on_button_start_clicked();
 }

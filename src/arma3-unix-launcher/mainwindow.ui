@@ -6,620 +6,906 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>645</height>
+    <width>1200</width>
+    <height>760</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>860</width>
+    <height>560</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Arma 3 Unix Launcher</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_7">
+   <layout class="QVBoxLayout" name="layout_vertical_main">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
-     <layout class="QVBoxLayout" name="layout_vertical_main">
+     <widget class="QFrame" name="frame_header">
+      <layout class="QHBoxLayout" name="layout_horizontal_header">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_logo_badge">
+         <property name="minimumSize">
+          <size>
+           <width>36</width>
+           <height>36</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>36</width>
+           <height>36</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>A3</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="layout_vertical_header_title">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_title">
+           <property name="text">
+            <string>ARMA 3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_subtitle">
+           <property name="text">
+            <string>UNIX LAUNCHER</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="spacer_header_left">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>16</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_arma_status">
+         <property name="text">
+          <string>Arma 3 is not running</string>
+         </property>
+         <property name="role" stdset="0">
+          <string>pill</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_workshop_status">
+         <property name="text">
+          <string>Steam Workshop - idle</string>
+         </property>
+         <property name="role" stdset="0">
+          <string>pill-info</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="spacer_header_right">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="layout_horizontal_body">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QTabWidget" name="widget_tabs">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QFrame" name="frame_sidebar">
         <property name="minimumSize">
          <size>
-          <width>500</width>
-          <height>500</height>
+          <width>210</width>
+          <height>0</height>
          </size>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>230</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="layout_vertical_sidebar">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <property name="leftMargin">
+          <number>12</number>
+         </property>
+         <property name="topMargin">
+          <number>16</number>
+         </property>
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>16</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="button_nav_mods">
+           <property name="text">
+            <string>Mods</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_nav_parameters">
+           <property name="text">
+            <string>Parameters</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_nav_server">
+           <property name="text">
+            <string>Server</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_nav_settings">
+           <property name="text">
+            <string>Settings</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_sidebar_section">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_sidebar_workshop">
+           <property name="text">
+            <string>STEAM WORKSHOP</string>
+           </property>
+           <property name="role" stdset="0">
+            <string>section</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_browse_workshop">
+           <property name="toolTip">
+            <string>Open the Arma 3 Steam Workshop</string>
+           </property>
+           <property name="text">
+            <string>Browse Workshop ↗</string>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav-link</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_my_subscriptions">
+           <property name="toolTip">
+            <string>Open your subscribed Arma 3 Workshop items</string>
+           </property>
+           <property name="text">
+            <string>My subscriptions ↗</string>
+           </property>
+           <property name="role" stdset="0">
+            <string>nav-link</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_sidebar_bottom">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_arma_path">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stacked_pages">
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tab_mods">
-         <attribute name="title">
-          <string>Mods</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+        <widget class="QWidget" name="page_mods">
+         <layout class="QVBoxLayout" name="layout_vertical_page_mods">
+          <property name="spacing">
+           <number>14</number>
+          </property>
+          <property name="leftMargin">
+           <number>28</number>
+          </property>
+          <property name="topMargin">
+           <number>22</number>
+          </property>
+          <property name="rightMargin">
+           <number>28</number>
+          </property>
+          <property name="bottomMargin">
+           <number>18</number>
+          </property>
           <item>
-           <widget class="QLabel" name="label_workshop_status">
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-             </font>
+           <layout class="QHBoxLayout" name="layout_horizontal_mods_header">
+            <property name="spacing">
+             <number>8</number>
             </property>
-            <property name="text">
-             <string>Steam Workshop - idle</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="ModTableWidget" name="table_mods"/>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="layout_horizontal_buttons_add_remove">
             <item>
-             <widget class="QLabel" name="label_custom_mods_buttons">
-              <property name="text">
-               <string>Custom mods:</string>
+             <layout class="QVBoxLayout" name="layout_vertical_mods_title">
+              <property name="spacing">
+               <number>2</number>
               </property>
-             </widget>
+              <item>
+               <widget class="QLabel" name="label_mods_title">
+                <property name="text">
+                 <string>MODS</string>
+                </property>
+                <property name="role" stdset="0">
+                 <string>page-title</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_mods_subtitle">
+                <property name="text">
+                 <string>Drag to reorder · right-click for more</string>
+                </property>
+                <property name="role" stdset="0">
+                 <string>muted</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="spacer_mods_header">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
             </item>
             <item>
              <widget class="QPushButton" name="button_add_custom_mod">
-              <property name="text">
-               <string>Add</string>
+              <property name="toolTip">
+               <string>Add mod folders from disk</string>
               </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/open-iconic/plus.svg</normaloff>:/icons/open-iconic/plus.svg</iconset>
+              <property name="text">
+               <string>Add local mod</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="button_remove_custom_mod">
+              <property name="toolTip">
+               <string>Remove the selected local mods from the list</string>
+              </property>
               <property name="text">
                <string>Remove</string>
-              </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/open-iconic/minus.svg</normaloff>:/icons/open-iconic/minus.svg</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="layout_horizontal_mod_preset">
-            <item>
-             <widget class="QLabel" name="label_mod_preset">
-              <property name="text">
-               <string>Mod preset:</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="button_mod_preset_open">
-              <property name="text">
-               <string>Open</string>
+              <property name="toolTip">
+               <string>Load an .a3ulml or Arma 3 Launcher .html preset</string>
               </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/open-iconic/envelope-open.svg</normaloff>:/icons/open-iconic/envelope-open.svg</iconset>
+              <property name="text">
+               <string>Import preset</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="button_mod_preset_save">
               <property name="text">
-               <string>Save</string>
+               <string>Save preset</string>
               </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/open-iconic/envelope-closed.svg</normaloff>:/icons/open-iconic/envelope-closed.svg</iconset>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_open_workshop">
+              <property name="toolTip">
+               <string>Open the Arma 3 Steam Workshop</string>
+              </property>
+              <property name="text">
+               <string>Open Workshop ↗</string>
+              </property>
+              <property name="role" stdset="0">
+               <string>outline</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="layout_horizontal_selected_mods">
+           <layout class="QHBoxLayout" name="layout_horizontal_mods_toolbar">
+            <property name="spacing">
+             <number>6</number>
+            </property>
             <item>
-             <widget class="QLabel" name="label_selected_mods">
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
+             <widget class="QLineEdit" name="textbox_mod_search">
+              <property name="minimumSize">
+               <size>
+                <width>260</width>
+                <height>0</height>
+               </size>
               </property>
-              <property name="lineWidth">
-               <number>0</number>
+              <property name="maximumSize">
+               <size>
+                <width>380</width>
+                <height>16777215</height>
+               </size>
               </property>
-              <property name="text">
-               <string>Selected 0 mods (0 from workshop, 0 custom)</string>
+              <property name="placeholderText">
+               <string>Search by name, Workshop ID or path</string>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+              <property name="clearButtonEnabled">
+               <bool>true</bool>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="spacer_mods_toolbar_gap">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>8</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_filter_all">
+              <property name="text">
+               <string>All</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="role" stdset="0">
+               <string>chip</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_filter_enabled">
+              <property name="text">
+               <string>Enabled</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="role" stdset="0">
+               <string>chip</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_filter_disabled">
+              <property name="text">
+               <string>Disabled</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="role" stdset="0">
+               <string>chip</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_filter_workshop">
+              <property name="text">
+               <string>Workshop</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="role" stdset="0">
+               <string>chip</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_filter_local">
+              <property name="text">
+               <string>Local</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="role" stdset="0">
+               <string>chip</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="spacer_mods_toolbar">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="layout_horizontal_button_start_lbl_status">
-            <item>
-             <widget class="QPushButton" name="button_start">
-              <property name="text">
-               <string>Start</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_arma_status">
-              <property name="text">
-               <string>Status: Arma 3 is not running</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_parameters">
-         <attribute name="title">
-          <string>Parameters</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QTabWidget" name="widget_tabs_parameters">
-            <property name="tabShape">
-             <enum>QTabWidget::Rounded</enum>
+           <widget class="QSplitter" name="splitter_mods">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="currentIndex">
-             <number>0</number>
+            <property name="childrenCollapsible">
+             <bool>false</bool>
             </property>
-            <property name="tabBarAutoHide">
-             <bool>true</bool>
-            </property>
-            <widget class="QWidget" name="tab_parameters_basic">
-             <attribute name="title">
-              <string>Basic</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_4">
-              <item row="0" column="0">
-               <layout class="QVBoxLayout" name="layout_vertical_parameters_basic">
+            <widget class="ModTableWidget" name="table_mods">
+             <property name="minimumSize">
+              <size>
+               <width>420</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+            <widget class="QFrame" name="frame_mod_preview">
+             <property name="minimumSize">
+              <size>
+               <width>280</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>420</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <layout class="QVBoxLayout" name="layout_vertical_mod_preview">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <property name="leftMargin">
+               <number>18</number>
+              </property>
+              <property name="topMargin">
+               <number>18</number>
+              </property>
+              <property name="rightMargin">
+               <number>18</number>
+              </property>
+              <property name="bottomMargin">
+               <number>18</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_preview_kicker">
+                <property name="text">
+                 <string>PREVIEW</string>
+                </property>
+                <property name="role" stdset="0">
+                 <string>kicker</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_preview_name">
+                <property name="text">
+                 <string>No mod selected</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_preview_author">
+                <property name="text">
+                 <string>Select a mod in the list to see its details.</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="role" stdset="0">
+                 <string>muted</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="layout_horizontal_preview_stats">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
                 <item>
-                 <widget class="QCheckBox" name="checkbox_skip_intro">
-                  <property name="text">
-                   <string>Skip intro</string>
+                 <widget class="QFrame" name="frame_preview_stat_size">
+                  <property name="role" stdset="0">
+                   <string>stat</string>
                   </property>
+                  <layout class="QVBoxLayout" name="layout_vertical_preview_stat_size">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>8</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>8</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_preview_size_title">
+                     <property name="text">
+                      <string>SIZE</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-title</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_preview_size">
+                     <property name="text">
+                      <string>—</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-value</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkbox_skip_logos_at_startup">
-                  <property name="text">
-                   <string>Skip logos at startup</string>
+                 <widget class="QFrame" name="frame_preview_stat_source">
+                  <property name="role" stdset="0">
+                   <string>stat</string>
                   </property>
+                  <layout class="QVBoxLayout" name="layout_vertical_preview_stat_source">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>8</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>8</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_preview_source_title">
+                     <property name="text">
+                      <string>SOURCE</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-title</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_preview_source">
+                     <property name="text">
+                      <string>—</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-value</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkbox_force_window_mode">
-                  <property name="text">
-                   <string>Force window mode</string>
+                 <widget class="QFrame" name="frame_preview_stat_load_order">
+                  <property name="role" stdset="0">
+                   <string>stat</string>
                   </property>
+                  <layout class="QVBoxLayout" name="layout_vertical_preview_stat_load_order">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>8</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>10</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>8</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_preview_load_order_title">
+                     <property name="text">
+                      <string>LOAD #</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-title</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_preview_load_order">
+                     <property name="text">
+                      <string>—</string>
+                     </property>
+                     <property name="role" stdset="0">
+                      <string>stat-value</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_basic_profile">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_profile">
-                    <property name="text">
-                     <string>Profile</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_profile">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_contact">
-                  <property name="text">
-                   <string>Enable Contact DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_global_mobilization">
-                  <property name="text">
-                   <string>Enable Global Mobilization - Cold War Germany DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_sog_prairie_fire">
-                  <property name="text">
-                   <string>Enable S.O.G. Prairie Fire DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_reaction_forces">
-                  <property name="text">
-                   <string>Enable Reaction Forces DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_expeditionary_forces">
-                  <property name="text">
-                   <string>Enable Expeditionary Forces DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_csla">
-                  <property name="text">
-                   <string>Enable CSLA Iron Curtain DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_spearhead_1944">
-                  <property name="text">
-                   <string>Enable Spearhead 1944</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_dlc_western_sahara">
-                  <property name="text">
-                   <string>Enable Western Sahara DLC</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_disable_esync">
-                  <property name="text">
-                   <string>Proton: Disable esync</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="layout_vertical_parameters_basic_environment_variables">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_environment_variables">
-                    <property name="text">
-                     <string>Environment variables</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_environment_variables">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
                 </item>
                </layout>
               </item>
-              <item row="1" column="0">
-               <spacer name="verticalSpacer">
+              <item>
+               <widget class="QLabel" name="label_preview_overview">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_preview_path_title">
+                <property name="text">
+                 <string>PATH</string>
+                </property>
+                <property name="role" stdset="0">
+                 <string>stat-title</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_preview_path">
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextSelectableByMouse</set>
+                </property>
+                <property name="role" stdset="0">
+                 <string>mono</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="spacer_preview">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>10</width>
+                  <height>10</height>
                  </size>
                 </property>
                </spacer>
               </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_parameters_advanced">
-             <attribute name="title">
-              <string>Advanced</string>
-             </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
-               <layout class="QVBoxLayout" name="layout_vertical_parameters_advanced">
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_parameter_file">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_parameter_file">
-                    <property name="text">
-                     <string>Parameter file</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_parameter_file">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="button_parameter_file_open">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="text">
-                     <string>Open</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_check_signatures">
-                  <property name="text">
-                   <string>Check signatures</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_cpu_count">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_cpu_count">
-                    <property name="text">
-                     <string>CPU count</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="spinbox_cpu_count">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="minimum">
-                     <number>1</number>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_extra_threads">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_extra_threads">
-                    <property name="text">
-                     <string>Extra threads</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QVBoxLayout" name="layout_vertical_parameters_advanced_extra_threads">
-                    <item>
-                     <widget class="QCheckBox" name="checkbox_extra_threads_file_operations">
-                      <property name="enabled">
-                       <bool>false</bool>
-                      </property>
-                      <property name="text">
-                       <string>File operations</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="checkbox_extra_threads_texture_loading">
-                      <property name="enabled">
-                       <bool>false</bool>
-                      </property>
-                      <property name="text">
-                       <string>Texture loading</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="checkbox_extra_threads_geometry_loading">
-                      <property name="enabled">
-                       <bool>false</bool>
-                      </property>
-                      <property name="text">
-                       <string>Geometry loading</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_enable_hyper_threading">
-                  <property name="text">
-                   <string>Enable Hyper-Threading</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_enable_file_patching">
-                  <property name="text">
-                   <string>Enable file patching</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_no_logs">
-                  <property name="text">
-                   <string>No logs</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_profiles">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_profiles">
-                    <property name="text">
-                     <string>Profiles Directory</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_profiles">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_world">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_world">
-                    <property name="text">
-                     <string>World</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_world">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_no_pause">
-                  <property name="text">
-                   <string>No pause</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_hugepages">
-                  <property name="text">
-                   <string>Huge pages</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_custom_parameters">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_custom_parameters">
-                    <property name="text">
-                     <string>Custom parameters</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_custom_parameters">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
+               <widget class="QPushButton" name="button_preview_open_workshop">
+                <property name="text">
+                 <string>Open in Workshop ↗</string>
+                </property>
+                <property name="role" stdset="0">
+                 <string>primary</string>
+                </property>
+               </widget>
               </item>
-             </layout>
-            </widget>
-            <widget class="QWidget" name="tab_parameters_client">
-             <attribute name="title">
-              <string>Client</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <layout class="QVBoxLayout" name="layout_vertical_parameters_client">
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_address">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_server_address">
-                    <property name="text">
-                     <string>Server address</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_server_address">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_port">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_server_port">
-                    <property name="text">
-                     <string>Server port</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_server_port">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_password">
-                  <item>
-                   <widget class="QCheckBox" name="checkbox_server_password">
-                    <property name="text">
-                     <string>Server password</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="textbox_server_password">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkbox_host_session">
+              <item>
+               <layout class="QGridLayout" name="layout_grid_preview_actions">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="button_preview_open_folder">
                   <property name="text">
-                   <string>Host session</string>
+                   <string>Open folder</string>
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <spacer name="verticalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="button_preview_copy_id">
+                  <property name="text">
+                   <string>Copy ID</string>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="button_preview_website">
+                  <property name="toolTip">
+                   <string>Open the website listed in the mod's mod.cpp</string>
                   </property>
-                 </spacer>
+                  <property name="text">
+                   <string>Mod website ↗</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QPushButton" name="button_preview_toggle">
+                  <property name="text">
+                   <string>Enable</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -629,44 +915,923 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_other">
-         <attribute name="title">
-          <string>Other</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
+        <widget class="QWidget" name="page_parameters">
+         <layout class="QVBoxLayout" name="layout_vertical_page_parameters">
+          <property name="spacing">
+           <number>14</number>
+          </property>
+          <property name="leftMargin">
+           <number>28</number>
+          </property>
+          <property name="topMargin">
+           <number>22</number>
+          </property>
+          <property name="rightMargin">
+           <number>28</number>
+          </property>
+          <property name="bottomMargin">
+           <number>18</number>
+          </property>
           <item>
-           <widget class="QPushButton" name="button_export_workshop_to_txt">
-            <property name="text">
-             <string>Export Workshop mods to .txt file</string>
+           <layout class="QVBoxLayout" name="layout_vertical_parameters_title">
+            <property name="spacing">
+             <number>2</number>
             </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QLabel" name="label_theme">
+             <widget class="QLabel" name="label_parameters_title">
               <property name="text">
-               <string>Theme</string>
+               <string>PARAMETERS</string>
+              </property>
+              <property name="role" stdset="0">
+               <string>page-title</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="combobox_theme">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <widget class="QLabel" name="label_parameters_subtitle">
+              <property name="text">
+               <string>Startup options for Arma 3 and Proton. The launch command below updates as you change them.</string>
+              </property>
+              <property name="role" stdset="0">
+               <string>muted</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="button_quit">
-            <property name="text">
-             <string>Quit</string>
+           <widget class="QScrollArea" name="scrollarea_parameters">
+            <property name="widgetResizable">
+             <bool>true</bool>
             </property>
+            <widget class="QWidget" name="widget_parameters_content">
+             <layout class="QGridLayout" name="layout_grid_parameters">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing">
+               <number>16</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>16</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupbox_parameters_game">
+                <property name="title">
+                 <string>GAME</string>
+                </property>
+                <layout class="QVBoxLayout" name="layout_vertical_parameters_basic">
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_skip_intro">
+                   <property name="toolTip">
+                    <string>-skipIntro</string>
+                   </property>
+                   <property name="text">
+                    <string>Skip intro</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_skip_logos_at_startup">
+                   <property name="toolTip">
+                    <string>-noSplash</string>
+                   </property>
+                   <property name="text">
+                    <string>Skip logos at startup</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_force_window_mode">
+                   <property name="toolTip">
+                    <string>-window</string>
+                   </property>
+                   <property name="text">
+                    <string>Force window mode</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_no_pause">
+                   <property name="toolTip">
+                    <string>-noPause</string>
+                   </property>
+                   <property name="text">
+                    <string>Keep running in background</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_basic_profile">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_profile">
+                     <property name="toolTip">
+                      <string>-name=</string>
+                     </property>
+                     <property name="text">
+                      <string>Profile</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="textbox_profile">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_world">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_world">
+                     <property name="toolTip">
+                      <string>-world= (use "empty" for a faster start)</string>
+                     </property>
+                     <property name="text">
+                      <string>World</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="textbox_world">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="placeholderText">
+                      <string>empty</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>10</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QGroupBox" name="groupbox_parameters_dlc">
+                <property name="title">
+                 <string>DLC</string>
+                </property>
+                <layout class="QVBoxLayout" name="layout_vertical_parameters_dlc">
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_contact">
+                   <property name="text">
+                    <string>Contact</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_global_mobilization">
+                   <property name="text">
+                    <string>Global Mobilization - Cold War Germany</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_sog_prairie_fire">
+                   <property name="text">
+                    <string>S.O.G. Prairie Fire</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_csla">
+                   <property name="text">
+                    <string>CSLA Iron Curtain</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_western_sahara">
+                   <property name="text">
+                    <string>Western Sahara</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_spearhead_1944">
+                   <property name="text">
+                    <string>Spearhead 1944</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_reaction_forces">
+                   <property name="text">
+                    <string>Reaction Forces</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_dlc_expeditionary_forces">
+                   <property name="text">
+                    <string>Expeditionary Forces</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QGroupBox" name="groupbox_parameters_performance">
+                <property name="title">
+                 <string>PERFORMANCE</string>
+                </property>
+                <layout class="QVBoxLayout" name="layout_vertical_parameters_performance">
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_cpu_count">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_cpu_count">
+                     <property name="toolTip">
+                      <string>-cpuCount=</string>
+                     </property>
+                     <property name="text">
+                      <string>CPU count</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinbox_cpu_count">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="spacer_cpu_count">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>10</width>
+                       <height>10</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_extra_threads">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_extra_threads">
+                     <property name="toolTip">
+                      <string>-exThreads=</string>
+                     </property>
+                     <property name="text">
+                      <string>Extra threads</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QVBoxLayout" name="layout_vertical_parameters_advanced_extra_threads">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QCheckBox" name="checkbox_extra_threads_file_operations">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>File operations</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="checkbox_extra_threads_texture_loading">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>Texture loading</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="checkbox_extra_threads_geometry_loading">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>Geometry loading</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_enable_hyper_threading">
+                   <property name="toolTip">
+                    <string>-enableHT</string>
+                   </property>
+                   <property name="text">
+                    <string>Enable Hyper-Threading</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_hugepages">
+                   <property name="toolTip">
+                    <string>-hugepages</string>
+                   </property>
+                   <property name="text">
+                    <string>Huge pages</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>10</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QGroupBox" name="groupbox_parameters_linux">
+                <property name="title">
+                 <string>LINUX &amp;&amp; PROTON</string>
+                </property>
+                <layout class="QVBoxLayout" name="layout_vertical_parameters_basic_environment_variables">
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_disable_esync">
+                   <property name="toolTip">
+                    <string>Sets PROTON_NO_ESYNC=1</string>
+                   </property>
+                   <property name="text">
+                    <string>Disable esync</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkbox_environment_variables">
+                   <property name="text">
+                    <string>Environment variables</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="textbox_environment_variables">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="placeholderText">
+                    <string>DXVK_HUD=fps MANGOHUD=1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>10</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="QGroupBox" name="groupbox_parameters_developer">
+                <property name="title">
+                 <string>ADVANCED</string>
+                </property>
+                <layout class="QVBoxLayout" name="layout_vertical_parameters_advanced">
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_flags">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_check_signatures">
+                     <property name="toolTip">
+                      <string>-checkSignatures</string>
+                     </property>
+                     <property name="text">
+                      <string>Check signatures</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_enable_file_patching">
+                     <property name="toolTip">
+                      <string>-filePatching</string>
+                     </property>
+                     <property name="text">
+                      <string>Enable file patching</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_no_logs">
+                     <property name="toolTip">
+                      <string>-noLogs</string>
+                     </property>
+                     <property name="text">
+                      <string>No logs</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="spacer_advanced_flags">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>10</width>
+                       <height>10</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_parameter_file">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_parameter_file">
+                     <property name="toolTip">
+                      <string>-par=</string>
+                     </property>
+                     <property name="text">
+                      <string>Parameter file</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="textbox_parameter_file">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="button_parameter_file_open">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Browse</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_profiles">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_profiles">
+                     <property name="toolTip">
+                      <string>-profiles=</string>
+                     </property>
+                     <property name="text">
+                      <string>Profiles directory</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="textbox_profiles">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="layout_horizontal_parameters_advanced_custom_parameters">
+                   <item>
+                    <widget class="QCheckBox" name="checkbox_custom_parameters">
+                     <property name="text">
+                      <string>Custom parameters</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="textbox_custom_parameters">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="placeholderText">
+                      <string>-debug -showScriptErrors</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupbox_launch_command">
+            <property name="title">
+             <string>LAUNCH PARAMETERS</string>
+            </property>
+            <layout class="QVBoxLayout" name="layout_vertical_launch_command">
+             <item>
+              <widget class="QPlainTextEdit" name="textbox_launch_command">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>70</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>84</height>
+                </size>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="layout_horizontal_launch_command_actions">
+               <item>
+                <widget class="QLabel" name="label_launch_command_hint">
+                 <property name="text">
+                  <string>Enabled mods are passed to the game through Arma3.cfg.</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>muted</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="spacer_launch_command">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>10</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="button_copy_launch_command">
+                 <property name="text">
+                  <string>Copy</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_server">
+         <layout class="QVBoxLayout" name="layout_vertical_page_server">
+          <property name="spacing">
+           <number>14</number>
+          </property>
+          <property name="leftMargin">
+           <number>28</number>
+          </property>
+          <property name="topMargin">
+           <number>22</number>
+          </property>
+          <property name="rightMargin">
+           <number>28</number>
+          </property>
+          <property name="bottomMargin">
+           <number>18</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="layout_vertical_server_title">
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_server_title">
+              <property name="text">
+               <string>SERVER</string>
+              </property>
+              <property name="role" stdset="0">
+               <string>page-title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_server_subtitle">
+              <property name="text">
+               <string>Connect straight to a server when the game starts, or host your own session.</string>
+              </property>
+              <property name="role" stdset="0">
+               <string>muted</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupbox_server_direct_connect">
+            <property name="maximumSize">
+             <size>
+              <width>720</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>DIRECT CONNECT</string>
+            </property>
+            <layout class="QVBoxLayout" name="layout_vertical_parameters_client">
+             <item>
+              <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_address">
+               <item>
+                <widget class="QCheckBox" name="checkbox_server_address">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Server address</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="textbox_server_address">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>203.0.113.10 or play.example.org</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_port">
+               <item>
+                <widget class="QCheckBox" name="checkbox_server_port">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Server port</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="textbox_server_port">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="placeholderText">
+                  <string>2302</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="layout_horizontal_parameters_client_server_password">
+               <item>
+                <widget class="QCheckBox" name="checkbox_server_password">
+                 <property name="minimumSize">
+                  <size>
+                   <width>150</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Server password</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="textbox_server_password">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="echoMode">
+                  <enum>QLineEdit::Password</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkbox_host_session">
+               <property name="text">
+                <string>Host session</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="layout_horizontal_server_actions">
+               <item>
+                <spacer name="spacer_server_actions">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>10</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="button_join_server">
+                 <property name="toolTip">
+                  <string>Start the game and connect to this server</string>
+                 </property>
+                 <property name="text">
+                  <string>Join server</string>
+                 </property>
+                 <property name="role" stdset="0">
+                  <string>primary</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spacer_page_server">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="page_settings">
+         <layout class="QVBoxLayout" name="layout_vertical_page_settings">
+          <property name="spacing">
+           <number>14</number>
+          </property>
+          <property name="leftMargin">
+           <number>28</number>
+          </property>
+          <property name="topMargin">
+           <number>22</number>
+          </property>
+          <property name="rightMargin">
+           <number>28</number>
+          </property>
+          <property name="bottomMargin">
+           <number>18</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_settings_title">
+            <property name="text">
+             <string>SETTINGS</string>
+            </property>
+            <property name="role" stdset="0">
+             <string>page-title</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupbox_settings_appearance">
+            <property name="maximumSize">
+             <size>
+              <width>720</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>APPEARANCE</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="label_theme">
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Theme</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="combobox_theme">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupbox_settings_tools">
+            <property name="maximumSize">
+             <size>
+              <width>720</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>TOOLS</string>
+            </property>
+            <layout class="QHBoxLayout" name="layout_horizontal_settings_tools">
+             <item>
+              <widget class="QPushButton" name="button_export_workshop_to_txt">
+               <property name="text">
+                <string>Export Workshop mods to .txt file</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="spacer_settings_tools">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="button_quit">
+               <property name="text">
+                <string>Quit</string>
+               </property>
+               <property name="role" stdset="0">
+                <string>danger</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -676,8 +1841,8 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>20</width>
-              <height>470</height>
+              <width>10</width>
+              <height>40</height>
              </size>
             </property>
            </spacer>
@@ -687,6 +1852,84 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QFrame" name="frame_footer">
+      <layout class="QHBoxLayout" name="layout_horizontal_button_start_lbl_status">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>14</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>14</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="layout_vertical_footer_summary">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_selected_mods">
+           <property name="text">
+            <string>0 MODS SELECTED</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_footer_details">
+           <property name="text">
+            <string>DLC: none</string>
+           </property>
+           <property name="role" stdset="0">
+            <string>muted</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="spacer_footer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_start">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>52</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>PLAY</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icons.qrc">
+           <normaloff>:/icons/launcher-icons/play.svg</normaloff>:/icons/launcher-icons/play.svg</iconset>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -717,6 +1960,21 @@
    </property>
    <property name="toolTip">
     <string>Save HTML preset</string>
+   </property>
+  </action>
+  <action name="action_mod_open_workshop">
+   <property name="text">
+    <string>Open in Steam Workshop</string>
+   </property>
+  </action>
+  <action name="action_mod_open_folder">
+   <property name="text">
+    <string>Open mod folder</string>
+   </property>
+  </action>
+  <action name="action_mod_copy_id">
+   <property name="text">
+    <string>Copy Workshop ID / path</string>
    </property>
   </action>
  </widget>

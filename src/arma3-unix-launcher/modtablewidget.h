@@ -10,6 +10,15 @@
 class ModTableWidget : public QTableWidget
 {
     public:
+        enum class Filter
+        {
+            all,
+            enabled,
+            disabled,
+            workshop,
+            local
+        };
+
         explicit ModTableWidget(QWidget *parent = nullptr);
         ModTableWidget(int rows, int columns, QWidget *parent = nullptr);
         ~ModTableWidget() override = default;
@@ -21,14 +30,24 @@ class ModTableWidget : public QTableWidget
         void disable_all_mods();
         void enable_all_mods();
         UiMod get_mod_at(int index) const;
+        bool is_row_complete(int index) const;
+        bool is_mod_enabled_at(int index) const;
+        void set_mod_enabled_at(int index, bool enabled);
         std::vector<UiMod> get_mods() const;
 
         void set_mod_counter_callback(std::function<void(int, int)> &&callback);
         void update_mod_selection_counters(int = 0);
 
+        void set_filter(QString const &search_text, Filter filter);
+        void apply_filter();
+
     private:
         int drop_on(QDropEvent *event);
         bool is_below(QPoint const &pos, QModelIndex const &index);
 
+        bool row_matches_filter(int row) const;
+
         std::function<void(int, int)> mod_counter_callback;
+        QString filter_search_text;
+        Filter filter_mode = Filter::all;
 };

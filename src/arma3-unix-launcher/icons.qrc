@@ -6,6 +6,8 @@
         <file>open-iconic/plus.svg</file>
         <file>open-iconic/envelope-closed.svg</file>
         <file>open-iconic/envelope-open.svg</file>
+        <file>launcher-icons/check-dark.svg</file>
+        <file>launcher-icons/play.svg</file>
         <file>blagoicons/arma3.png</file>
     </qresource>
 </RCC>

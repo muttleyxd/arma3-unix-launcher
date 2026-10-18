@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/stylesheet">
+        <file>Arma.stylesheet</file>
         <file>QTDark.stylesheet</file>
     </qresource>
 </RCC>

@@ -54,7 +54,7 @@ namespace
                                                         },
                                                         "settings": {
                                                             "checkForUpdates": null,
-                                                            "theme": "System"
+                                                            "theme": "Arma"
                                                         }
                                                     })json");
         StdUtils::FileWriteAllText(config_file, json.dump(4));
@@ -262,7 +262,7 @@ void Settings::save_settings_from_ui(Ui::MainWindow *ui)
 
     // client tab
     write_setting("connect", ui->checkbox_server_address, ui->textbox_server_address);
-    write_setting("port", ui->checkbox_server_password, ui->textbox_server_port);
+    write_setting("port", ui->checkbox_server_port, ui->textbox_server_port);
     write_setting("password", ui->checkbox_server_password, ui->textbox_server_password);
     write_setting("host", ui->checkbox_host_session);
 

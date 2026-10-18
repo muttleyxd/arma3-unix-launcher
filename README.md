@@ -111,6 +111,25 @@ arma3-unix-launcher --preset-to-run testmod --server-ip 127.0.0.1 --server-port 
 
 ## Screenshots
 
+### Redesigned launcher (Arma theme)
+
+The Arma 3 launcher has a sidebar layout and a new **Arma** theme (Settings → Theme), in the style of the official Arma 3 launcher.
+
+- **Mods**: search, filters (All / Enabled / Disabled / Workshop / Local), an **Open Workshop** button, and a preview panel with mod details, size on disk, load order, and Open in Workshop / Open folder / Copy ID actions
+- **Parameters**: options grouped into cards, with a launch-parameters preview that updates as you change them
+- **Server**: direct connect with a one-click **Join server**
+- **Settings**: theme selection and tools
+
+| Mods | Parameters |
+| --- | --- |
+| <img src="docs/screenshots/mods.png" width="420"> | <img src="docs/screenshots/parameters.png" width="420"> |
+| **Server** | **Settings** |
+| <img src="docs/screenshots/server.png" width="420"> | <img src="docs/screenshots/settings.png" width="420"> |
+
+The screenshots show sample mod data.
+
+### Classic layout
+
 <img src="https://i.imgur.com/t2HXjY5.png" width="400"><img src="https://i.imgur.com/sAetuqr.png" width="400">
 
 ## Arma 3 Troubleshooting

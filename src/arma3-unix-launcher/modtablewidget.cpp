@@ -27,12 +27,24 @@ namespace
         w.setSelectionBehavior(QAbstractItemView::SelectRows);
         w.setDragDropMode(QAbstractItemView::InternalMove);
 
-        QStringList const column_labels = {"Enabled", "Name", "ID/Path", "Type"};
+        QStringList const column_labels = {"ON", "NAME", "WORKSHOP ID / PATH", "SOURCE"};
         w.setColumnCount(column_labels.size());
         w.setHorizontalHeaderLabels(column_labels);
         w.horizontalHeader()->setVisible(true);
+        w.horizontalHeader()->setHighlightSections(false);
+        w.horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        w.horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
         w.horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
         w.horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
+        w.horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+        w.setColumnWidth(0, 52);
+        w.setColumnWidth(2, 160);
+
+        w.verticalHeader()->setVisible(false);
+        w.verticalHeader()->setDefaultSectionSize(42);
+        w.setShowGrid(false);
+        w.setWordWrap(false);
+        w.setTextElideMode(Qt::ElideMiddle);
     }
 }
 
@@ -156,22 +168,28 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
 
     setItem(index, 1, new QTableWidgetItem(mod.name.c_str()));
     setItem(index, 2, new QTableWidgetItem(mod.path_or_workshop_id.c_str()));
-    setItem(index, 3, new QTableWidgetItem(mod.is_workshop_mod_to_string()));
-
-    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::update_mod_selection_counters);
+    auto source_item = new QTableWidgetItem(mod.is_workshop_mod ? "Workshop" : "Local");
+    source_item->setData(Qt::UserRole, mod.is_workshop_mod);
+    setItem(index, 3, source_item);
 
     //kinda hacky again, but QTableWidgetItem isn't a QObject, so we cannot connect to it
-    QObject::connect(checkbox, &QCheckBox::stateChanged, this, [ = ](int c)
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, [this, checkbox_sort](int c)
     {
         checkbox_sort->setModEnabled(c);
+        apply_filter();
     });
+
+    QObject::connect(checkbox, &QCheckBox::stateChanged, this, &ModTableWidget::update_mod_selection_counters);
 
     for (int i = 1; i < columnCount(); ++i)
     {
         auto current_item = item(index, i);
         current_item->setFlags(current_item->flags() ^ Qt::ItemIsEditable);
-        current_item->setTextAlignment(Qt::AlignCenter);
+        current_item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     }
+    item(index, 2)->setToolTip(QString::fromStdString(mod.path_or_workshop_id));
+
+    setRowHidden(index, !row_matches_filter(index));
 }
 
 bool ModTableWidget::contains_mod(std::string_view const path_or_workshop_id) const
@@ -213,8 +231,32 @@ UiMod ModTableWidget::get_mod_at(int index) const
     bool enabled = checkbox->checkState() == Qt::CheckState::Checked;
     std::string name = item(index, 1)->text().toStdString();
     std::string path_or_workshop_id = item(index, 2)->text().toStdString();
-    std::string type = item(index, 3)->text().toStdString();
-    return {enabled, name, path_or_workshop_id, type != UiMod{}.is_workshop_mod_to_string()};
+    bool is_workshop_mod = item(index, 3)->data(Qt::UserRole).toBool();
+    return {enabled, name, path_or_workshop_id, is_workshop_mod};
+}
+
+bool ModTableWidget::is_row_complete(int index) const
+{
+    return cellWidget(index, 0) != nullptr && item(index, 1) != nullptr && item(index, 2) != nullptr
+           && item(index, 3) != nullptr;
+}
+
+bool ModTableWidget::is_mod_enabled_at(int index) const
+{
+    auto cell_widget = cellWidget(index, 0);
+    if (cell_widget == nullptr)
+        return false;
+    auto checkbox = cell_widget->findChild<QCheckBox *>();
+    return checkbox != nullptr && checkbox->checkState() == Qt::CheckState::Checked;
+}
+
+void ModTableWidget::set_mod_enabled_at(int index, bool enabled)
+{
+    auto cell_widget = cellWidget(index, 0);
+    if (cell_widget == nullptr)
+        return;
+    if (auto checkbox = cell_widget->findChild<QCheckBox *>())
+        checkbox->setCheckState(enabled ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 std::vector<UiMod> ModTableWidget::get_mods() const
@@ -229,4 +271,54 @@ std::vector<UiMod> ModTableWidget::get_mods() const
 void ModTableWidget::set_mod_counter_callback(std::function<void (int, int)> &&callback)
 {
     mod_counter_callback = std::move(callback);
+}
+
+void ModTableWidget::set_filter(QString const &search_text, Filter filter)
+{
+    filter_search_text = search_text.trimmed();
+    filter_mode = filter;
+    apply_filter();
+}
+
+void ModTableWidget::apply_filter()
+{
+    for (int row = 0; row < rowCount(); ++row)
+        setRowHidden(row, !row_matches_filter(row));
+}
+
+bool ModTableWidget::row_matches_filter(int row) const
+{
+    if (!is_row_complete(row))
+        return true;
+
+    auto const enabled = is_mod_enabled_at(row);
+    auto const is_workshop_mod = item(row, 3)->data(Qt::UserRole).toBool();
+
+    switch (filter_mode)
+    {
+        case Filter::enabled:
+            if (!enabled)
+                return false;
+            break;
+        case Filter::disabled:
+            if (enabled)
+                return false;
+            break;
+        case Filter::workshop:
+            if (!is_workshop_mod)
+                return false;
+            break;
+        case Filter::local:
+            if (is_workshop_mod)
+                return false;
+            break;
+        case Filter::all:
+            break;
+    }
+
+    if (filter_search_text.isEmpty())
+        return true;
+
+    return item(row, 1)->text().contains(filter_search_text, Qt::CaseInsensitive)
+           || item(row, 2)->text().contains(filter_search_text, Qt::CaseInsensitive);
 }
