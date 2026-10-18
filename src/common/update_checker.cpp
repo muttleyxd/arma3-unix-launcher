@@ -9,23 +9,11 @@
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 
-#include "filesystem_utils.hpp"
+#include "ca_bundle.hpp"
 
 #ifndef REPOSITORY_VERSION
     #define REPOSITORY_VERSION 0
 #endif
-
-namespace
-{
-    std::filesystem::path get_ca_bundle_path()
-    {
-        if (FilesystemUtils::Exists("/etc/ssl/certs/ca-certificates.crt"))
-            return "/etc/ssl/certs/ca-certificates.crt";
-        if (FilesystemUtils::Exists("/etc/ssl/certs/ca-bundle.crt"))
-            return "/etc/ssl/certs/ca-bundle.crt";
-        throw std::runtime_error("not able to find ca bundle file");
-    }
-}
 
 namespace UpdateChecker
 {
@@ -43,7 +31,10 @@ namespace UpdateChecker
             {
                 curlpp::Cleanup curl_cleanup;
                 curlpp::Easy curl_request;
-                curl_request.setOpt<curlpp::options::CaInfo>(get_ca_bundle_path().string());
+                auto const ca_bundle = CaBundle::Find();
+                if (!ca_bundle)
+                    throw std::runtime_error("not able to find ca bundle file");
+                curl_request.setOpt<curlpp::options::CaInfo>(ca_bundle->string());
                 curl_request.setOpt<curlpp::options::Url>("https://api.github.com/repos/muttleyxd/arma3-unix-launcher/releases");
                 curl_request.setOpt<curlpp::options::UserAgent>("curl/12.3.4.5");
 

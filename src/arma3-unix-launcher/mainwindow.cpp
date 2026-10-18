@@ -6,8 +6,10 @@
 #include <QCheckBox>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QKeySequence>
 #include <QListView>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QTabBar>
 #include <QTimer>
 #include <QTreeView>
@@ -25,14 +27,20 @@
 #include <scope_guard.hpp>
 #include <spdlog/spdlog.h>
 
+#include "ca_bundle.hpp"
 #include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
+#include "http_client.hpp"
 #include "steam_integration_impl.hpp"
 #include "string_utils.hpp"
 #include "std_utils.hpp"
+#include "thumbnail_cache.hpp"
 #include "ui_mod.hpp"
 #include "update_checker.hpp"
+
+#include "previewstrip.h"
+#include "workshop_page.h"
 
 #include "exceptions/preset_loading_failed.hpp"
 #include "exceptions/steam_api_not_initialized.hpp"
@@ -160,10 +168,83 @@ If there is an update, then you will get a notification, nothing will be downloa
     menu_button_save.addAction(ui->action_mods_save_html);
     menu_button_save.addAction(ui->action_mods_save_json);
     ui->button_mod_preset_save->setMenu(&menu_button_save);
+
+    setup_mod_search();
+    setup_preview_strip();
+    setup_open_in_steam();
+}
+
+void MainWindow::setup_open_in_steam()
+{
+    auto const open = [](std::string const &workshop_id)
+    {
+        if (!open_workshop_page(workshop_id))
+            spdlog::warn("Could not open the Workshop page of mod {}", workshop_id);
+    };
+    connect(preview_strip, &PreviewStrip::workshop_page_requested, this, open);
+
+    auto const action = new QAction("Open in Steam", ui->table_mods);
+    action->setVisible(false);
+    ui->table_mods->addAction(action);
+    connect(action, &QAction::triggered, this, [this, open]()
+    {
+        if (auto const workshop_id = ui->table_mods->current_workshop_id())
+            open(*workshop_id);
+    });
+    // Local mods have no Workshop page
+    connect(ui->table_mods, &QTableWidget::itemSelectionChanged, action, [this, action]()
+    {
+        action->setVisible(ui->table_mods->current_workshop_id().has_value());
+    });
+}
+
+void MainWindow::setup_preview_strip()
+{
+    preview_strip = new PreviewStrip(ui->tab_mods);
+    ui->verticalLayout_2->insertWidget(ui->verticalLayout_2->indexOf(ui->table_mods), preview_strip);
+    preview_strip->attach(ui->table_mods);
+
+    auto const &collapsed = manager.settings["settings"]["previewStripCollapsed"];
+    if (collapsed.is_boolean())
+        preview_strip->set_collapsed(collapsed.get<bool>());
+    connect(preview_strip, &PreviewStrip::collapsed_changed, this, [this](bool is_collapsed)
+    {
+        manager.settings["settings"]["previewStripCollapsed"] = is_collapsed;
+    });
+
+    thumbnail_worker = std::make_unique<Thumbnails::ThumbnailWorker>(
+                           std::make_unique<Http::CurlHttpClient>(CaBundle::Find()), ThumbnailCache(ThumbnailCache::DefaultRoot()));
+    connect(preview_strip, &PreviewStrip::thumbnails_needed, this, [this](std::vector<std::uint64_t> workshop_ids)
+    {
+        auto deliver = [strip = preview_strip](std::uint64_t id, std::optional<std::filesystem::path> image)
+        {
+            if (image)
+                strip->deliver_thumbnail(id, *image);
+        };
+        thumbnail_worker->Request(std::move(workshop_ids), std::move(deliver));
+    });
+}
+
+void MainWindow::setup_mod_search()
+{
+    connect(ui->textbox_mod_search, &QLineEdit::textChanged, ui->table_mods, &ModTableWidget::set_filter);
+
+    auto const focus_search = new QShortcut(QKeySequence::Find, this);
+    connect(focus_search, &QShortcut::activated, this, [this]()
+    {
+        ui->widget_tabs->setCurrentWidget(ui->tab_mods);
+        ui->textbox_mod_search->setFocus(Qt::ShortcutFocusReason);
+        ui->textbox_mod_search->selectAll();
+    });
+
+    auto const clear_search = new QShortcut(QKeySequence(Qt::Key_Escape), ui->textbox_mod_search);
+    clear_search->setContext(Qt::WidgetShortcut);
+    connect(clear_search, &QShortcut::activated, ui->textbox_mod_search, &QLineEdit::clear);
 }
 
 MainWindow::~MainWindow()
 {
+    thumbnail_worker.reset();
     if (update_notification_thread.joinable())
         update_notification_thread.join();
     manager.save_settings_from_ui(ui);

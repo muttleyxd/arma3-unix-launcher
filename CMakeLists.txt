@@ -15,6 +15,23 @@ add_libraries_to_linker(COMPILER_ID GNU
 option(BUILD_DAYZ_LAUNCHER "Build DayZ Launcher instead of Arma Launcher" OFF)
 option(DEVELOPER_MODE "Enable developer checks" OFF)
 option(RUN_TESTS "Run tests with DocTest" OFF)
+# Defaults can come from the environment, the Nix devShell exports A3UL_USE_SYSTEM_DEPS=ON
+set(A3UL_USE_SYSTEM_DEPS_DEFAULT OFF)
+if (DEFINED ENV{A3UL_USE_SYSTEM_DEPS})
+    set(A3UL_USE_SYSTEM_DEPS_DEFAULT $ENV{A3UL_USE_SYSTEM_DEPS})
+endif()
+option(A3UL_USE_SYSTEM_DEPS "Never download dependencies, require them to be provided by the system (e.g. Nix)"
+       ${A3UL_USE_SYSTEM_DEPS_DEFAULT})
+
+if (A3UL_USE_SYSTEM_DEPS)
+    set(FETCHCONTENT_FULLY_DISCONNECTED ON)
+endif()
+
+option(A3UL_COVERAGE "Instrument for clang source-based coverage (see tools/ci/coverage.sh)" OFF)
+if (A3UL_COVERAGE)
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+    add_link_options(-fprofile-instr-generate)
+endif()
 
 if (NOT DEFINED COMMIT_COUNT)
     set(COMMIT_COUNT 0) # used for update notifications

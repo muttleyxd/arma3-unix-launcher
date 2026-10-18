@@ -55,6 +55,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QLineEdit" name="textbox_mod_search">
+            <property name="placeholderText">
+             <string>Search mods by name or Workshop ID (⌘F)</string>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="ModTableWidget" name="table_mods"/>
           </item>
           <item>

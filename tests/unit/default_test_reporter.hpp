@@ -12,9 +12,9 @@ struct DefaultTestReporter : public doctest::IReporter
 
     void test_case_start(doctest::TestCaseData const &in) override
     {
-        doctest::color_to_stream(stdout_stream, doctest::Color::Green);
+        stdout_stream << doctest::Color::Green;
         stdout_stream << "[TEST STARTED] ";
-        doctest::color_to_stream(stdout_stream, doctest::Color::None);
+        stdout_stream << doctest::Color::None;
         stdout_stream << in.m_name << '\n';
     }
 
@@ -22,15 +22,15 @@ struct DefaultTestReporter : public doctest::IReporter
     {
         if (in.failure_flags == 0)
         {
-            doctest::color_to_stream(stdout_stream, doctest::Color::Green);
+            stdout_stream << doctest::Color::Green;
             stdout_stream << "[TEST SUCCESS]\n";
         }
         else
         {
-            doctest::color_to_stream(stdout_stream, doctest::Color::Red);
+            stdout_stream << doctest::Color::Red;
             stdout_stream << "[TEST FAILURE]\n";
         }
-        doctest::color_to_stream(stdout_stream, doctest::Color::None);
+        stdout_stream << doctest::Color::None;
     }
 
     /* useless functions because virtual interface is purely virtual :D */

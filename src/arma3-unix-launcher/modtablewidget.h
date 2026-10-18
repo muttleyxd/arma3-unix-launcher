@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <optional>
+#include <string>
 #include <vector>
 
 #include <QTableWidget>
@@ -9,6 +11,8 @@
 
 class ModTableWidget : public QTableWidget
 {
+        Q_OBJECT
+
     public:
         explicit ModTableWidget(QWidget *parent = nullptr);
         ModTableWidget(int rows, int columns, QWidget *parent = nullptr);
@@ -26,9 +30,25 @@ class ModTableWidget : public QTableWidget
         void set_mod_counter_callback(std::function<void(int, int)> &&callback);
         void update_mod_selection_counters(int = 0);
 
+        // Hides mods not matching query (see ModSearch::Matches); drag and drop is off while filtering
+        void set_filter(QString const &query);
+        bool is_filtering() const;
+
+        // Workshop id of the selected (visible) mod, std::nullopt for none or a local mod
+        std::optional<std::string> current_workshop_id() const;
+
+    signals:
+        // Mods were added, removed, reordered, enabled/disabled or filtered
+        void mods_changed();
+
+    public:
     private:
         int drop_on(QDropEvent *event);
         bool is_below(QPoint const &pos, QModelIndex const &index);
 
+        void apply_filter(int row);
+        void apply_filter_to_all_rows();
+
         std::function<void(int, int)> mod_counter_callback;
+        QString filter;
 };

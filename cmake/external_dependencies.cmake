@@ -1,6 +1,14 @@
 include(CheckCXXSourceCompiles)
 include(FetchContent)
 
+function(fail_if_downloads_disabled NAME)
+    if (A3UL_USE_SYSTEM_DEPS)
+        message(FATAL_ERROR "${NAME} was not found on the system and A3UL_USE_SYSTEM_DEPS is ON, "
+                            "refusing to download it. Provide ${NAME} (e.g. via the Nix flake) "
+                            "or configure with -DA3UL_USE_SYSTEM_DEPS=OFF.")
+    endif()
+endfunction()
+
 function(setup_library SOURCE_TO_TEST)
     set(boolArgs HEADER_ONLY)
     set(oneValueArgs NAME CXX_FLAGS GIT_REPOSITORY GIT_TAG TEST_DEFINITIONS TEST_LINK_LIBS)
@@ -20,6 +28,8 @@ function(setup_library SOURCE_TO_TEST)
         endif()
         return()
     endif()
+
+    fail_if_downloads_disabled(${LIB_SETUP_NAME})
 
     if (NOT LIB_SETUP_GIT_TAG)
         set(LIB_SETUP_GIT_TAG master)
@@ -61,6 +71,16 @@ function(setup_argparse)
 endfunction()
 
 function(setup_curlpp)
+    # curlpp ships no CMake package config, distributions (e.g. Nix) provide a pkg-config file
+    find_package(PkgConfig QUIET)
+    if (PKG_CONFIG_FOUND)
+        pkg_check_modules(CURLPP QUIET IMPORTED_TARGET GLOBAL curlpp)
+        if (CURLPP_FOUND)
+            add_library(curlpp::curlpp ALIAS PkgConfig::CURLPP)
+            return()
+        endif()
+    endif()
+
     set(CHECK_SOURCE "#error unimplemented}")
     # Force static library build
     set(BUILD_SHARED_LIBS OFF)
@@ -127,6 +147,7 @@ function(setup_nlohmann_json)
     if (SYSTEM_nlohmann_json_WORKS)
         add_library(nlohmann_json INTERFACE)
     else()
+        fail_if_downloads_disabled(nlohmann_json)
         FetchContent_Declare(nlohmann_json
                              URL https://github.com/nlohmann/json/releases/download/v3.12.0/include.zip)
         FetchContent_GetProperties(nlohmann_json)
@@ -201,13 +222,19 @@ function(setup_spdlog)
 endfunction()
 
 function(setup_steamworkssdk)
-    FetchContent_Declare(steamworkssdk
-        URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
-        URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        )
-    FetchContent_MakeAvailable(steamworkssdk)
+    set(STEAMWORKS_SDK_DIR "$ENV{STEAMWORKS_SDK_DIR}" CACHE PATH "Path to an extracted Steamworks SDK (skips download)")
+    if (STEAMWORKS_SDK_DIR)
+        set(steamworkssdk_SOURCE_DIR "${STEAMWORKS_SDK_DIR}")
+    else()
+        fail_if_downloads_disabled("Steamworks SDK (set STEAMWORKS_SDK_DIR)")
+        FetchContent_Declare(steamworkssdk
+            URL https://github.com/julianxhokaxhiu/SteamworksSDKCI/releases/download/1.53/SteamworksSDK-v1.53.0_x64.zip
+            URL_HASH MD5=322c2c90c3ab76201c92f4a2c443f664
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            )
+        FetchContent_MakeAvailable(steamworkssdk)
+    endif()
 
 
     add_library(steamworks_sdk SHARED IMPORTED GLOBAL)
