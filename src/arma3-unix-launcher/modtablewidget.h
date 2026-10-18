@@ -26,9 +26,17 @@ class ModTableWidget : public QTableWidget
         void set_mod_counter_callback(std::function<void(int, int)> &&callback);
         void update_mod_selection_counters(int = 0);
 
+        // Hides mods not matching query (see ModSearch::Matches); drag and drop is off while filtering
+        void set_filter(QString const &query);
+        bool is_filtering() const;
+
     private:
         int drop_on(QDropEvent *event);
         bool is_below(QPoint const &pos, QModelIndex const &index);
 
+        void apply_filter(int row);
+        void apply_filter_to_all_rows();
+
         std::function<void(int, int)> mod_counter_callback;
+        QString filter;
 };

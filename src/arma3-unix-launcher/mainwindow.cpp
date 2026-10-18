@@ -6,8 +6,10 @@
 #include <QCheckBox>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QKeySequence>
 #include <QListView>
 #include <QMessageBox>
+#include <QShortcut>
 #include <QTabBar>
 #include <QTimer>
 #include <QTreeView>
@@ -160,6 +162,25 @@ If there is an update, then you will get a notification, nothing will be downloa
     menu_button_save.addAction(ui->action_mods_save_html);
     menu_button_save.addAction(ui->action_mods_save_json);
     ui->button_mod_preset_save->setMenu(&menu_button_save);
+
+    setup_mod_search();
+}
+
+void MainWindow::setup_mod_search()
+{
+    connect(ui->textbox_mod_search, &QLineEdit::textChanged, ui->table_mods, &ModTableWidget::set_filter);
+
+    auto const focus_search = new QShortcut(QKeySequence::Find, this);
+    connect(focus_search, &QShortcut::activated, this, [this]()
+    {
+        ui->widget_tabs->setCurrentWidget(ui->tab_mods);
+        ui->textbox_mod_search->setFocus(Qt::ShortcutFocusReason);
+        ui->textbox_mod_search->selectAll();
+    });
+
+    auto const clear_search = new QShortcut(QKeySequence(Qt::Key_Escape), ui->textbox_mod_search);
+    clear_search->setContext(Qt::WidgetShortcut);
+    connect(clear_search, &QShortcut::activated, ui->textbox_mod_search, &QLineEdit::clear);
 }
 
 MainWindow::~MainWindow()

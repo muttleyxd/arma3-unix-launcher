@@ -90,6 +90,7 @@ class MainWindow : public QMainWindow
         void on_mods_enable_all_mods();
 
         void initialize_theme_combobox();
+        void setup_mod_search();
 
         std::string ui_path_to_full_path(std::string ui_path) const;
         std::string full_path_to_ui_path(std::string ui_path) const;

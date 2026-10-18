@@ -1,6 +1,8 @@
 #include "modtablewidget.h"
 #include "tablewidgetcheckboxitem.h"
 
+#include "mod_search.hpp"
+
 #include <algorithm>
 #include <set>
 
@@ -39,11 +41,14 @@ namespace
 ModTableWidget::ModTableWidget(QWidget *parent) : QTableWidget(parent)
 {
     setup(*this);
+    // Hidden flags belong to row positions, sorting moves mods between them
+    QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::apply_filter_to_all_rows);
 }
 
 ModTableWidget::ModTableWidget(int rows, int columns, QWidget *parent) : QTableWidget(rows, columns, parent)
 {
     setup(*this);
+    QObject::connect(model(), &QAbstractItemModel::layoutChanged, this, &ModTableWidget::apply_filter_to_all_rows);
 }
 
 void ModTableWidget::dropEvent(QDropEvent *event) // https://stackoverflow.com/a/43789304
@@ -172,6 +177,8 @@ void ModTableWidget::add_mod(UiMod const &mod, int index)
         current_item->setFlags(current_item->flags() ^ Qt::ItemIsEditable);
         current_item->setTextAlignment(Qt::AlignCenter);
     }
+
+    apply_filter(index);
 }
 
 bool ModTableWidget::contains_mod(std::string_view const path_or_workshop_id) const
@@ -229,4 +236,41 @@ std::vector<UiMod> ModTableWidget::get_mods() const
 void ModTableWidget::set_mod_counter_callback(std::function<void (int, int)> &&callback)
 {
     mod_counter_callback = std::move(callback);
+}
+
+void ModTableWidget::set_filter(QString const &query)
+{
+    filter = query.trimmed();
+
+    // Reordering is only meaningful with every mod visible
+    setDragEnabled(!is_filtering());
+    setDragDropMode(is_filtering() ? QAbstractItemView::NoDragDrop : QAbstractItemView::InternalMove);
+
+    apply_filter_to_all_rows();
+}
+
+bool ModTableWidget::is_filtering() const
+{
+    return !filter.isEmpty();
+}
+
+void ModTableWidget::apply_filter(int row)
+{
+    auto const name_item = item(row, 1);
+    auto const id_item = item(row, 2);
+    auto const type_item = item(row, 3);
+    if (!name_item || !id_item || !type_item)
+        return;
+
+    auto const name = name_item->text().toStdString();
+    // Local mods are identified by their path, which should not match
+    auto const is_workshop_mod = type_item->text() != UiMod{}.is_workshop_mod_to_string();
+    auto const workshop_id = is_workshop_mod ? id_item->text().toStdString() : std::string();
+    setRowHidden(row, !ModSearch::Matches(name, workshop_id, filter.toStdString()));
+}
+
+void ModTableWidget::apply_filter_to_all_rows()
+{
+    for (int row = 0; row < rowCount(); ++row)
+        apply_filter(row);
 }
