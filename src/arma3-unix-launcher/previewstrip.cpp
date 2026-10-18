@@ -2,6 +2,7 @@
 
 #include <QEvent>
 #include <QIcon>
+#include <QImage>
 #include <QPainter>
 #include <QScrollBar>
 #include <QVBoxLayout>
@@ -87,7 +88,11 @@ void PreviewStrip::attach(ModTableWidget *table)
 
 void PreviewStrip::set_thumbnail(std::string const &workshop_id, QPixmap const &pixmap)
 {
-    auto const scaled = pixmap.scaled(thumbnail_pixels, thumbnail_pixels, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // Scale once to device pixels, e.g. 256px for 128pt cards on Retina displays
+    auto const ratio = devicePixelRatioF();
+    auto const device_pixels = static_cast<int>(thumbnail_pixels * ratio);
+    auto scaled = pixmap.scaled(device_pixels, device_pixels, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    scaled.setDevicePixelRatio(ratio);
     thumbnails_[workshop_id] = scaled;
     for (int row = 0; row < model_.rowCount(); ++row)
     {
@@ -97,6 +102,18 @@ void PreviewStrip::set_thumbnail(std::string const &workshop_id, QPixmap const &
         item->setIcon(QIcon(scaled));
         item->setData(scaled, pixmap_role);
     }
+}
+
+void PreviewStrip::deliver_thumbnail(std::uint64_t const workshop_id, std::filesystem::path const &image)
+{
+    // QImage can be used off the UI thread, QPixmap cannot
+    QImage loaded(QString::fromStdString(image.string()));
+    if (loaded.isNull())
+        return;
+    QMetaObject::invokeMethod(this, [this, workshop_id, loaded = std::move(loaded)]()
+    {
+        set_thumbnail(std::to_string(workshop_id), QPixmap::fromImage(loaded));
+    }, Qt::QueuedConnection);
 }
 
 void PreviewStrip::set_collapsed(bool collapsed)

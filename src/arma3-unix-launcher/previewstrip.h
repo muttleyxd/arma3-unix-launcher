@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <string>
@@ -32,6 +33,10 @@ class PreviewStrip : public QWidget
         void attach(ModTableWidget *table);
 
         void set_thumbnail(std::string const &workshop_id, QPixmap const &pixmap);
+
+        // Thread-safe: loads the image on the calling thread and applies it on the UI thread.
+        // Unreadable images are ignored.
+        void deliver_thumbnail(std::uint64_t const workshop_id, std::filesystem::path const &image);
 
         void set_collapsed(bool collapsed);
         bool is_collapsed() const;

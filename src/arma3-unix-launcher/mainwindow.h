@@ -17,6 +17,7 @@
 #include <steam_integration_stub.hpp>
 
 #include "settings.hpp"
+#include "thumbnail_service.hpp"
 #include "ui_mod.hpp"
 
 class PreviewStrip;
@@ -75,6 +76,8 @@ class MainWindow : public QMainWindow
         std::thread update_notification_thread;
         Settings manager;
         PreviewStrip *preview_strip = nullptr; // owned by the Mods tab
+        // Reset before the UI is destroyed: it joins the thread whose callbacks reach preview_strip
+        std::unique_ptr<Thumbnails::ThumbnailWorker> thumbnail_worker;
 
         std::vector<std::uint64_t> mods_to_enable;
 

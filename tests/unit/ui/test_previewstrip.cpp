@@ -5,7 +5,10 @@
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QSignalSpy>
+#include <QTemporaryDir>
 #include <QWheelEvent>
+
+#include <thread>
 
 #include "default_test_reporter.hpp"
 
@@ -227,9 +230,58 @@ TEST_CASE("Wheel_ScrollsHorizontally")
     CHECK_GT(scroll_bar->value(), 0);
 }
 
+TEST_CASE("DeliverThumbnail_FromWorkerThread")
+{
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    auto const image_path = directory.filePath("463939057.png").toStdString();
+    REQUIRE(solid(Qt::green).save(QString::fromStdString(image_path)));
+
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    std::thread worker([&strip, &image_path]()
+    {
+        strip.deliver_thumbnail(463939057, image_path);
+        strip.deliver_thumbnail(450814997, "/nonexistent/image.png"); // unreadable: ignored
+    });
+    worker.join();
+    // Applied on the UI thread
+    CHECK(same_image(strip.card_pixmap(0), PreviewStrip::placeholder()));
+    QApplication::processEvents();
+
+    auto const delivered = strip.card_pixmap(0).toImage();
+    REQUIRE_FALSE(delivered.isNull());
+    CHECK_EQ(delivered.pixelColor(delivered.width() / 2, delivered.height() / 2), QColor(Qt::green));
+    CHECK(same_image(strip.card_pixmap(1), PreviewStrip::placeholder()));
+}
+
+TEST_CASE("Thumbnail_ScaledForDevicePixelRatio")
+{
+    ModTableWidget table;
+    PreviewStrip strip;
+    strip.attach(&table);
+    fill(table);
+    strip.sync_now();
+
+    QPixmap large(1024, 512);
+    large.fill(Qt::red);
+    strip.set_thumbnail("463939057", large);
+    auto const pixmap = strip.card_pixmap(0);
+    auto const ratio = strip.devicePixelRatioF();
+    REQUIRE_EQ(ratio, doctest::Approx(2.0));
+    CHECK_EQ(pixmap.devicePixelRatio(), doctest::Approx(ratio));
+    CHECK_EQ(pixmap.width(), static_cast<int>(PreviewStrip::thumbnail_pixels * ratio));
+    CHECK_EQ(pixmap.height(), static_cast<int>(PreviewStrip::thumbnail_pixels * ratio / 2));
+}
+
 int main(int argc, char **argv)
 {
     qputenv("QT_QPA_PLATFORM", "offscreen");
+    qputenv("QT_SCALE_FACTOR", "2"); // Retina-like device pixel ratio
     QApplication application(argc, argv);
     qRegisterMetaType<std::vector<std::uint64_t>>();
 

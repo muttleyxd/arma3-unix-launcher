@@ -27,12 +27,15 @@
 #include <scope_guard.hpp>
 #include <spdlog/spdlog.h>
 
+#include "ca_bundle.hpp"
 #include "fmt_custom_formatters.hpp"
 #include "filesystem_utils.hpp"
 #include "html_preset_export.hpp"
+#include "http_client.hpp"
 #include "steam_integration_impl.hpp"
 #include "string_utils.hpp"
 #include "std_utils.hpp"
+#include "thumbnail_cache.hpp"
 #include "ui_mod.hpp"
 #include "update_checker.hpp"
 
@@ -182,6 +185,18 @@ void MainWindow::setup_preview_strip()
     {
         manager.settings["settings"]["previewStripCollapsed"] = is_collapsed;
     });
+
+    thumbnail_worker = std::make_unique<Thumbnails::ThumbnailWorker>(
+                           std::make_unique<Http::CurlHttpClient>(CaBundle::Find()), ThumbnailCache(ThumbnailCache::DefaultRoot()));
+    connect(preview_strip, &PreviewStrip::thumbnails_needed, this, [this](std::vector<std::uint64_t> workshop_ids)
+    {
+        auto deliver = [strip = preview_strip](std::uint64_t id, std::optional<std::filesystem::path> image)
+        {
+            if (image)
+                strip->deliver_thumbnail(id, *image);
+        };
+        thumbnail_worker->Request(std::move(workshop_ids), std::move(deliver));
+    });
 }
 
 void MainWindow::setup_mod_search()
@@ -203,6 +218,7 @@ void MainWindow::setup_mod_search()
 
 MainWindow::~MainWindow()
 {
+    thumbnail_worker.reset();
     if (update_notification_thread.joinable())
         update_notification_thread.join();
     manager.save_settings_from_ui(ui);
