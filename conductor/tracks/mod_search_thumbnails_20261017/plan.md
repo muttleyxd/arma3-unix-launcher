@@ -48,5 +48,5 @@
     - [x] Card button and table context menu for Workshop mods; `QDesktopServices::openUrl` with browser fallback
 - [x] Task: Large-list check 5d5c1d1
     - [x] Script that creates 500 fake Workshop mods in a temp Arma layout; confirm filtering and scrolling stay responsive
-- [~] Task: Update `tech-stack.md` (new common modules, Web API usage, cache location)
+- [x] Task: Update `tech-stack.md` (new common modules, Web API usage, cache location) 9f2f8eb
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Integration' (Protocol in workflow.md)
