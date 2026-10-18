@@ -38,11 +38,11 @@
 - [x] Task: Search box 8524f2a
     - [x] Add search field above the mod table; filter rows with `ModSearch` (`setRowHidden`), Esc clears, ⌘F focuses
     - [x] Disable drag reordering while filtered; verify selected-mods counter unaffected
-- [~] Task: Preview strip widget (`previewstrip.{h,cpp}`)
-    - [ ] Horizontal `QListView` (icon mode, uniform item sizes) over a model of the visible mods; placeholder card art
-    - [ ] Two-way selection sync with the table, centre on selection, arrow keys / wheel scrolling
-    - [ ] Collapse toggle persisted in settings
-- [ ] Task: Thumbnails in the UI
+- [x] Task: Preview strip widget (`previewstrip.{h,cpp}`) c156e5d
+    - [x] Horizontal `QListView` (icon mode, uniform item sizes) over a model of the visible mods; placeholder card art
+    - [x] Two-way selection sync with the table, centre on selection, arrow keys / wheel scrolling
+    - [x] Collapse toggle persisted in settings
+- [~] Task: Thumbnails in the UI
     - [ ] Run `ThumbnailService` off the UI thread, deliver images via queued signals, scale once and cache `QPixmap`s
 - [ ] Task: Open in Steam
     - [ ] Card button and table context menu for Workshop mods; `QDesktopServices::openUrl` with browser fallback
