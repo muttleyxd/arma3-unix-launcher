@@ -1,8 +1,8 @@
 {
   "track_id": "mod_search_thumbnails_20261017",
   "type": "feature",
-  "status": "new",
+  "status": "completed",
   "created_at": "2026-10-17T15:24:39Z",
-  "updated_at": "2026-10-17T15:24:39Z",
+  "updated_at": "2026-10-18T10:03:00Z",
   "description": "mod search with workshop links and thumbnails with a carosel browser"
 }
