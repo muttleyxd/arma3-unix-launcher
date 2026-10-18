@@ -17,7 +17,7 @@
     - [x] Implement and switch `update_checker.cpp` to it
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Search, Links and HTTPS Foundations' (Protocol in workflow.md)
 
-## Phase 2: Workshop Preview Metadata and Thumbnail Cache
+## Phase 2: Workshop Preview Metadata and Thumbnail Cache [checkpoint: 5310a77]
 - [x] Task: HTTP client interface (`common/http_client.{hpp,cpp}`) 4263279
     - [x] `IHttpClient` (POST form / GET bytes → `std::optional`), libcurl C API implementation (curlpp throws) using the CA bundle; trompeloeil mock in `tests/unit/mock`
 - [x] Task: Web API request building (`common/workshop_details.{hpp,cpp}`) e851908
